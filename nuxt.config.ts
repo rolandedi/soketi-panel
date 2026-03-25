@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: "en",
       },
+      meta: [{ name: "robots", content: "noindex, nofollow" }],
       link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
     },
   },
