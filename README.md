@@ -38,6 +38,14 @@ Locally preview production build:
 pnpm preview
 ```
 
+## Génération des clés
+
+```bash
+openssl rand -hex 16   # APP_ID
+openssl rand -hex 32   # APP_KEY
+openssl rand -hex 64   # APP_SECRET
+```
+
 ## License
 
 Under GPL-3.0 License

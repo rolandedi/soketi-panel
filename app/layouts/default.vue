@@ -4,7 +4,7 @@
   >
     <Navbar />
 
-    <main class="flex-1 overflow-x-hidden overflow-y-auto">
+    <main class="flex-1">
       <div :class="cn('max-w-6xl mx-auto p-4 md:p-6', props.class)">
         <slot />
       </div>

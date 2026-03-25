@@ -1,5 +1,7 @@
 <template>
-  <header class="border-b px-4 md:px-6">
+  <header
+    class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 md:px-6"
+  >
     <div
       class="flex h-16 items-center justify-between gap-4 max-w-6xl mx-auto px-4 md:px-6"
     >
@@ -45,17 +47,18 @@
                   class="w-full"
                 >
                   <NavigationMenuLink
-                    :href="link.href"
+                    as-child
                     class="flex-row items-center gap-2 py-1.5"
                     :active="link.active"
                   >
-                    <component
-                      :is="link.icon"
-                      :size="16"
-                      class="text-muted-foreground/80"
-                      aria-hidden="true"
-                    />
-                    <span>{{ link.label }}</span>
+                    <NuxtLink :to="link.href">
+                      <component
+                        :is="link.icon"
+                        :size="16"
+                        aria-hidden="true"
+                      />
+                      <span>{{ link.label }}</span>
+                    </NuxtLink>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -64,10 +67,10 @@
         </Popover>
         <!-- Logo -->
         <div class="flex items-center">
-          <a href="#" class="flex items-center gap-2">
+          <NuxtLink to="/" class="flex items-center gap-2">
             <img src="/logo.png" alt="Soketi Panel" class="size-8" />
             <span class="text-xl font-bold">Soketi Panel</span>
-          </a>
+          </NuxtLink>
         </div>
       </div>
       <!-- Middle area -->
@@ -77,20 +80,22 @@
             <NavigationMenuItem v-if="!item.children">
               <NavigationMenuLink
                 :active="item.active"
-                :href="item.href"
+                as-child
                 class="text-foreground hover:text-primary flex-row items-center gap-2 py-1.5 font-medium"
               >
-                <component
-                  :is="item.icon"
-                  :size="16"
-                  class="text-muted-foreground/80"
-                  aria-hidden="true"
-                />
-                <span class="text-nowrap">{{ item.label }}</span>
+                <NuxtLink :to="item.href">
+                  <component :is="item.icon" :size="16" aria-hidden="true" />
+                  <span class="text-nowrap">{{ item.label }}</span>
+                </NuxtLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem v-else>
-              <NavigationMenuTrigger>{{ item.label }}</NavigationMenuTrigger>
+              <NavigationMenuTrigger
+                class="hover:text-primary data-[state=open]:text-primary"
+                :class="item.active ? 'text-primary' : ''"
+              >
+                {{ item.label }}
+              </NavigationMenuTrigger>
               <NavigationMenuContent align="end">
                 <ul class="grid w-50 gap-4">
                   <li>
@@ -98,10 +103,14 @@
                       v-for="(child, idx) in item.children"
                       :key="idx"
                       as-child
+                      :active="child.active"
                     >
-                      <a :href="child.href" class="flex-row items-center gap-2">
+                      <NuxtLink
+                        :to="child.href"
+                        class="flex-row items-center gap-2"
+                      >
                         {{ child.label }}
-                      </a>
+                      </NuxtLink>
                     </NavigationMenuLink>
                   </li>
                 </ul>
@@ -153,7 +162,7 @@ interface MenuItem {
 
 const route = useRoute();
 
-const menuItems: MenuItem[] = [
+const menuItems = computed<MenuItem[]>(() => [
   {
     href: "/",
     label: "Dashboard",
@@ -182,6 +191,7 @@ const menuItems: MenuItem[] = [
     href: "#",
     label: "Documentation",
     icon: BookOpen,
+    active: route.path.startsWith("/docs/"),
     children: [
       {
         href: "/docs/client",
@@ -195,5 +205,5 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-];
+]);
 </script>

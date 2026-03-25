@@ -3,7 +3,7 @@
     class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
   >
     <div>
-      <h2 class="text-2xl font-bold tracking-tight">{{ title }}</h2>
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">{{ title }}</h2>
       <p v-if="description" class="text-muted-foreground">
         {{ description }}
       </p>
