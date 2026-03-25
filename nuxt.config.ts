@@ -13,9 +13,11 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2025-07-15",
+  colorMode: {
+    classSuffix: "",
+  },
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "shadcn-nuxt"],
-
+  modules: ["@nuxt/eslint", "shadcn-nuxt", "@nuxtjs/color-mode"],
   css: ["~/assets/css/tailwind.css"],
   vite: {
     plugins: [tailwindcss()],
