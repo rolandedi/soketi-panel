@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/eslint": "1.15.2",
     "@tanstack/vue-table": "^8.21.3",
+    "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.2.1",
     "better-auth": "^1.5.6",
     "better-sqlite3": "^12.8.0",
@@ -27,6 +28,7 @@
     "shadcn-nuxt": "2.4.3",
     "sqlite3": "^6.0.1",
     "tailwind-merge": "^3.5.0",
+    "vee-validate": "^4.15.1",
     "vue": "^3.5.30",
     "vue-input-otp": "^0.3.2",
     "vue-router": "^5.0.4",
