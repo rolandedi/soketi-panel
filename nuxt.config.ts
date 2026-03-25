@@ -61,8 +61,14 @@ export default defineNuxtConfig({
     pusherTls: process.env.PUSHER_TLS || "0",
 
     public: {
+      betterAuthUrl: process.env.BETTER_AUTH_URL,
       soketiHost: process.env.SOKETI_HOST || "127.0.0.1",
       soketiPort: process.env.SOKETI_PORT || "6001",
+      pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
+      pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
+      pusherPort: process.env.PUSHER_PORT || "6001",
+      pusherScheme: process.env.PUSHER_SCHEME || "http",
+      pusherTls: process.env.PUSHER_TLS || "0",
     },
   },
 });
