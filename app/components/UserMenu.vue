@@ -1,12 +1,12 @@
 <template>
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="ghost" class="h-auto p-0 hover:bg-transparent">
+        <Button variant="ghost" class="h-auto p-0 hover:bg-transparent">
         <Avatar>
           <AvatarImage src="./avatar.jpg" alt="Profile image" />
           <AvatarFallback>KK</AvatarFallback>
         </Avatar>
-        <LucideChevronDown class="size-4 opacity-60" aria-hidden="true" />
+        <LucideChevronDown class="size-4" aria-hidden="true" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent class="max-w-64" align="end">
@@ -20,9 +20,11 @@
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem>
-          <UserIcon class="size-4 opacity-60" aria-hidden="true" />
-          <span>Profile</span>
+        <DropdownMenuItem as-child>
+          <NuxtLink to="/profile" class="flex w-full items-center">
+            <UserIcon class="size-4" aria-hidden="true" />
+            <span>Profile</span>
+          </NuxtLink>
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
@@ -31,7 +33,7 @@
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem>
-        <LucideLogOut class="size-4 opacity-60" aria-hidden="true" />
+        <LucideLogOut class="size-4" aria-hidden="true" />
         <span>Logout</span>
       </DropdownMenuItem>
     </DropdownMenuContent>
