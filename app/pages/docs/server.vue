@@ -1,9 +1,18 @@
 <template>
-  <div>
-    <h1>Server Docs Page</h1>
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    </p>
+  <div class="space-y-6">
+    <PageHero
+      title="Server configuration"
+      description="Learn more about Soketi Server configuration."
+    />
+
+    <Card>
+      <CardContent>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+          quod.
+        </p>
+      </CardContent>
+    </Card>
   </div>
 </template>
 
