@@ -25,33 +25,33 @@
 - [ ] **1.5 Layouts et Structure UI**
   - [x] Layout principal `default.vue` avec Sidebar.
   - [x] Layout spécial d'authentification `auth.vue`.
-  - [ ] Pages stubs (déjà créées, à habiller par la suite).
+  - [x] Pages stubs (déjà créées, à habiller par la suite).
 
 ---
 
 ## 🔐 Phase 2 : Authentification (Better Auth)
 
-- [ ] **2.1 Base de Données & Migrations (Auth)**
-  - [ ] Générer une migration pour les tables Better Auth (`user`, `session`, `account`, `verification`).
-  - [ ] Exécuter la migration (`migrate:latest`).
-- [ ] **2.2 Configuration Serveur API (Better Auth)**
-  - [ ] Instancier Better Auth dans `server/utils/auth.ts` avec plugin `emailAndPassword` et DB Knex.
-  - [ ] Créer le route handler `server/api/auth/[...all].ts` pour l'API REST.
-- [ ] **2.3 Composables Nuxt (Frontend)**
-  - [ ] Intégrer l'instance client `app/lib/auth-client.ts`.
-  - [ ] Exposer les états avec un composable réactif `useAuth.ts` (signIn, signOut, useSession).
-- [ ] **2.4 UI Login & Protection des Routes**
-  - [ ] Page login `app/pages/auth/login.vue` (UI avec zod, shadcn, et formulaires).
-  - [ ] Middleware global `app/middleware/auth.ts` redirigeant les non-authentifiés.
-  - [ ] Protéger conditionnellement l'affichage du header et de la sidebar (bouton Logout).
-  - [ ] (Optionnel) Script de seeding pour le compte Admin.
+- [x] **2.1 Base de Données & Migrations (Auth)**
+  - [x] Générer une migration pour les tables Better Auth (`user`, `session`, `account`, `verification`).
+  - [x] Exécuter la migration (`migrate:latest`).
+- [x] **2.2 Configuration Serveur API (Better Auth)**
+  - [x] Instancier Better Auth dans `server/utils/auth.ts` avec plugin `emailAndPassword` et DB Knex.
+  - [x] Créer le route handler `server/api/auth/[...all].ts` pour l'API REST.
+- [x] **2.3 Composables Nuxt (Frontend)**
+  - [x] Intégrer l'instance client `app/lib/auth-client.ts`.
+  - [x] Exposer les états avec un composable réactif `useAuth.ts` (signIn, signOut, useSession).
+- [x] **2.4 UI Login & Protection des Routes**
+  - [x] Page login `app/pages/auth/login.vue` (UI avec zod, shadcn, et formulaires).
+  - [x] Middleware global `app/middleware/auth.ts` redirigeant les non-authentifiés.
+  - [x] Protéger conditionnellement l'affichage du header et de la sidebar (bouton Logout).
+  - [x] (Optionnel) Script de seeding pour le compte Admin.
 
 ---
 
 ## 📱 Phase 3 : Gestion des Applications Soketi (Core CRUD)
 
-- [ ] **3.1 Modèle de Données (Soketi Apps)**
-  - [ ] Migration table `soketi_apps` (`id`, `name`, `app_id`, `app_key`, `app_secret`, `max_connections`, etc).
+- [x] **3.1 Modèle de Données (Soketi Applications)**
+  - [x] Migration table `soketi_applications` (`id`, `name`, `app_id`, `app_key`, `app_secret`, `max_connections`, etc).
 - [ ] **3.2 API Routes Server (Nitro)**
   - [ ] `GET /api/applications` : Lister.
   - [ ] `POST /api/applications` : Créer (génération sécurisée app id/key/secret).

@@ -1,10 +1,5 @@
 # 📊 Analyse Mise à Jour — Soketi Panel
 
-> **Date** : 24 mars 2026 — **v2**  
-> **Statut actuel** : Phase 1 (Fondations) en cours — Design system installé ✅
-
----
-
 ## 1. Ce qui a changé depuis la v1
 
 | Ajout | Détail |
@@ -68,10 +63,13 @@ Package mgr    : pnpm
 ---
 
 ### 🏗️ Phase 1 — Complétion des Fondations (Suite)
+
 **Estimé** : 2-3 jours restants
 
 #### 1.1 Configuration & Environnement
+
 - [ ] Ajouter `runtimeConfig` dans [nuxt.config.ts](file:///Users/rolandedi/dev/codivoire/soketi-panel/nuxt.config.ts) :
+
   ```ts
   runtimeConfig: {
     soketiHost: '', soketiPort: '6001',
@@ -80,19 +78,23 @@ Package mgr    : pnpm
     public: { soketiHost: '', soketiPort: '' }
   }
   ```
+
 - [ ] Créer `.env.example`
 - [ ] Configurer knex : `server/utils/db.ts` + connexion SQLite dev / PG prod
 
 #### 1.2 Layouts & Navigation
+
 - [ ] [layouts/default.vue](file:///Users/rolandedi/dev/codivoire/soketi-panel/app/layouts/default.vue) : sidebar avec navigation (Applications, Playground, Docs, Users), header, zone principale
 - [ ] [layouts/auth.vue](file:///Users/rolandedi/dev/codivoire/soketi-panel/app/layouts/auth.vue) : layout centré minimaliste
 
 #### 1.3 Middleware
+
 - [ ] [middleware/auth.ts](file:///Users/rolandedi/dev/codivoire/soketi-panel/app/middleware/auth.ts) : rediriger vers `/auth/login` si pas de session
 
 ---
 
 ### 🔐 Phase 2 — Authentification
+
 **Estimé** : 4-5 jours
 
 - [ ] `server/utils/auth.ts` : instance better-auth + knex adapter
@@ -105,6 +107,7 @@ Package mgr    : pnpm
 ---
 
 ### 📱 Phase 3 — Gestion Applications Soketi
+
 **Estimé** : 1 semaine
 
 - [ ] Migration DB : table `soketi_apps`
@@ -115,6 +118,7 @@ Package mgr    : pnpm
 ---
 
 ### 🎮 Phase 4 — Playground WebSocket
+
 **Estimé** : 4-5 jours
 
 - [ ] Connexion pusher-js (client only via `import.meta.client`)
@@ -124,6 +128,7 @@ Package mgr    : pnpm
 ---
 
 ### 📚 Phase 5 — Documentation, QA & Deploy
+
 **Estimé** : 3-4 jours
 
 - [ ] Pages [docs/client.vue](file:///Users/rolandedi/dev/codivoire/soketi-panel/app/pages/docs/client.vue) et [docs/server.vue](file:///Users/rolandedi/dev/codivoire/soketi-panel/app/pages/docs/server.vue) avec code examples
