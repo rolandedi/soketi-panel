@@ -38,11 +38,29 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    databaseUrl: process.env.DATABASE_URL || "sqlite://./data.db",
-    soketiAppId: process.env.SOKETI_APP_ID,
-    soketiKey: process.env.SOKETI_KEY,
-    soketiSecret: process.env.SOKETI_SECRET,
+    appName: process.env.APP_NAME || "Soketi Panel",
+    appUrl: process.env.APP_URL || "http://localhost:3000",
+
     betterAuthSecret: process.env.BETTER_AUTH_SECRET,
+    betterAuthUrl: process.env.BETTER_AUTH_URL,
+
+    dbDriver: process.env.DB_DRIVER,
+    dbHost: process.env.DB_HOST,
+    dbPort: process.env.DB_PORT,
+    dbName: process.env.DB_NAME,
+    dbUser: process.env.DB_USER,
+    dbPassword: process.env.DB_PASSWORD,
+    dbPrefix: process.env.DB_PREFIX,
+
+    soketiMetricsHost: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
+    soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
+
+    pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
+    pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
+    pusherPort: process.env.PUSHER_PORT || "6001",
+    pusherScheme: process.env.PUSHER_SCHEME || "http",
+    pusherTls: process.env.PUSHER_TLS || "0",
+
     public: {
       soketiHost: process.env.SOKETI_HOST || "127.0.0.1",
       soketiPort: process.env.SOKETI_PORT || "6001",
