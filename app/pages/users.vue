@@ -5,7 +5,7 @@
     </PageHero>
 
     <div class="space-y-4">
-      <DataTable :columns="usersColumns" :data="data" filter-column="name" />
+      <DataTable v-model="data" :columns="usersColumns" filter-column="name" />
     </div>
   </div>
 </template>

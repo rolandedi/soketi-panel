@@ -93,6 +93,6 @@ export const usersColumns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => h(DataTableRowActions, { row }),
+    cell: ({ row }: any) => h(DataTableRowActions, { row }),
   },
 ];
