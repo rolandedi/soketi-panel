@@ -5,7 +5,7 @@
       <CardDescription> Login with your email account </CardDescription>
     </CardHeader>
     <CardContent>
-      <form>
+      <form @submit="onSubmit">
         <FieldGroup>
           <Field>
             <FieldLabel for="email">Email</FieldLabel>
@@ -15,6 +15,7 @@
               id="email"
               type="email"
               placeholder="m@example.com"
+              :disabled="isLoading"
             />
             <FieldError :errors="[errors.email]" />
           </Field>
@@ -27,6 +28,7 @@
                 id="password"
                 placeholder="********"
                 :type="showPassword ? 'text' : 'password'"
+                :disabled="isLoading"
               />
               <Button
                 variant="ghost"
@@ -34,6 +36,7 @@
                 type="button"
                 class="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 @click="showPassword = !showPassword"
+                :disabled="isLoading"
               >
                 <EyeIcon v-if="!showPassword" class="w-5 h-5" />
                 <EyeOffIcon v-else class="w-5 h-5" />
@@ -47,12 +50,16 @@
                 v-model="remember"
                 v-bind="rememberAttrs"
                 id="remember"
+                :disabled="isLoading"
               />
               <Label for="remember">Remember me</Label>
             </div>
           </Field>
           <Field>
-            <Button type="submit">Login</Button>
+            <Button type="submit" :disabled="isLoading">
+              <Loader2Icon v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
+              Login
+            </Button>
           </Field>
         </FieldGroup>
       </form>
@@ -64,6 +71,7 @@
 import { useForm } from "vee-validate";
 import { z } from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
+import { toast } from "vue-sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,7 +90,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { EyeIcon, EyeOffIcon } from "lucide-vue-next";
+import { EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-vue-next";
+import { useAuth } from "~/composables/useAuth";
 
 definePageMeta({
   layout: "auth",
@@ -91,6 +100,10 @@ definePageMeta({
 useHead({ title: "Login" });
 
 const showPassword = ref(false);
+const isLoading = ref(false);
+
+const { signIn } = useAuth();
+const router = useRouter();
 
 const { errors, handleSubmit, defineField } = useForm({
   validationSchema: toTypedSchema(
@@ -112,4 +125,20 @@ const { errors, handleSubmit, defineField } = useForm({
 const [email, emailAttrs] = defineField("email");
 const [password, passwordAttrs] = defineField("password");
 const [remember, rememberAttrs] = defineField("remember");
+
+const onSubmit = handleSubmit(async (values) => {
+  isLoading.value = true;
+  
+  const { data, error } = await signIn(values.email, values.password);
+  
+  isLoading.value = false;
+  
+  if (error) {
+    toast.error(error.message || "Failed to sign in. Please check your credentials.");
+    return;
+  }
+  
+  toast.success("Successfully logged in");
+  router.push("/");
+});
 </script>
