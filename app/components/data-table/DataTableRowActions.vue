@@ -1,5 +1,7 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TData">
 import { type Row } from "@tanstack/vue-table";
+import { LucideEllipsis } from "lucide-vue-next";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,11 +11,9 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LucideEllipsis } from "lucide-vue-next";
-import type { User } from "../table-columns/usersColumns";
 
 interface DataTableRowActionsProps {
-  row: Row<User>;
+  row: Row<TData>;
 }
 
 defineProps<DataTableRowActionsProps>();

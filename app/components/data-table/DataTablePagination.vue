@@ -1,24 +1,25 @@
 <script setup lang="ts" generic="TData">
-import { type Table } from "@tanstack/vue-table"
-import { Button } from "@/components/ui/button"
+import { type Table } from "@tanstack/vue-table";
+import {
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideChevronsLeft,
+  LucideChevronsRight,
+} from "lucide-vue-next";
+
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import {
-  LucideChevronLeft,
-  LucideChevronRight,
-  LucideChevronsLeft,
-  LucideChevronsRight,
-} from "lucide-vue-next"
+} from "@/components/ui/select";
 
 interface DataTablePaginationProps {
-  table: Table<TData>
+  table: Table<TData>;
 }
-defineProps<DataTablePaginationProps>()
+defineProps<DataTablePaginationProps>();
 </script>
 
 <template>
@@ -35,10 +36,16 @@ defineProps<DataTablePaginationProps>()
           @update:model-value="(value) => table.setPageSize(Number(value))"
         >
           <SelectTrigger class="h-8 w-17.5">
-            <SelectValue :placeholder="`${table.getState().pagination.pageSize}`" />
+            <SelectValue
+              :placeholder="`${table.getState().pagination.pageSize}`"
+            />
           </SelectTrigger>
           <SelectContent side="top">
-            <SelectItem v-for="pageSize in [10, 20, 30, 40, 50]" :key="pageSize" :value="`${pageSize}`">
+            <SelectItem
+              v-for="pageSize in [10, 20, 30, 40, 50]"
+              :key="pageSize"
+              :value="`${pageSize}`"
+            >
               {{ pageSize }}
             </SelectItem>
           </SelectContent>

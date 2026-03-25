@@ -1,45 +1,46 @@
 <script setup lang="ts" generic="TData, TValue">
-import type { Column } from "@tanstack/vue-table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { computed, type Component } from "vue";
+import { LucidePlusCircle } from "lucide-vue-next";
+import type { Column } from "@tanstack/vue-table";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
-import { LucidePlusCircle } from "lucide-vue-next"
-import { computed, type Component } from "vue"
+} from "@/components/ui/popover";
 
 interface DataTableFacetedFilterProps {
-  column?: Column<TData, TValue>
-  title?: string
+  column?: Column<TData, TValue>;
+  title?: string;
   options: {
-    label: string
-    value: string
-    icon?: Component
-  }[]
+    label: string;
+    value: string;
+    icon?: Component;
+  }[];
 }
 
-const props = defineProps<DataTableFacetedFilterProps>()
+const props = defineProps<DataTableFacetedFilterProps>();
 
-const selectedValues = computed(() => new Set(props.column?.getFilterValue() as string[]))
+const selectedValues = computed(
+  () => new Set(props.column?.getFilterValue() as string[]),
+);
 
 function handleSelect(value: string, checked: boolean) {
   if (checked) {
-    selectedValues.value.add(value)
+    selectedValues.value.add(value);
   } else {
-    selectedValues.value.delete(value)
+    selectedValues.value.delete(value);
   }
-  const filterValues = Array.from(selectedValues.value)
-  props.column?.setFilterValue(
-    filterValues.length ? filterValues : undefined,
-  )
+  const filterValues = Array.from(selectedValues.value);
+  props.column?.setFilterValue(filterValues.length ? filterValues : undefined);
 }
 
-const facets = computed(() => props.column?.getFacetedUniqueValues())
+const facets = computed(() => props.column?.getFacetedUniqueValues());
 </script>
 
 <template>
@@ -66,7 +67,9 @@ const facets = computed(() => props.column?.getFacetedUniqueValues())
             </Badge>
             <template v-else>
               <Badge
-                v-for="option in options.filter((opt) => selectedValues.has(opt.value))"
+                v-for="option in options.filter((opt) =>
+                  selectedValues.has(opt.value),
+                )"
                 :key="option.value"
                 variant="secondary"
                 class="rounded-sm px-1 font-normal"
@@ -80,11 +83,17 @@ const facets = computed(() => props.column?.getFacetedUniqueValues())
     </PopoverTrigger>
     <PopoverContent class="w-50 p-3" align="start">
       <div class="space-y-3">
-        <div v-for="option in options" :key="option.value" class="flex items-center space-x-2">
+        <div
+          v-for="option in options"
+          :key="option.value"
+          class="flex items-center space-x-2"
+        >
           <Checkbox
             :id="option.value"
             :checked="selectedValues.has(option.value)"
-            @update:model-value="(checked) => handleSelect(option.value, !!checked)"
+            @update:model-value="
+              (checked) => handleSelect(option.value, !!checked)
+            "
           />
           <Label
             :for="option.value"
@@ -98,7 +107,10 @@ const facets = computed(() => props.column?.getFacetedUniqueValues())
               />
               {{ option.label }}
             </div>
-            <span v-if="facets?.get(option.value)" class="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+            <span
+              v-if="facets?.get(option.value)"
+              class="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs"
+            >
               {{ facets.get(option.value) }}
             </span>
           </Label>

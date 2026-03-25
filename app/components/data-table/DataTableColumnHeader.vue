@@ -1,26 +1,35 @@
 <script setup lang="ts" generic="TData, TValue">
-import type { Column } from "@tanstack/vue-table"
-import { Button } from "@/components/ui/button"
+import type { Column } from "@tanstack/vue-table";
+import {
+  LucideArrowDown,
+  LucideArrowUp,
+  LucideChevronsUpDown,
+  LucideEyeOff,
+} from "lucide-vue-next";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { LucideArrowDown, LucideArrowUp, LucideChevronsUpDown, LucideEyeOff } from "lucide-vue-next"
+} from "@/components/ui/dropdown-menu";
 
 interface DataTableColumnHeaderProps {
-  column: Column<TData, TValue>
-  title: string
+  column: Column<TData, TValue>;
+  title: string;
 }
 
-defineProps<DataTableColumnHeaderProps>()
+defineProps<DataTableColumnHeaderProps>();
 </script>
 
 <template>
-  <div v-if="column.getCanSort()" :class="cn('flex items-center space-x-2', $attrs.class ?? '')">
+  <div
+    v-if="column.getCanSort()"
+    :class="cn('flex items-center space-x-2', $attrs.class ?? '')"
+  >
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
@@ -29,8 +38,14 @@ defineProps<DataTableColumnHeaderProps>()
           class="-ml-3 h-8 data-[state=open]:bg-accent"
         >
           <span>{{ title }}</span>
-          <LucideArrowDown v-if="column.getIsSorted() === 'desc'" class="ml-2 h-4 w-4" />
-          <LucideArrowUp v-else-if="column.getIsSorted() === 'asc'" class="ml-2 h-4 w-4" />
+          <LucideArrowDown
+            v-if="column.getIsSorted() === 'desc'"
+            class="ml-2 h-4 w-4"
+          />
+          <LucideArrowUp
+            v-else-if="column.getIsSorted() === 'asc'"
+            class="ml-2 h-4 w-4"
+          />
           <LucideChevronsUpDown v-else class="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

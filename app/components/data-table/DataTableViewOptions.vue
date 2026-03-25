@@ -1,5 +1,8 @@
 <script setup lang="ts" generic="TData">
+import { computed } from "vue";
 import { type Table } from "@tanstack/vue-table";
+import { LucideSettings2 } from "lucide-vue-next";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,8 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LucideSettings2 } from "lucide-vue-next";
-import { computed } from "vue";
 
 interface DataTableViewOptionsProps {
   table: Table<TData>;

@@ -1,27 +1,30 @@
 <script setup lang="ts" generic="TData">
-import { type Table } from "@tanstack/vue-table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { LucideX } from "lucide-vue-next"
-import DataTableViewOptions from "./DataTableViewOptions.vue"
-import DataTableFacetedFilter from "./DataTableFacetedFilter.vue"
-import { computed } from "vue"
+import { computed } from "vue";
+import { type Table } from "@tanstack/vue-table";
+import { LucideX } from "lucide-vue-next";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import DataTableViewOptions from "./DataTableViewOptions.vue";
+import DataTableFacetedFilter from "./DataTableFacetedFilter.vue";
 
 interface DataTableToolbarProps {
-  table: Table<TData>
-  filterColumn?: string
+  table: Table<TData>;
+  filterColumn?: string;
 }
 
-const props = defineProps<DataTableToolbarProps>()
+const props = defineProps<DataTableToolbarProps>();
 
-const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
+const isFiltered = computed(
+  () => props.table.getState().columnFilters.length > 0,
+);
 
 // Status options for the faceted filter (specific to User table but could be abstracted)
 const statuses = [
   { label: "Active", value: "Active" },
   { label: "Inactive", value: "Inactive" },
   { label: "Pending", value: "Pending" },
-]
+];
 </script>
 
 <template>
@@ -30,15 +33,19 @@ const statuses = [
       <Input
         v-if="filterColumn"
         placeholder="Filter..."
-        :model-value="(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ''"
+        :model-value="
+          (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ''
+        "
         class="h-8 w-37.5 lg:w-62.5"
-        @input="table.getColumn(filterColumn)?.setFilterValue($event.target.value)"
+        @input="
+          table.getColumn(filterColumn)?.setFilterValue($event.target.value)
+        "
       />
-      
+
       <DataTableFacetedFilter
         v-if="table.getColumn('status')"
-        :column="table.getColumn('status')"
         title="Status"
+        :column="table.getColumn('status')"
         :options="statuses"
       />
 
