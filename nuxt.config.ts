@@ -1,8 +1,17 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  app: {
+    head: {
+      title: "Soketi Panel", // default fallback title
+      htmlAttrs: {
+        lang: "en",
+      },
+      link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
+    },
+  },
 
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["@nuxt/eslint", "shadcn-nuxt"],
 
