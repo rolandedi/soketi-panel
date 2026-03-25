@@ -4,7 +4,7 @@
       title="Applications"
       description="Manage your Soketi applications."
     >
-      <Button><PlusIcon class="w-4 h-4 mr-2" /> New application</Button>
+      <Button><PlusIcon /> New application</Button>
     </PageHero>
 
     <!-- Stats Cards -->
@@ -41,29 +41,6 @@
       </Card>
     </div>
 
-    <!-- Filter Toggle -->
-    <div class="flex justify-center mt-10">
-      <div
-        class="inline-flex items-center rounded-lg border bg-card p-1.5 shadow-sm"
-      >
-        <button
-          class="flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium bg-primary/10 text-primary transition-colors"
-        >
-          <ListFilter class="w-4 h-4" /> All
-        </button>
-        <button
-          class="flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
-        >
-          <CheckCircle class="w-4 h-4" /> Active
-        </button>
-        <button
-          class="flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
-        >
-          <XCircle class="w-4 h-4" /> Inactive
-        </button>
-      </div>
-    </div>
-
     <!-- Data Table Card -->
     <Card class="p-0">
       <div class="flex items-center justify-between p-6 pb-0">
@@ -73,8 +50,25 @@
           />
           <Input type="search" placeholder="Search" class="pl-9 h-9" />
         </div>
-        <div>
-          <Button><PlusIcon class="w-4 h-4 mr-2" /> New application</Button>
+        <div class="flex items-center justify-end gap-2">
+          <Select>
+            <SelectTrigger class="w-36">
+              <SelectValue placeholder="10" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="10">
+                  <ListFilter class="w-4 h-4" /> All
+                </SelectItem>
+                <SelectItem value="25">
+                  <CheckCircle class="w-4 h-4" /> Active
+                </SelectItem>
+                <SelectItem value="50">
+                  <XCircle class="w-4 h-4" /> Inactive
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
