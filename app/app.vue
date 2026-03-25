@@ -3,3 +3,11 @@
     <NuxtPage />
   </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+useHead({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${titleChunk} - Soketi Panel` : "Soketi Panel";
+  },
+});
+</script>
