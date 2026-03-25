@@ -151,18 +151,48 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
+const route = useRoute();
+
 const menuItems: MenuItem[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/applications", label: "Applications", icon: AppWindow },
-  { href: "/users", label: "Users", icon: Users },
-  { href: "/playground", label: "Playground", icon: Play },
+  {
+    href: "/",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    active: route.path === "/",
+  },
+  {
+    href: "/applications",
+    label: "Applications",
+    icon: AppWindow,
+    active: route.path === "/applications",
+  },
+  {
+    href: "/users",
+    label: "Users",
+    icon: Users,
+    active: route.path === "/users",
+  },
+  {
+    href: "/playground",
+    label: "Playground",
+    icon: Play,
+    active: route.path === "/playground",
+  },
   {
     href: "#",
     label: "Documentation",
     icon: BookOpen,
     children: [
-      { href: "/docs/client", label: "Client configuration" },
-      { href: "/docs/server", label: "Server configuration" },
+      {
+        href: "/docs/client",
+        label: "Client configuration",
+        active: route.path === "/docs/client",
+      },
+      {
+        href: "/docs/server",
+        label: "Server configuration",
+        active: route.path === "/docs/server",
+      },
     ],
   },
 ];
