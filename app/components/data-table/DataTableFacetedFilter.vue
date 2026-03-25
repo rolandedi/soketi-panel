@@ -1,6 +1,10 @@
 <script setup lang="ts" generic="TData, TValue">
 import { computed, type Component } from "vue";
-import { LucidePlusCircle } from "lucide-vue-next";
+import {
+  LucideFilter,
+  LucideListFilter,
+  LucidePlusCircle,
+} from "lucide-vue-next";
 import type { Column } from "@tanstack/vue-table";
 
 import { Badge } from "@/components/ui/badge";
@@ -46,8 +50,8 @@ const facets = computed(() => props.column?.getFacetedUniqueValues());
 <template>
   <Popover>
     <PopoverTrigger asChild>
-      <Button variant="outline" size="sm" class="h-8 border-dashed">
-        <LucidePlusCircle class="mr-2 h-4 w-4" />
+      <Button variant="outline">
+        <LucideFilter class="size-4" />
         {{ title }}
         <template v-if="selectedValues.size > 0">
           <Separator orientation="vertical" class="mx-2 h-4" />

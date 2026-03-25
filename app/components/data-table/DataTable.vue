@@ -76,14 +76,14 @@ import {
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
 
-interface DataTableProps {
+interface Props {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
   filterColumn?: string;
   loading?: boolean;
 }
 
-const props = defineProps<DataTableProps>();
+const props = defineProps<Props>();
+const data = defineModel<TData[]>({ default: [] });
 
 const loading = ref(props.loading || false);
 const sorting = ref<SortingState>([]);
@@ -93,7 +93,7 @@ const rowSelection = ref({});
 
 const table = useVueTable({
   get data() {
-    return props.data;
+    return data.value;
   },
   get columns() {
     return props.columns;
@@ -143,4 +143,13 @@ const table = useVueTable({
   getFacetedRowModel: getFacetedRowModel(),
   getFacetedUniqueValues: getFacetedUniqueValues(),
 });
+
+const handleDeleteRows = () => {
+  const selectedRows = table.getSelectedRowModel().rows;
+  const updatedData = data.value.filter((item: any) => {
+    return !selectedRows.some((row: any) => row.original.id === item.id);
+  });
+  data.value = updatedData;
+  table.resetRowSelection();
+};
 </script>

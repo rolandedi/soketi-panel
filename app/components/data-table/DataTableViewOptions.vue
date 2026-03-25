@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="TData">
 import { computed } from "vue";
 import { type Table } from "@tanstack/vue-table";
-import { LucideSettings2 } from "lucide-vue-next";
+import { LucideColumns3 } from "lucide-vue-next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,8 +29,8 @@ const columns = computed(() =>
 <template>
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
-        <LucideSettings2 class="mr-2 h-4 w-4" />
+      <Button variant="outline" class="hidden lg:flex">
+        <LucideColumns3 class="size-4" />
         View
       </Button>
     </DropdownMenuTrigger>
@@ -39,8 +39,8 @@ const columns = computed(() =>
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem
         v-for="column in columns"
-        :key="column.id"
         class="capitalize"
+        :key="column.id"
         :checked="column.getIsVisible()"
         @update:checked="(v?: boolean) => column.toggleVisibility(!!v)"
       >

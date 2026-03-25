@@ -1,19 +1,66 @@
+<template>
+  <div class="flex items-center justify-between">
+    <div class="flex flex-1 items-center gap-3">
+      <div class="relative">
+        <Input
+          v-if="filterColumn"
+          placeholder="Filter..."
+          class="peer ps-9 min-w-72"
+          :model-value="
+            (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ''
+          "
+          @input="
+            table.getColumn(filterColumn)?.setFilterValue($event.target.value)
+          "
+        />
+        <div
+          class="text-muted-foreground/80 pointer-events-none absolute inset-y-0 inset-s-0 flex items-center justify-center ps-3 peer-disabled:opacity-50"
+        >
+          <LucideListFilter :size="16" aria-hidden="true" />
+        </div>
+        <button
+          v-if="Boolean(table.getColumn('name')?.getFilterValue())"
+          class="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 inset-e-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Clear filter"
+          @click="() => table.resetColumnFilters()"
+        >
+          <LucideCircleX :size="16" aria-hidden="true" />
+        </button>
+      </div>
+
+      <DataTableFacetedFilter
+        v-if="table.getColumn('status')"
+        title="Status"
+        :column="table.getColumn('status')"
+        :options="statuses"
+      />
+      <DataTableDeleteItems :table="table" @delete="emit('delete')" />
+    </div>
+    <div class="flex items-center gap-2">
+      <DataTableViewOptions :table="table" />
+
+      <slot />
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts" generic="TData">
 import { computed } from "vue";
 import { type Table } from "@tanstack/vue-table";
-import { LucideX } from "lucide-vue-next";
+import { LucideCircleX, LucideListFilter } from "lucide-vue-next";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import DataTableViewOptions from "./DataTableViewOptions.vue";
 import DataTableFacetedFilter from "./DataTableFacetedFilter.vue";
+import DataTableDeleteItems from "./DataTableDeleteItems.vue";
 
-interface DataTableToolbarProps {
+interface Props {
   table: Table<TData>;
   filterColumn?: string;
 }
 
-const props = defineProps<DataTableToolbarProps>();
+const props = defineProps<Props>();
+const emit = defineEmits(["delete"]);
 
 const isFiltered = computed(
   () => props.table.getState().columnFilters.length > 0,
@@ -26,39 +73,3 @@ const statuses = [
   { label: "Pending", value: "Pending" },
 ];
 </script>
-
-<template>
-  <div class="flex items-center justify-between">
-    <div class="flex flex-1 items-center space-x-2">
-      <Input
-        v-if="filterColumn"
-        placeholder="Filter..."
-        :model-value="
-          (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ''
-        "
-        class="h-8 w-37.5 lg:w-62.5"
-        @input="
-          table.getColumn(filterColumn)?.setFilterValue($event.target.value)
-        "
-      />
-
-      <DataTableFacetedFilter
-        v-if="table.getColumn('status')"
-        title="Status"
-        :column="table.getColumn('status')"
-        :options="statuses"
-      />
-
-      <Button
-        v-if="isFiltered"
-        variant="ghost"
-        class="h-8 px-2 lg:px-3"
-        @click="table.resetColumnFilters()"
-      >
-        Reset
-        <LucideX class="ml-2 h-4 w-4" />
-      </Button>
-    </div>
-    <DataTableViewOptions :table="table" />
-  </div>
-</template>
