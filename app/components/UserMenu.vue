@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { LucideChevronDown, LucideLogOut, UserIcon } from "lucide-vue-next";
 
-import { getInitials } from "~/lib/utils";
+import { getInitials } from "#shared/utils";
 import { useAuth } from "~/composables/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
