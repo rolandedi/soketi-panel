@@ -84,17 +84,14 @@
                 class="text-foreground hover:text-primary flex-row items-center gap-2 py-1.5 font-medium"
               >
                 <NuxtLink :to="item.href">
-                  <component
-                    :is="item.icon"
-                    :size="16"
-                    aria-hidden="true"
-                  />
+                  <component :is="item.icon" :size="16" aria-hidden="true" />
                   <span class="text-nowrap">{{ item.label }}</span>
                 </NuxtLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem v-else>
               <NavigationMenuTrigger
+                class="hover:text-primary data-[state=open]:text-primary"
                 :class="item.active ? 'text-primary' : ''"
               >
                 {{ item.label }}
@@ -108,7 +105,10 @@
                       as-child
                       :active="child.active"
                     >
-                      <NuxtLink :to="child.href" class="flex-row items-center gap-2">
+                      <NuxtLink
+                        :to="child.href"
+                        class="flex-row items-center gap-2"
+                      >
                         {{ child.label }}
                       </NuxtLink>
                     </NavigationMenuLink>
