@@ -183,3 +183,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Shiki Dual Themes Styling */
+html .shiki {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+html .shiki span {
+  color: var(--shiki-light);
+}
+
+html.dark .shiki {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+html.dark .shiki span {
+  color: var(--shiki-dark);
+}
