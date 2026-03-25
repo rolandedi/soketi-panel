@@ -10,7 +10,6 @@ const config: Record<string, any> = {
   user: process.env.DB_USER || "soketi",
   database: process.env.DB_NAME || "soketi",
   password: process.env.DB_PASSWORD || "",
-  prefix: process.env.DB_PREFIX || "",
 };
 
 if (DB_DRIVER === "mysql") {
@@ -34,7 +33,7 @@ export default {
     password: config.password,
   },
   migrations: {
-    tableName: "migrations",
+    tableName: "sktp_migrations",
     directory: "database/migrations",
     extension: "ts",
   },

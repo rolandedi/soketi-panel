@@ -50,7 +50,6 @@ export default defineNuxtConfig({
     dbName: process.env.DB_NAME,
     dbUser: process.env.DB_USER,
     dbPassword: process.env.DB_PASSWORD,
-    dbPrefix: process.env.DB_PREFIX,
 
     soketiMetricsHost: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
     soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
