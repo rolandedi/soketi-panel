@@ -19,7 +19,7 @@
 import { ref, onMounted } from "vue";
 import { PlusIcon } from "lucide-vue-next";
 
-import type { User } from "#shared/types";
+import type { PaginatedResponse, User } from "#shared/types";
 import { usersColumns } from "~/table-columns/usersColumns";
 import { DataTable } from "~/components/data-table";
 import PageHero from "~/components/PageHero.vue";
@@ -37,8 +37,8 @@ async function handleFetch() {
   loading.value = true;
 
   try {
-    const users = await $fetch<User[]>("/api/users");
-    data.value = users;
+    const res = await $fetch<PaginatedResponse<User>>("/api/users");
+    data.value = res.data;
   } catch (error) {
     console.error(error);
   } finally {
