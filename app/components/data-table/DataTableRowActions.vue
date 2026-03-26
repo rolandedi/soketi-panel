@@ -8,15 +8,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableRowActionsProps {
+interface Props {
   row: Row<TData>;
 }
 
-defineProps<DataTableRowActionsProps>();
+defineProps<Props>();
 </script>
 
 <template>
@@ -24,9 +23,9 @@ defineProps<DataTableRowActionsProps>();
     <DropdownMenuTrigger asChild>
       <Button
         variant="ghost"
-        class="inline-flex h-8 w-8 p-0 data-[state=open]:bg-accent"
+        class="inline-flex size-8 p-0 data-[state=open]:bg-accent"
       >
-        <LucideEllipsis class="h-4 w-4" />
+        <LucideEllipsis class="size-4" />
         <span class="sr-only">Open menu</span>
       </Button>
     </DropdownMenuTrigger>
@@ -35,10 +34,7 @@ defineProps<DataTableRowActionsProps>();
       <DropdownMenuItem>Make a copy</DropdownMenuItem>
       <DropdownMenuItem>Favorite</DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
-        Delete
-        <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-      </DropdownMenuItem>
+      <DropdownMenuItem>Delete</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
