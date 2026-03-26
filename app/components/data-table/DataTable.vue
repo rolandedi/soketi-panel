@@ -40,14 +40,21 @@
               </TableCell>
             </TableRow>
           </template>
-          <TableRow v-else>
-            <TableCell :colspan="columns.length" class="h-24 text-center">
-              <div v-if="loading">
-                <Loader2Icon class="h-8 w-8 animate-spin" />
-              </div>
-              <div v-else>No results.</div>
-            </TableCell>
-          </TableRow>
+          <template v-else>
+            <TableRow v-if="!loading">
+              <TableCell :colspan="columns.length" class="h-24 text-center">
+                <div>No results.</div>
+              </TableCell>
+            </TableRow>
+            <template v-else>
+              <template v-if="$slots.placeholder">
+                <slot name="placeholder" />
+              </template>
+              <template v-else>
+                <DataTableSkeleton :columns-length="columns.length" />
+              </template>
+            </template>
+          </template>
         </TableBody>
       </Table>
     </div>
@@ -57,7 +64,6 @@
 
 <script setup lang="ts" generic="TData, TValue">
 import { ref } from "vue";
-import { Loader2Icon } from "lucide-vue-next";
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -83,6 +89,7 @@ import {
 } from "@/components/ui/table";
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
+import { Skeleton } from "../ui/skeleton";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
@@ -93,7 +100,7 @@ interface Props {
 const props = defineProps<Props>();
 const data = defineModel<TData[]>({ default: [] });
 
-const loading = ref(props.loading || false);
+const loading = computed(() => props.loading || false);
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
