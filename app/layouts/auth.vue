@@ -13,6 +13,8 @@
       </div>
     </div>
   </div>
+
+  <Toaster position="top-center" richColors />
 </template>
 
 <script setup lang="ts">

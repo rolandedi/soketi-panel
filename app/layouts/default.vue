@@ -10,6 +10,8 @@
       </div>
     </main>
   </div>
+
+  <Toaster position="top-center" richColors />
 </template>
 
 <script lang="ts" setup>
