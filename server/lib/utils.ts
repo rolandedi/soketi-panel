@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type ZodError } from "zod";
 import type { H3Event } from "h3";
 
 export async function validateWith(
@@ -21,4 +21,11 @@ export async function validateWith(
   }
 
   return schema.safeParse(data);
+}
+
+export function createValidationError(error: ZodError<any> | undefined) {
+  return createError({
+    statusCode: 400,
+    statusMessage: error?.issues[0]?.message || "Validation error occurred",
+  });
 }

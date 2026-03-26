@@ -1,15 +1,12 @@
 import { useAuth } from "~~/server/lib/auth";
-import { validateWith } from "~~/server/lib/utils";
+import { createValidationError, validateWith } from "~~/server/lib/utils";
 import { createUserScheme } from "~~/server/validations/users/createUserScheme";
 
 export default defineEventHandler(async (event) => {
   const { data, error } = await validateWith(event, "body", createUserScheme);
 
   if (error) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: error.message,
-    });
+    throw createValidationError(error);
   }
 
   try {
