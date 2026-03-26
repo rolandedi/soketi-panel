@@ -1,17 +1,13 @@
 import { User } from "~~/server/models/user";
 
 export default defineEventHandler(async (event) => {
-  const limit = 10;
-  const page = 1;
+  const query = getQuery(event);
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
 
   try {
-    const users = await User.query()
-      .limit(limit)
-      .offset((page - 1) * limit);
-
-    return users;
+    return await User.paginate(page, limit);
   } catch (error: any) {
-    console.error(error);
     return createError({
       statusCode: 500,
       statusMessage: error?.message || "Failed to fetch users",
