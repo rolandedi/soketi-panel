@@ -24,6 +24,9 @@
 </template>
 
 <script lang="ts" setup>
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableRow, TableCell } from "@/components/ui/table";
+
 interface Props {
   length?: number;
   columnsLength: number;

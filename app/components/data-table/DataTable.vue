@@ -9,9 +9,12 @@
             :key="headerGroup.id"
           >
             <TableHead
-              v-for="header in headerGroup.headers"
+              v-for="(header, idx) in headerGroup.headers"
               :key="header.id"
-              class="pl-3"
+              :class="{
+                'pl-3': idx === 0,
+                'pr-3': idx === headerGroup.headers.length - 1,
+              }"
             >
               <FlexRender
                 v-if="!header.isPlaceholder"
@@ -29,9 +32,12 @@
               :data-state="row.getIsSelected() && 'selected'"
             >
               <TableCell
-                v-for="cell in row.getVisibleCells()"
+                v-for="(cell, idx) in row.getVisibleCells()"
                 :key="cell.id"
-                class="pl-3"
+                :class="{
+                  'pl-3': idx === 0,
+                  'pr-3': idx === row.getVisibleCells().length - 1,
+                }"
               >
                 <FlexRender
                   :render="cell.column.columnDef.cell"
@@ -58,7 +64,7 @@
         </TableBody>
       </Table>
     </div>
-    <DataTablePagination :table="table" />
+    <DataTablePagination :table="table" :pagination="pagination" />
   </div>
 </template>
 
@@ -89,12 +95,17 @@ import {
 } from "@/components/ui/table";
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
-import { Skeleton } from "../ui/skeleton";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
   filterColumn?: string;
   loading?: boolean;
+  pagination?: {
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+  };
 }
 
 const props = defineProps<Props>();

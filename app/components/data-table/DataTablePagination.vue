@@ -13,7 +13,7 @@
         </SelectTrigger>
         <SelectContent side="top">
           <SelectItem
-            v-for="pageSize in [10, 25, 50, 100]"
+            v-for="pageSize in pageSizes"
             :key="pageSize"
             :value="`${pageSize}`"
           >
@@ -109,8 +109,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface DataTablePaginationProps {
+interface Props {
   table: Table<TData>;
+  pagination?: {
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+  };
 }
-defineProps<DataTablePaginationProps>();
+
+const props = withDefaults(defineProps<Props>(), {
+  pagination: () => ({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 10,
+    total: 0,
+  }),
+});
+
+const pageSizes = [10, 25, 50, 100];
 </script>
