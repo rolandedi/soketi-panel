@@ -4,10 +4,11 @@
       <Button variant="ghost" class="h-auto p-0 hover:bg-transparent">
         <Avatar>
           <AvatarImage
-            :src="user.image || './avatar.jpg'"
+            v-if="user.image"
+            :src="user.image"
             alt="Profile image"
           />
-          <AvatarFallback>{{ getInitials(user.name) }}</AvatarFallback>
+          <AvatarFallback v-else>{{ getInitials(user.name) }}</AvatarFallback>
         </Avatar>
         <LucideChevronDown class="size-4" aria-hidden="true" />
       </Button>
