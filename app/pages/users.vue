@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
     <PageHero title="Users" description="Manage your Soketi Panel users.">
-      <CreateUserModal @success="handleFetch" />
+      <CreateUserModal @success="handleCreated" />
     </PageHero>
 
     <div class="space-y-4">
@@ -32,6 +32,10 @@ const data = ref<User[]>([]);
 onMounted(() => {
   handleFetch();
 });
+
+function handleCreated(item: User) {
+  data.value.push(item);
+}
 
 async function handleFetch() {
   loading.value = true;
