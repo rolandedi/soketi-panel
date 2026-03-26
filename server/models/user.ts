@@ -1,20 +1,17 @@
-import knex, { type Knex } from "knex";
-import type { User } from "#shared/types";
+import { Model } from "../lib/orm/model";
 
-/**
- * @typedef {Object} User
- * @property {string} id
- * @property {string} name
- * @property {string} email
- * @property {boolean} emailVerified
- * @property {string|null} image
- * @property {string} role
- * @property {boolean} banned
- * @property {string|null} banReason
- * @property {string|null} banExpires
- * @property {string} createdAt
- * @property {string|null} updatedAt
- *
- * @returns {Knex.QueryBuilder<User, {}>}
- */
-export const Users = () => knex<User>("sktp_users");
+export class User extends Model {
+  public static table = "sktp_users";
+
+  public id!: string;
+  public name!: string;
+  public email!: string;
+  public emailVerified!: boolean;
+  public image!: string | null;
+  public role!: string;
+  public banned!: boolean;
+  public banReason!: string | null;
+  public banExpires!: string | null;
+  public createdAt!: string;
+  public updatedAt!: string | null;
+}

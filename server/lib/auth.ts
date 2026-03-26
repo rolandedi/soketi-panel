@@ -22,7 +22,7 @@ function createDbPool() {
       password: DB_PASSWORD,
       database: DB_NAME,
     });
-  } else if (DB_DRIVER === "postgres") {
+  } else if (DB_DRIVER === "pg" || DB_DRIVER === "postgres") {
     return new Pool({
       host: DB_HOST,
       port: Number(DB_PORT),
