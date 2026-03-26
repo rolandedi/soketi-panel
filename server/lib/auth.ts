@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import mysql from "mysql2/promise";
 
 export const auth = betterAuth({
@@ -31,4 +32,5 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minute cache
     },
   },
+  plugins: [admin()],
 });

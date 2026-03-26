@@ -10,6 +10,10 @@ export default defineEventHandler(async (event) => {
       image: null,
       createdAt: "2022-01-01T00:00:00.000Z",
       updatedAt: "2022-01-01T00:00:00.000Z",
+      role: "admin",
+      banned: false,
+      banReason: null,
+      banExpires: null,
     },
     {
       id: "2",
@@ -19,6 +23,10 @@ export default defineEventHandler(async (event) => {
       image: null,
       createdAt: "2022-01-01T00:00:00.000Z",
       updatedAt: "2022-01-01T00:00:00.000Z",
+      role: "user",
+      banned: false,
+      banReason: null,
+      banExpires: null,
     },
     {
       id: "3",
@@ -28,6 +36,10 @@ export default defineEventHandler(async (event) => {
       image: null,
       createdAt: "2022-01-01T00:00:00.000Z",
       updatedAt: "2022-01-01T00:00:00.000Z",
+      role: "user",
+      banned: true,
+      banReason: "Spamming",
+      banExpires: "2022-01-01T00:00:00.000Z",
     },
     {
       id: "4",
@@ -37,6 +49,10 @@ export default defineEventHandler(async (event) => {
       image: null,
       createdAt: "2022-01-01T00:00:00.000Z",
       updatedAt: "2022-01-01T00:00:00.000Z",
+      role: "user",
+      banned: false,
+      banReason: null,
+      banExpires: null,
     },
   ];
 

@@ -6,6 +6,11 @@ export interface User {
   image: string | null;
   createdAt: string;
   updatedAt: string;
+
+  role: "admin" | "user";
+  banned: boolean;
+  banReason: string | null;
+  banExpires: string | null;
 }
 
 export interface Application {
