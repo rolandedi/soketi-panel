@@ -55,14 +55,15 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) =>
       h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status = row.getValue("emailVerified") as boolean;
+      console.log(row.getValue("emailVerified"), status);
       return h(
         Badge,
         {
           variant: "outline",
-          class: status === "Inactive" ? "bg-muted-foreground/10" : "",
+          class: status ? "bg-muted-foreground" : "bg-muted-foreground/10",
         },
-        () => status,
+        () => (status ? "Verified" : "Unverified"),
       );
     },
     filterFn: (row, id, value) => {
@@ -85,7 +86,7 @@ export const usersColumns: ColumnDef<User>[] = [
   {
     id: "actions",
     cell: ({ row }: any) =>
-      h(DataTableRowActions, { row, class: "text-right" }),
+      h("div", { class: "text-right" }, h(DataTableRowActions, { row })),
     enableHiding: false,
   },
 ];
