@@ -1,13 +1,44 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
+import { LucideEllipsis } from "lucide-vue-next";
 
 import type { User } from "#shared/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  DataTableColumnHeader,
-  DataTableRowActions,
-} from "@/components/data-table";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DataTableColumnHeader } from "@/components/data-table";
+
+const rowActions = (row: User) => {
+  return h(DropdownMenu, [
+    h(DropdownMenuTrigger, { asChild: true }, [
+      h(
+        Button,
+        {
+          variant: "ghost",
+          class: "inline-flex size-8 p-0 data-[state=open]:bg-accent",
+        },
+        [
+          h(LucideEllipsis, { class: "size-4" }),
+          h("span", { class: "sr-only" }, "Open menu"),
+        ],
+      ),
+    ]),
+    h(DropdownMenuContent, { align: "end", class: "w-40" }, [
+      h(DropdownMenuItem, {}, "Edit"),
+      h(DropdownMenuItem, {}, "Ban"),
+      h(DropdownMenuItem, {}, "Favorite"),
+      h(DropdownMenuSeparator, {}),
+      h(DropdownMenuItem, {}, "Delete"),
+    ]),
+  ]);
+};
 
 export const usersColumns: ColumnDef<User>[] = [
   {
@@ -51,6 +82,25 @@ export const usersColumns: ColumnDef<User>[] = [
     enableHiding: true,
   },
   {
+    accessorKey: "role",
+    header: ({ column }) =>
+      h(DataTableColumnHeader<User, any>, { column, title: "Role" }),
+    cell: ({ row }) => {
+      const role = row.getValue("role") as string;
+      return h(
+        Badge,
+        {
+          variant: "outline",
+          class:
+            role === "admin"
+              ? "bg-muted-foreground text-white"
+              : "bg-muted-foreground/10",
+        },
+        () => (role === "admin" ? "Admin" : "User"),
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: ({ column }) =>
       h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
@@ -71,22 +121,50 @@ export const usersColumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "balance",
+    accessorKey: "banned",
     header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Balance" }),
+      h(DataTableColumnHeader<User, any>, { column, title: "Banned" }),
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("balance"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return h("div", { class: "font-medium" }, formatted);
+      const banned = row.getValue("banned") as boolean;
+      return h(
+        Badge,
+        {
+          variant: "outline",
+          class: banned ? "bg-muted-foreground" : "bg-muted-foreground/10",
+        },
+        () => (banned ? "Banned" : "Not banned"),
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) =>
+      h(DataTableColumnHeader<User, any>, { column, title: "Created At" }),
+    cell: ({ row }) => {
+      const createdAt = row.getValue("createdAt") as string;
+      return h(
+        "div",
+        { class: "max-w-[500px] truncate font-medium" },
+        createdAt,
+      );
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) =>
+      h(DataTableColumnHeader<User, any>, { column, title: "Updated At" }),
+    cell: ({ row }) => {
+      const updatedAt = row.getValue("updatedAt") as string;
+      return h(
+        "div",
+        { class: "max-w-[500px] truncate font-medium" },
+        updatedAt,
+      );
     },
   },
   {
     id: "actions",
-    cell: ({ row }: any) =>
-      h("div", { class: "text-right" }, h(DataTableRowActions, { row })),
+    cell: ({ row }: any) => h("div", { class: "text-right" }, rowActions(row)),
     enableHiding: false,
   },
 ];
