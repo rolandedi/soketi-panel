@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model:open="isOpen">
     <DialogTrigger as-child>
-      <Button> <PlusIcon /> New user </Button>
+      <slot />
     </DialogTrigger>
     <DialogContent class="sm:max-w-md">
       <form @submit.prevent="onSubmit">

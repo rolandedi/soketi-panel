@@ -1,7 +1,9 @@
 <template>
   <div class="space-y-6">
     <PageHero title="Users" description="Manage your Soketi Panel users.">
-      <CreateUserModal @success="handleCreated" />
+      <CreateUserModal @success="handleCreated">
+        <Button variant="default"> <PlusIcon /> New user </Button>
+      </CreateUserModal>
     </PageHero>
 
     <div class="space-y-4">
@@ -23,6 +25,8 @@ import { usersColumns } from "~/table-columns/usersColumns";
 import { DataTable } from "~/components/data-table";
 import PageHero from "~/components/PageHero.vue";
 import CreateUserModal from "~/components/modals/CreateUserModal.vue";
+import { toast } from "vue-sonner";
+import { PlusIcon } from "lucide-vue-next";
 
 useHead({ title: "Users" });
 
@@ -43,8 +47,8 @@ async function handleFetch() {
   try {
     const res = await $fetch<PaginatedResponse<User>>("/api/users");
     data.value = res.data;
-  } catch (error) {
-    console.error(error);
+  } catch (err: any) {
+    toast.error(err?.message || "Failed to fetch users");
   } finally {
     loading.value = false;
   }
