@@ -16,26 +16,26 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table";
 
 const rowActions = (row: User) => {
-  return h(DropdownMenu, [
-    h(DropdownMenuTrigger, { asChild: true }, [
+  return h(DropdownMenu, () => [
+    h(DropdownMenuTrigger, { asChild: true }, () =>
       h(
         Button,
         {
           variant: "ghost",
           class: "inline-flex size-8 p-0 data-[state=open]:bg-accent",
         },
-        [
+        () => [
           h(LucideEllipsis, { class: "size-4" }),
           h("span", { class: "sr-only" }, "Open menu"),
         ],
       ),
-    ]),
-    h(DropdownMenuContent, { align: "end", class: "w-40" }, [
-      h(DropdownMenuItem, {}, "Edit"),
-      h(DropdownMenuItem, {}, "Ban"),
-      h(DropdownMenuItem, {}, "Favorite"),
-      h(DropdownMenuSeparator, {}),
-      h(DropdownMenuItem, {}, "Delete"),
+    ),
+    h(DropdownMenuContent, { align: "end", class: "w-40" }, () => [
+      h(DropdownMenuItem, () => "Edit"),
+      h(DropdownMenuItem, () => "Ban"),
+      h(DropdownMenuItem, () => "Favorite"),
+      h(DropdownMenuSeparator),
+      h(DropdownMenuItem, () => "Delete"),
     ]),
   ]);
 };
