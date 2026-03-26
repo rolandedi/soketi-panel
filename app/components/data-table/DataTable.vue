@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <DataTableToolbar :table="table" :filter-column="filterColumn" />
-    <div class="rounded-md border bg-card overflow-hidden">
+    <div class="rounded-md border bg-card overflow-y-hidden overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow
