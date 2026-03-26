@@ -1,32 +1,29 @@
-import knex, { type Knex } from "knex";
-import type { Application } from "#shared/types";
+import type { Application as ApplicationType } from "#shared/types";
+import { Model } from "../lib/orm/model";
 
-/**
- * @typedef {Object} Application
- * @property {string} id
- * @property {string} name
- * @property {string} key
- * @property {string} secret
- * @property {number} max_connections
- * @property {boolean} enable_client_messages
- * @property {boolean} enabled
- * @property {number} max_backend_events_per_sec
- * @property {number} max_client_events_per_sec
- * @property {number} max_read_req_per_sec
- * @property {string} webhooks
- * @property {number} max_presence_members_per_channel
- * @property {number} max_presence_member_size_in_kb
- * @property {number} max_channel_name_length
- * @property {number} max_event_channels_at_once
- * @property {number} max_event_name_length
- * @property {number} max_event_payload_in_kb
- * @property {number} max_event_batch_size
- * @property {boolean} enable_user_authentication
- * @property {string} created_at
- * @property {string} updated_at
- * @property {string} user_id
- * @property {User} user
- *
- * @returns {Knex.QueryBuilder<Application, {}>}
- */
-export const Applications = () => knex<Application>("sktp_applications");
+export class Application extends Model implements ApplicationType {
+  public static table = "sktp_applications";
+
+  public id!: string;
+  public name!: string;
+  public key!: string;
+  public secret!: string;
+  public max_connections!: number;
+  public enable_client_messages!: boolean;
+  public enabled!: boolean;
+  public max_backend_events_per_sec!: number;
+  public max_client_events_per_sec!: number;
+  public max_read_req_per_sec!: number;
+  public webhooks!: string;
+  public max_presence_members_per_channel!: number;
+  public max_presence_member_size_in_kb!: number;
+  public max_channel_name_length!: number;
+  public max_event_channels_at_once!: number;
+  public max_event_name_length!: number;
+  public max_event_payload_in_kb!: number;
+  public max_event_batch_size!: number;
+  public enable_user_authentication!: boolean;
+  public created_at!: string;
+  public updated_at!: string;
+  public user_id!: string;
+}
