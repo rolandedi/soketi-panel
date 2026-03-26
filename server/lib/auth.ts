@@ -61,3 +61,7 @@ export const auth = betterAuth({
   },
   plugins: [admin()],
 });
+
+export const useAuth = () => {
+  return auth.api;
+};
