@@ -1,28 +1,32 @@
-import { User } from "~~/server/models/user";
+import { useAuth } from "~~/server/lib/auth";
+import { validateWith } from "~~/server/lib/utils";
+import { createUserScheme } from "~~/server/validations/users/createUserScheme";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
+  const { data, error } = await validateWith(event, "body", createUserScheme);
 
-  if (!body.email || !body.name) {
+  if (error) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Email and name are required",
+      statusMessage: error.message,
     });
   }
 
   try {
-    const user = await User.create({
-      name: body.name,
-      email: body.email,
-      role: body.role || "user",
-      banned: false,
+    const { user } = await useAuth().createUser({
+      body: {
+        role: data.role,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      },
     });
 
     return user;
-  } catch (error: any) {
+  } catch (err: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Failed to create user",
+      statusMessage: err.message || "Failed to create user",
     });
   }
 });
