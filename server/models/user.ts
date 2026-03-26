@@ -7,9 +7,13 @@ import type { User } from "#shared/types";
  * @property {string} name
  * @property {string} email
  * @property {boolean} emailVerified
- * @property {string} image
+ * @property {string|null} image
+ * @property {string} role
+ * @property {boolean} banned
+ * @property {string|null} banReason
+ * @property {string|null} banExpires
  * @property {string} createdAt
- * @property {string} updatedAt
+ * @property {string|null} updatedAt
  *
  * @returns {Knex.QueryBuilder<User, {}>}
  */
