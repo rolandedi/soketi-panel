@@ -47,3 +47,13 @@ export interface Message {
   payload: string;
   created_at: string;
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    perPage: number;
+    currentPage: number;
+    lastPage: number;
+  };
+}
