@@ -1,4 +1,5 @@
 import knex, { type Knex } from "knex";
+import type { User } from "#shared/types";
 
 /**
  * @typedef {Object} User
@@ -12,4 +13,4 @@ import knex, { type Knex } from "knex";
  *
  * @returns {Knex.QueryBuilder<User, {}>}
  */
-export const Users = () => knex("sktp_users");
+export const Users = () => knex<User>("sktp_users");
