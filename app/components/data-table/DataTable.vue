@@ -1,14 +1,18 @@
 <template>
   <div class="space-y-4">
     <DataTableToolbar :table="table" :filter-column="filterColumn" />
-    <div class="rounded-md border bg-background">
+    <div class="rounded-md border bg-card overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"
             :key="headerGroup.id"
           >
-            <TableHead v-for="header in headerGroup.headers" :key="header.id">
+            <TableHead
+              v-for="header in headerGroup.headers"
+              :key="header.id"
+              class="pl-3"
+            >
               <FlexRender
                 v-if="!header.isPlaceholder"
                 :render="header.column.columnDef.header"
@@ -24,7 +28,11 @@
               :key="row.id"
               :data-state="row.getIsSelected() && 'selected'"
             >
-              <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+              <TableCell
+                v-for="cell in row.getVisibleCells()"
+                :key="cell.id"
+                class="pl-3"
+              >
                 <FlexRender
                   :render="cell.column.columnDef.cell"
                   :props="cell.getContext()"
