@@ -1,6 +1,11 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { LucideEllipsis } from "lucide-vue-next";
+import {
+  BanIcon,
+  LucideEllipsis,
+  PencilIcon,
+  TrashIcon,
+} from "lucide-vue-next";
 
 import type { User } from "#shared/types";
 import { formatDate } from "#shared/utils";
@@ -22,21 +27,20 @@ const rowActions = (row: User) => {
       h(
         Button,
         {
-          variant: "ghost",
+          variant: "outline",
           class: "inline-flex size-8 p-0 data-[state=open]:bg-accent",
         },
         () => [
-          h(LucideEllipsis, { class: "size-4" }),
-          h("span", { class: "sr-only" }, "Open menu"),
+          h(LucideEllipsis, { size: 16 }),
+          h("span", { class: "sr-only" }, "Open actions"),
         ],
       ),
     ),
     h(DropdownMenuContent, { align: "end", class: "w-40" }, () => [
-      h(DropdownMenuItem, () => "Edit"),
-      h(DropdownMenuItem, () => "Ban"),
-      h(DropdownMenuItem, () => "Favorite"),
+      h(DropdownMenuItem, () => [h(PencilIcon, { size: 16 }), "Edit"]),
+      h(DropdownMenuItem, () => [h(BanIcon, { size: 16 }), "Ban"]),
       h(DropdownMenuSeparator),
-      h(DropdownMenuItem, () => "Delete"),
+      h(DropdownMenuItem, () => [h(TrashIcon, { size: 16 }), "Delete"]),
     ]),
   ]);
 };
@@ -168,7 +172,8 @@ export const usersColumns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }: any) => h("div", { class: "text-right" }, rowActions(row)),
+    cell: ({ row }) =>
+      h("div", { class: "text-right" }, rowActions(row.original)),
     enableHiding: false,
   },
 ];
