@@ -19,11 +19,11 @@ interface DataTableViewOptionsProps {
 
 const props = defineProps<DataTableViewOptionsProps>();
 
-const columns = computed(() =>
-  props.table
-    .getAllColumns()
-    .filter((column) => column.accessorFn !== undefined && column.getCanHide()),
-);
+const columns = computed(() => {
+  // Force tracking of column visibility changes
+  const _ = props.table.getState().columnVisibility;
+  return props.table.getAllColumns().filter((column) => column.getCanHide());
+});
 </script>
 
 <template>
@@ -39,10 +39,10 @@ const columns = computed(() =>
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem
         v-for="column in columns"
-        class="capitalize"
         :key="column.id"
+        class="capitalize"
         :checked="column.getIsVisible()"
-        @update:checked="(v?: boolean) => column.toggleVisibility(!!v)"
+        @update:checked="(value: boolean) => column.toggleVisibility(!!value)"
       >
         {{ column.id }}
       </DropdownMenuCheckboxItem>

@@ -3,7 +3,7 @@
     <AlertDialogTrigger asChild>
       <Button
         variant="outline"
-        class="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+        class="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50 dark:text-destructive/50 dark:hover:bg-destructive/10 dark:hover:text-destructive/50"
       >
         <LucideTrash class="-ms-1 opacity-80" :size="16" aria-hidden="true" />
         Delete

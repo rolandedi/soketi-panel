@@ -19,17 +19,16 @@ export const usersColumns: ColumnDef<User>[] = [
           (table.getIsSomePageRowsSelected() && "indeterminate"),
         "onUpdate:modelValue": (value: boolean | "indeterminate") =>
           table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: "Select all",
-        class: "translate-y-0.5",
+        "aria-label": "Select all",
       }),
     cell: ({ row }) =>
       h(Checkbox, {
         modelValue: row.getIsSelected(),
         "onUpdate:modelValue": (value: boolean | "indeterminate") =>
           row.toggleSelected(!!value),
-        ariaLabel: "Select row",
-        class: "translate-y-0.5",
+        "aria-label": "Select row",
       }),
+    size: 28,
     enableSorting: false,
     enableHiding: false,
   },
@@ -43,21 +42,13 @@ export const usersColumns: ColumnDef<User>[] = [
         { class: "max-w-[500px] truncate font-medium" },
         row.getValue("name"),
       ),
+    enableHiding: true,
   },
   {
     accessorKey: "email",
     header: ({ column }) =>
       h(DataTableColumnHeader<User, any>, { column, title: "Email" }),
-  },
-  {
-    accessorKey: "location",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Location" }),
-    cell: ({ row }) =>
-      h("div", { class: "flex items-center" }, [
-        h("span", { class: "mr-2 text-lg" }, row.original.flag),
-        h("span", {}, row.getValue("location")),
-      ]),
+    enableHiding: true,
   },
   {
     accessorKey: "status",
@@ -93,6 +84,8 @@ export const usersColumns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }: any) => h(DataTableRowActions, { row }),
+    cell: ({ row }: any) =>
+      h(DataTableRowActions, { row, class: "text-right" }),
+    enableHiding: false,
   },
 ];

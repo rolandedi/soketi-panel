@@ -2,7 +2,6 @@
 import { computed, type Component } from "vue";
 import {
   LucideFilter,
-  LucideListFilter,
   LucidePlusCircle,
 } from "lucide-vue-next";
 import type { Column } from "@tanstack/vue-table";

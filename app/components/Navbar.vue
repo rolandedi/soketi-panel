@@ -81,7 +81,7 @@
               <NavigationMenuLink
                 :active="item.active"
                 as-child
-                class="text-foreground hover:text-primary flex-row items-center gap-2 py-1.5 font-medium"
+                class="flex-row items-center gap-2 py-1.5 font-medium text-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:text-primary"
               >
                 <NuxtLink :to="item.href">
                   <component :is="item.icon" :size="16" aria-hidden="true" />

@@ -24,7 +24,7 @@ defineProps<DataTableRowActionsProps>();
     <DropdownMenuTrigger asChild>
       <Button
         variant="ghost"
-        class="flex h-8 w-8 p-0 data-[state=open]:bg-accent"
+        class="inline-flex h-8 w-8 p-0 data-[state=open]:bg-accent"
       >
         <LucideEllipsis class="h-4 w-4" />
         <span class="sr-only">Open menu</span>
