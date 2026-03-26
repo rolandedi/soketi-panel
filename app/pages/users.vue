@@ -5,7 +5,12 @@
     </PageHero>
 
     <div class="space-y-4">
-      <DataTable v-model="data" :columns="usersColumns" filter-column="name" />
+      <DataTable
+        v-model="data"
+        filter-column="name"
+        :columns="usersColumns"
+        :loading="loading"
+      />
     </div>
   </div>
 </template>
@@ -21,6 +26,7 @@ import PageHero from "~/components/PageHero.vue";
 
 useHead({ title: "Users" });
 
+const loading = ref(false);
 const data = ref<User[]>([]);
 
 onMounted(() => {
@@ -28,11 +34,15 @@ onMounted(() => {
 });
 
 async function handleFetch() {
-  const { data: users } = await useFetch<User[]>("/api/users");
-  console.log(users.value);
+  loading.value = true;
 
-  setTimeout(() => {
-    data.value = users.value || [];
-  }, 1000);
+  try {
+    const users = await $fetch<User[]>("/api/users");
+    data.value = users;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
