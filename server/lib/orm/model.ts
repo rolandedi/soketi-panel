@@ -2,16 +2,19 @@ import { useDB } from "./db";
 
 export class Model {
   public static table: string;
+  public static casts: Record<string, "boolean" | "number" | "string" | "json"> = {};
 
   public static async all<T extends Model>(this: (new () => T) & typeof Model): Promise<T[]> {
-    return this.query() as unknown as Promise<T[]>;
+    const data = await this.query();
+    return data.map((row: any) => this.cast(row)) as unknown as T[];
   }
 
   public static async find<T extends Model>(
     this: (new () => T) & typeof Model,
     id: number | string
   ): Promise<T | undefined> {
-    return this.query().where({ id }).first() as unknown as Promise<T | undefined>;
+    const row = await this.query().where({ id }).first();
+    return row ? (this.cast(row) as unknown as T) : undefined;
   }
 
   public static async create<T extends Model>(
@@ -54,7 +57,7 @@ export class Model {
     const data = await this.query().limit(limit).offset(offset);
 
     return {
-      data: data as T[],
+      data: data.map((row: any) => this.cast(row)) as T[],
       meta: {
         total,
         perPage: limit,
@@ -62,6 +65,30 @@ export class Model {
         lastPage,
       },
     };
+  }
+
+  protected static cast(data: any) {
+    const casted = { ...data };
+
+    for (const [key, type] of Object.entries(this.casts)) {
+      if (casted[key] === undefined || casted[key] === null) continue;
+
+      if (type === "boolean") {
+        casted[key] = Boolean(casted[key]);
+      } else if (type === "number") {
+        casted[key] = Number(casted[key]);
+      } else if (type === "string") {
+        casted[key] = String(casted[key]);
+      } else if (type === "json") {
+        try {
+          casted[key] = typeof casted[key] === "string" ? JSON.parse(casted[key]) : casted[key];
+        } catch (e) {
+          casted[key] = null;
+        }
+      }
+    }
+
+    return casted;
   }
 
   private static buildQuery() {
