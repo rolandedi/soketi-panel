@@ -4,6 +4,11 @@ import { Model } from "../lib/orm/model";
 export class User extends Model implements UserType {
   public static table = "sktp_users";
 
+  public static casts = {
+    emailVerified: "boolean" as const,
+    banned: "boolean" as const,
+  };
+
   public id!: string;
   public name!: string;
   public email!: string;

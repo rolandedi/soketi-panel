@@ -3,6 +3,22 @@ import { Model } from "../lib/orm/model";
 
 export class Application extends Model implements ApplicationType {
   public static table = "sktp_applications";
+  public static casts = {
+    max_connections: "number" as const,
+    enable_client_messages: "boolean" as const,
+    enabled: "boolean" as const,
+    max_backend_events_per_sec: "number" as const,
+    max_client_events_per_sec: "number" as const,
+    max_read_req_per_sec: "number" as const,
+    max_presence_members_per_channel: "number" as const,
+    max_presence_member_size_in_kb: "number" as const,
+    max_channel_name_length: "number" as const,
+    max_event_channels_at_once: "number" as const,
+    max_event_name_length: "number" as const,
+    max_event_payload_in_kb: "number" as const,
+    max_event_batch_size: "number" as const,
+    enable_user_authentication: "boolean" as const,
+  };
 
   public id!: string;
   public name!: string;
