@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 import { LucideEllipsis } from "lucide-vue-next";
 
 import type { User } from "#shared/types";
+import { formatDate } from "#shared/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -105,13 +106,14 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) =>
       h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
     cell: ({ row }) => {
-      const status = row.getValue("emailVerified") as boolean;
-      console.log(row.getValue("emailVerified"), status);
+      const status = row.original.emailVerified;
       return h(
         Badge,
         {
           variant: "outline",
-          class: status ? "bg-muted-foreground" : "bg-muted-foreground/10",
+          class: status
+            ? "bg-green-500 text-white border-0"
+            : "bg-yellow-500 text-white border-0",
         },
         () => (status ? "Verified" : "Unverified"),
       );
@@ -130,7 +132,9 @@ export const usersColumns: ColumnDef<User>[] = [
         Badge,
         {
           variant: "outline",
-          class: banned ? "bg-muted-foreground" : "bg-muted-foreground/10",
+          class: banned
+            ? "bg-muted-foreground text-white"
+            : "bg-muted-foreground/10",
         },
         () => (banned ? "Banned" : "Not banned"),
       );
@@ -144,8 +148,8 @@ export const usersColumns: ColumnDef<User>[] = [
       const createdAt = row.getValue("createdAt") as string;
       return h(
         "div",
-        { class: "max-w-[500px] truncate font-medium" },
-        createdAt,
+        { class: "max-w-[200px] text-muted-foreground truncate" },
+        formatDate(createdAt),
       );
     },
   },
@@ -154,11 +158,11 @@ export const usersColumns: ColumnDef<User>[] = [
     header: ({ column }) =>
       h(DataTableColumnHeader<User, any>, { column, title: "Updated At" }),
     cell: ({ row }) => {
-      const updatedAt = row.getValue("updatedAt") as string;
+      const updatedAt = row.getValue("updatedAt") as string | null;
       return h(
         "div",
-        { class: "max-w-[500px] truncate font-medium" },
-        updatedAt,
+        { class: "max-w-[200px] text-muted-foreground truncate" },
+        updatedAt ? formatDate(updatedAt) : "-",
       );
     },
   },

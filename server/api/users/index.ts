@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       id: "4",
       name: "Jane Smith",
       email: "jane@example.com",
-      emailVerified: true,
+      emailVerified: false,
       image: null,
       createdAt: "2022-01-01T00:00:00.000Z",
       updatedAt: "2022-01-01T00:00:00.000Z",
