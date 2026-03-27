@@ -1,394 +1,283 @@
-# Directory Structure & Key Locations
+# Codebase Structure
 
-## Project Root
+**Analysis Date:** 2026-03-27
+
+## Directory Layout
+
 ```
 soketi-panel/
-├── app/                          # Frontend application (Nuxt client)
-├── server/                       # Backend (Nitro engine)
-├── shared/                       # Shared types and utils
-├── database/                     # Migrations and seeds
-├── public/                       # Static assets (favicon, images)
-├── .planning/                    # GSD project planning
-├── node_modules/                 # Dependencies (pnpm)
-├── nuxt.config.ts               # Nuxt configuration (SSR, modules, runtimeConfig)
-├── tsconfig.json                # TypeScript root config (references .nuxt generated configs)
-├── package.json                 # Dependencies and scripts
-├── pnpm-lock.yaml               # pnpm lockfile
-├── knexfile.ts                  # Knex database configuration
-├── eslint.config.mjs            # ESLint configuration (flat config format)
-├── components.json              # Shadcn Vue component registry
-└── .env.example                 # Environment variable template
+├── app/                    # Frontend Vue 3 application
+│   ├── assets/            # Static assets (CSS, images)
+│   │   └── css/           # Stylesheets (Tailwind CSS v4)
+│   ├── components/        # Vue components
+│   │   ├── ui/            # Shadcn Vue base components
+│   │   ├── modals/        # Modal dialog components
+│   │   └── data-table/    # Data table components
+│   ├── composables/       # Reusable Vue composition functions
+│   ├── layouts/           # Page layout components
+│   ├── lib/               # Frontend utilities and clients
+│   ├── middleware/        # Client-side route middleware
+│   ├── pages/             # File-based routing (Nuxt)
+│   ├── plugins/           # Vue plugins and initialization
+│   ├── table-columns/     # Data table column definitions
+│   └── app.vue            # Root Vue component
+├── server/                # Nitro backend engine
+│   ├── api/               # REST API endpoints
+│   │   ├── applications/  # Application management routes
+│   │   ├── auth/          # Authentication routes (Better Auth)
+│   │   ├── messages/      # Message management routes
+│   │   └── users/         # User management routes
+│   ├── lib/               # Server-side utilities
+│   │   └── orm/           # Custom ORM implementation
+│   ├── markdowns/         # Markdown content for docs
+│   ├── middleware/        # Server middleware (Nitro)
+│   ├── models/            # Type definitions and ORM models
+│   ├── repositories/      # Data access layer
+│   ├── services/          # Business logic layer
+│   ├── validations/       # Zod validation schemas
+│   └── types.d.ts         # Server-side type declarations
+├── shared/                # Shared code (frontend + backend)
+│   ├── types.ts           # TypeScript interfaces
+│   └── utils.ts           # Shared utility functions
+├── database/              # Database management
+│   ├── migrations/        # Knex schema migrations
+│   └── seeds/             # Database seed data
+├── test/                  # Test files
+│   └── repositories/      # Repository tests
+├── plans/                 # GSD planning artifacts
+├── .agents/               # Agent skills and instructions
+├── .planning/             # GSD planning directory
+│   └── codebase/          # Codebase analysis documents
+└── nuxt.config.ts         # Nuxt configuration
 ```
 
-## Frontend (`app/`)
+## Directory Purposes
 
-### Pages (File-Based Routing)
-```
-app/pages/
-├── index.vue                    # Home / dashboard
-├── login.vue                    # Login page
-├── profile.vue                  # User profile page
-├── users.vue                    # User management page
-├── applications.vue             # Application management page
-├── otp.vue                      # Two-factor authentication flow
-├── playground.vue               # WebSocket playground/tester
-├── about.vue                    # About page
-└── docs/
-    └── [...]                    # Documentation pages (nested routing)
-```
+**`app/`:**
 
-### Components
-```
-app/components/
-├── Navbar.vue                   # Main navigation bar
-├── UserMenu.vue                 # User profile dropdown menu
-├── PageHero.vue                 # Page header/title component
-├── CodeBlock.vue                # Code snippet display with syntax highlight
-├── ThemeSwitcher.vue            # Dark/light mode toggle
-├── modals/
-│   ├── CreateApplicationModal.vue
-│   ├── EditApplicationModal.vue
-│   ├── CreateUserModal.vue
-│   └── [...]                    # Other action modals
-├── data-table/
-│   ├── DataTable.vue            # TanStack Table wrapper
-│   ├── DataTableHeader.vue
-│   ├── DataTableBody.vue
-│   └── [...]                    # Column and cell components
-└── ui/                          # Shadcn Vue components
-    ├── button/                  # Button variants
-    ├── card/                    # Card container
-    ├── dialog/                  # Modal dialog
-    ├── dropdown-menu/           # Dropdown menu
-    ├── form/                    # Form helpers
-    ├── input/                   # Text input
-    ├── label/                   # Form labels
-    ├── pagination/              # Pagination controls
-    ├── select/                  # Select dropdown
-    ├── switch/                  # Toggle switch
-    ├── tabs/                    # Tab container
-    ├── table/                   # HTML table
-    ├── toast/                   # Toast notifications
-    ├── tooltip/                 # Tooltip component
-    └── [...]                    # Other Shadcn Vue components
-```
+- Purpose: Frontend Vue 3 application with Shadcn Vue components
+- Contains: Pages, components, composables, layouts, client utilities
+- Key files: `app/app.vue` (root), `app/pages/index.vue` (home), `app/composables/useAuth.ts`
+- Conventions: `.vue` files for components, TypeScript with Composition API
 
-### Composables (Reusable Logic)
-```
-app/composables/
-└── useAuth.ts                   # Authentication composable
-    - user (computed)
-    - isAuthenticated (computed)
-    - isPending (computed)
-    - signIn(email, password)
-    - signOut()
-```
+**`server/`:**
 
-### Lib (Frontend Utilities)
-```
-app/lib/
-├── auth-client.ts               # Better Auth client instance
-└── utils.ts                     # Helper utilities (cn(), etc.)
-```
+- Purpose: Nitro server backend with API routes and business logic
+- Contains: API endpoints, middleware, repositories, services, models, validations
+- Key files: `server/lib/auth.ts` (Better Auth config), `server/lib/orm/model.ts` (base ORM)
+- Conventions: `.ts` files, file-based routing with HTTP method suffixes
 
-### Middleware
-```
-app/middleware/
-└── auth.global.ts               # Global auth guard for protected routes
-```
+**`shared/`:**
 
-### Plugins
-```
-app/plugins/
-└── ssr-width.ts                 # SSR-safe window dimension detection
-```
+- Purpose: Code shared between frontend and backend
+- Contains: TypeScript interfaces, utility functions
+- Key files: `shared/types.ts` (domain types), `shared/utils.ts` (shared helpers)
+- Conventions: Pure TypeScript, no framework-specific code
 
-### Assets
-```
-app/assets/
-└── css/
-    └── tailwind.css             # Tailwind CSS imports and config
-```
+**`database/`:**
 
-### Table Columns
-```
-app/table-columns/
-├── users-columns.ts             # TanStack Table columns for users
-└── applications-columns.ts      # TanStack Table columns for applications
-```
+- Purpose: Database schema and seed data management
+- Contains: Knex migrations and seed files
+- Key files: Timestamped migration files, seed scripts
+- Conventions: Sequential timestamps in filenames, reversible migrations
 
-### Layout Templates
-```
-app/layouts/
-└── default.vue                  # Default layout wrapper
-```
+**`test/`:**
 
-## Backend (`server/`)
+- Purpose: Automated test suite
+- Contains: Repository tests, utility tests
+- Key files: `test/utils.test.ts`, `test/setup.ts`
+- Conventions: `.test.ts` suffix, co-located with source or in parallel structure
 
-### API Routes (HTTP Endpoints)
-```
-server/api/
-├── auth/
-│   └── [...all].ts              # Catch-all Better Auth endpoint
-│       Delegates to server/lib/auth.ts
-│
-├── users/
-│   ├── index.ts                 # GET /api/users (list, paginated)
-│   ├── index.post.ts            # POST /api/users (create)
-│   ├── [id].ts                  # GET /api/users/[id] (get single)
-│   ├── [id].put.ts              # PUT /api/users/[id] (update)
-│   ├── [id].delete.ts           # DELETE /api/users/[id] (delete)
-│   └── ban.ts                   # POST /api/users/ban (ban/unban action)
-│
-├── applications/
-│   ├── index.ts                 # GET /api/applications (list, paginated)
-│   ├── index.post.ts            # POST /api/applications (create)
-│   ├── [id].ts                  # GET /api/applications/[id]
-│   ├── [id].put.ts              # PUT /api/applications/[id]
-│   └── [id].delete.ts           # DELETE /api/applications/[id]
-│
-├── messages/
-│   └── index.ts                 # GET /api/messages (list, paginated)
-│
-└── markdown.ts                  # POST /api/markdown (render markdown)
-```
+## Key File Locations
 
-### Models (ORM Entities)
-```
-server/models/
-├── user.ts                      # User model
-│   extends Model
-│   table: 'sktp_users'
-│   casts: { emailVerified, banned: boolean }
-│
-├── application.ts               # Application model
-│   extends Model
-│   table: 'sktp_applications'
-│   casts: { numeric fields, boolean fields }
-│
-└── message.ts                   # Message model
-    extends Model
-    table: 'sktp_messages'
-```
+**Entry Points:**
 
-### Repositories (Data Access Layer)
-```
-server/repositories/
-├── user.repository.ts           # User database operations
-│   UserRepository class
-│   - getById(id)
-│   - getAll(pagination)
-│   - create(data)
-│   - update(id, data)
-│   - delete(id)
-│   - ban(id, reason, expires)
-│   - unban(id)
-│
-├── application.repository.ts    # Application database operations
-│   ApplicationRepository class
-│   - getById(id)
-│   - getByUser(userId)
-│   - create(userId, data)
-│   - update(id, data)
-│   - delete(id)
-│
-└── message.repository.ts        # Message database operations
-    MessageRepository class
-    - getByApp(appId, pagination)
-    - create(appId, data)
-    - deleteOld(appId, days)
-```
+- `app/app.vue`: Root Vue component, mounts application
+- `server/api/auth/[...all].ts`: Better Auth catch-all endpoint
+- `server/api/health.get.ts`: Health check endpoint
 
-### Services (Business Logic)
-```
-server/services/                 # (Directory reserved, not yet populated)
-(Future services for complex business logic)
-```
+**Configuration:**
 
-### ORM Library
-```
-server/lib/orm/
-├── model.ts                     # Base Model class
-│   Static methods:
-│   - find(id)
-│   - all()
-│   - create(data)
-│   - update(id, data)
-│   - delete(id)
-│   Instance type casting via casts property
-│
-└── db.ts                        # Knex database instance
-    - Drivers: MySQL or PostgreSQL
-    - Pool configuration
-    - Connection management
-```
+- `nuxt.config.ts`: Nuxt 4 configuration (runtime config, modules, plugins)
+- `app/lib/auth-client.ts`: Better Auth client configuration
+- `server/lib/auth.ts`: Better Auth server configuration
+- `server/lib/orm/db.ts`: Knex database connection setup
 
-### Auth Library
-```
-server/lib/
-├── auth.ts                      # Better Auth configuration
-│   - betterAuth instance
-│   - Database pool factory
-│   - Email/password method setup
-│   - Admin plugin configuration
-│   - Session settings (7 days TTL, 24h refresh)
-│
-└── utils.ts                     # Server-side helper utilities
-```
+**Core Logic:**
 
-### Validations
-```
-server/validations/
-└── users/
-    └── createUserScheme.ts      # Zod schema for user creation
-```
+- `server/repositories/user.repository.ts`: User data access
+- `server/models/user.ts`: User model with ORM
+- `app/composables/useAuth.ts`: Authentication composable
+- `shared/types.ts`: Domain type definitions
 
-### Markdown
-```
-server/markdowns/                # Static markdown files
-                                 # Served via /api/markdown endpoint
+**Middleware:**
+
+- `server/middleware/auth.ts`: Session validation
+- `server/middleware/csrf.ts`: CSRF token validation
+- `server/middleware/rate-limit.ts`: Request rate limiting
+- `server/middleware/user-admin.ts`: Admin role authorization
+
+**Validation:**
+
+- `server/validations/users/createUserScheme.ts`: User creation schema
+- `server/validations/users/updateUserScheme.ts`: User update schema
+- `server/validations/users/banUserScheme.ts`: User ban schema
+
+**UI Components:**
+
+- `app/components/ui/button/`: Button component variants
+- `app/components/ui/dialog/`: Dialog/modal components
+- `app/components/ui/table/`: Data table components
+- `app/components/data-table/`: Application-specific data tables
+
+## Naming Conventions
+
+**Files:**
+
+- Vue components: `PascalCase.vue` (e.g., `UserProfile.vue`)
+- API routes: `kebab-case.method.ts` (e.g., `index.post.ts`, `[id].delete.ts`)
+- Utilities: `camelCase.ts` (e.g., `auth-client.ts`, `utils.ts`)
+- Models: `camelCase.ts` (e.g., `user.ts`, `application.ts`)
+- Repositories: `entity.repository.ts` (e.g., `user.repository.ts`)
+- Validations: `actionEntityScheme.ts` (e.g., `createUserScheme.ts`)
+- Middleware: `kebab-case.ts` (e.g., `user-admin.ts`, `rate-limit.ts`)
+- Migrations: `YYYYMMDDHHMMSS_description.ts` (e.g., `20260325154325_create_auth_tables.ts`)
+
+**Directories:**
+
+- All lowercase with hyphens: `data-table/`, `ui/`, `composables/`
+- Feature-based grouping: `users/`, `applications/`, `messages/`
+
+## Where to Add New Code
+
+**New Feature:**
+
+- API routes: `server/api/{feature}/index.ts` or `server/api/{feature}/{action}.ts`
+- Frontend pages: `app/pages/{feature}.vue` or `app/pages/{feature}/index.vue`
+- Components: `app/components/{feature}/` or `app/components/ui/{feature}/`
+- Composables: `app/composables/use{Feature}.ts`
+
+**New Entity:**
+
+- Model: `server/models/{entity}.ts` extending `Model` base class
+- Repository: `server/repositories/{entity}.repository.ts`
+- Validation schemas: `server/validations/{entity}/{action}Scheme.ts`
+- Types: Add interface to `shared/types.ts`
+
+**New API Endpoint:**
+
+- Route file: `server/api/{resource}/{action}.{method}.ts`
+- Method suffixes: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`
+- Dynamic params: `[id].ts`, `[id].put.ts`, etc.
+
+**New Middleware:**
+
+- Server middleware: `server/middleware/{name}.ts` (auto-loaded, alphabetical order)
+- Client middleware: `app/middleware/{name}.ts` (route-level)
+
+**Database Changes:**
+
+- Migration: `pnpm knex migrate:make {description}` → `database/migrations/`
+- Seed: `database/seeds/{description}.ts`
+
+**Utilities:**
+
+- Shared utils: `shared/utils.ts` or `shared/{util}.ts`
+- Server utils: `server/lib/{util}.ts`
+- Frontend utils: `app/lib/{util}.ts`
+
+## Module Organization
+
+**Authentication Module:**
+
+- Server: `server/lib/auth.ts`, `server/api/auth/[...all].ts`
+- Client: `app/lib/auth-client.ts`, `app/composables/useAuth.ts`
+- Middleware: `server/middleware/auth.ts`
+- Tables: `sktp_users`, `sktp_accounts`, `sktp_sessions`, `sktp_verifications`
+
+**User Management Module:**
+
+- Routes: `server/api/users/` (index.ts, [id].ts, [id].put.ts, [id].delete.ts, ban.ts)
+- Repository: `server/repositories/user.repository.ts`
+- Model: `server/models/user.ts`
+- Validations: `server/validations/users/`
+- Pages: `app/pages/users.vue`, `app/pages/profile.vue`
+
+**Application Management Module:**
+
+- Routes: `server/api/applications/index.ts`
+- Repository: `server/repositories/application.repository.ts`
+- Model: `server/models/application.ts`
+- Pages: `app/pages/applications.vue`
+
+**Message Management Module:**
+
+- Routes: `server/api/messages/index.ts`
+- Repository: `server/repositories/message.repository.ts`
+- Model: `server/models/message.ts`
+
+## Special Directories
+
+**`app/components/ui/`:**
+
+- Purpose: Shadcn Vue base component library
+- Generated: Yes (via Shadcn CLI)
+- Committed: Yes
+- Modification: Avoid direct edits, use Shadcn CLI for updates
+
+**`server/api/auth/`:**
+
+- Purpose: Better Auth catch-all routes
+- Generated: Manual setup
+- Committed: Yes
+- Modification: Only update catch-all handler `[...all].ts`
+
+**`database/migrations/`:**
+
+- Purpose: Database schema version control
+- Generated: Knex CLI
+- Committed: Yes
+- Modification: Never edit applied migrations, create new ones for changes
+
+**`.planning/codebase/`:**
+
+- Purpose: GSD codebase analysis documents
+- Generated: GSD mapper agents
+- Committed: Yes
+- Contains: ARCHITECTURE.md, STRUCTURE.md, STACK.md, etc.
+
+**`plans/`:**
+
+- Purpose: GSD phase plans and execution artifacts
+- Generated: GSD workflow
+- Committed: Yes
+- Contains: Phase directories with PLAN.md, execution logs
+
+## Test Structure
+
+**Location:** `test/` directory at root
+
+**Organization:**
+
+- `test/setup.ts`: Test configuration and setup
+- `test/utils.test.ts`: Utility function tests
+- `test/repositories/`: Repository layer tests
+
+**Pattern:**
+
+- Test files: `{name}.test.ts` suffix
+- Setup: Vitest configuration in `nuxt.config.ts` or separate `vitest.config.ts`
+- Assertions: Expect-based testing
+- Mocking: ViTest mocks for external dependencies
+
+**Run Commands:**
+
+```bash
+pnpm test              # Run all tests
+pnpm test:watch        # Watch mode
+pnpm test:coverage     # With coverage report
 ```
 
-## Shared Code (`shared/`)
-```
-shared/
-├── types.ts                     # Type definitions used by both client and server
-│   - User interface
-│   - Application interface
-│   - Message interface
-│   - PaginatedResponse<T> generic
-│
-└── utils.ts                     # Utility functions shared between layers
-```
+---
 
-## Database (`database/`)
-
-### Migrations
-```
-database/migrations/
-├── 20260325154325_create_auth_tables.ts
-│   Creates Better Auth tables:
-│   - sktp_users
-│   - sktp_accounts
-│   - sktp_verifications
-│   - sktp_sessions
-│
-├── 20260325192549_create_applications_table.ts
-│   Creates sktp_applications table
-│   Columns: id, name, key, secret, limits, webhook config, etc.
-│   Foreign key: user_id → sktp_users
-│
-├── 20260325194928_create_messages_table.ts
-│   Creates sktp_messages table
-│   Columns: id, app_id, channel, event, payload, created_at
-│   Foreign key: app_id → sktp_applications
-│
-└── 20260326133005_add_admin_columns_in_auth_tables.ts
-    Adds admin-related columns to sktp_users:
-    - role (admin | user)
-    - banned (boolean)
-    - banReason (nullable)
-    - banExpires (nullable)
-```
-
-### Seeds
-```
-database/seeds/                  # Seed scripts for development data
-```
-
-## Configuration Files
-
-### `nuxt.config.ts`
-- App metadata (title, icon, robots)
-- Module imports (eslint, shadcn, color-mode, vue-sonner)
-- CSS imports (Tailwind)
-- Shadcn configuration (componentDir, prefix)
-- runtimeConfig (app, database, auth, soketi, pusher variables)
-
-### `knexfile.ts`
-- Database driver configuration (MySQL/PostgreSQL)
-- Migration directory
-- Seed directory
-- Connection pooling settings
-
-### `tsconfig.json`
-- References to .nuxt generated TypeScript configs for app, server, shared, node
-
-### `eslint.config.mjs`
-- Nuxt ESLint configuration wrapper (flat config format)
-
-### `components.json`
-- Shadcn Vue component registry
-- Component paths and import aliases
-
-### `.env.example`
-- Template for all environment variables
-- Grouped by feature (app, auth, database, soketi, pusher)
-
-## Public Assets
-```
-public/
-├── favicon.png                  # Site favicon
-└── [other static files]
-```
-
-## Static Files Not Committed
-```
-.nuxt/                           # Build artifacts (auto-generated)
-.env                             # Actual environment variables (gitignored)
-node_modules/                    # Dependencies (pnpm, gitignored)
-```
-
-## Planning & Tracking
-```
-.planning/
-├── codebase/                    # Codebase mapping documents (this directory)
-│   ├── STACK.md
-│   ├── INTEGRATIONS.md
-│   ├── ARCHITECTURE.md
-│   ├── STRUCTURE.md
-│   ├── CONVENTIONS.md
-│   ├── TESTING.md
-│   └── CONCERNS.md
-├── STATE.md                     # Project state summary
-├── research/                    # Phase research artifacts
-└── phases/                      # Completed phase milestones
-```
-
-## File Naming Conventions
-
-### Pages & Routes
-- Kebab-case: `login.vue`, `user-profile.vue`
-- Dynamic segments: `[id].ts`, `[...all].ts`
-
-### Components
-- PascalCase: `Navbar.vue`, `UserMenu.vue`, `CodeBlock.vue`
-- UI: `Button.vue`, `Dialog.vue`, `Input.vue`
-
-### Composables
-- camelCase with `use` prefix: `useAuth.ts`, `useForm.ts`
-
-### TypeScript
-- Classes: PascalCase: `User.ts`, `Application.ts`
-- Interfaces: PascalCase with suffix: `UserType`, `ApplicationType`
-- Functions: camelCase: `getUser()`, `createApplication()`
-
-### Files
-- Classes: PascalCase: `Model.ts`
-- Logic: camelCase: `auth.ts`, `utils.ts`
-- Schemas: camelCase with suffix: `createUserScheme.ts`
-
-## Key Paths for Development
-
-| What | Where | Access |
-|------|-------|--------|
-| Frontend pages | `app/pages/` | Auto-imported by Nuxt |
-| Frontend components | `app/components/` | Auto-imported by Nuxt |
-| Composables | `app/composables/` | Auto-imported by Nuxt |
-| API endpoints | `server/api/` | `POST /api/path/to/file` |
-| Database models | `server/models/` | Import directly `server/models/user.ts` |
-| Repositories | `server/repositories/` | Import directly, use in endpoints |
-| Shared types | `shared/types.ts` | Import from `#shared/types` (alias) |
-| Database migrations | `database/migrations/` | `pnpm migrate` commands |
-| ENV config | `nuxt.config.ts` | Access via `useRuntimeConfig()` |
-| Tailwind styles | `app/assets/css/tailwind.css` | Auto-applied |
+_Structure analysis: 2026-03-27_
