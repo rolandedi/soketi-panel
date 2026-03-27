@@ -7,12 +7,7 @@ import {
 import { banUserScheme } from "~~/server/validations/users/banUserScheme";
 
 export default defineEventHandler(async (event) => {
-  if (event.context.user?.role !== "admin") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
+  // Protection admin via middleware user-admin.ts
 
   const { data, error } = await validateWith(event, "body", banUserScheme);
 
@@ -20,7 +15,7 @@ export default defineEventHandler(async (event) => {
     throw createValidationError(error);
   }
 
-  if (event.context.user.id === data.userId) {
+  if (event.context.user?.id === data.userId) {
     throw createError({
       statusCode: 400,
       statusMessage: "You cannot ban your own account",

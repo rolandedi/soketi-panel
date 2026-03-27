@@ -2,16 +2,11 @@ import { UserRepository } from "~~/server/repositories/user.repository";
 import { logError } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
-  if (event.context.user?.role !== "admin") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
+  // Protection admin via middleware user-admin.ts
 
   const { id } = getRouterParams(event);
 
-  if (event.context.user.id === id) {
+  if (event.context.user?.id === id) {
     throw createError({
       statusCode: 400,
       statusMessage: "You cannot delete your own account",

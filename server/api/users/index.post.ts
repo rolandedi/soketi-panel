@@ -7,12 +7,7 @@ import {
 import { createUserScheme } from "~~/server/validations/users/createUserScheme";
 
 export default defineEventHandler(async (event) => {
-  if (event.context.user?.role !== "admin") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
+  // Protection admin via middleware user-admin.ts
 
   const { data, error } = await validateWith(event, "body", createUserScheme);
 
