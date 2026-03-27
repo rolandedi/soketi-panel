@@ -58,9 +58,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: "Choisir une date",
+  placeholder: "Choose a date",
   layout: "month-and-year",
-  locale: "fr-FR",
+  locale: "en-US",
 });
 
 // v-model is a plain ISO string "YYYY-MM-DD" to integrate with vee-validate fields
