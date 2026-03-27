@@ -1,23 +1,31 @@
-import { User } from "../../models/user";
+import { UserRepository } from "~~/server/repositories/user.repository";
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, "id");
-
-  if (!id) {
+  if (!event.context.user || event.context.user.role !== "admin") {
     throw createError({
-      statusCode: 400,
-      statusMessage: "User ID is required",
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
   }
 
-  const user = await User.find(id);
+  const { id } = getRouterParams(event);
+  const userRepository = new UserRepository();
 
-  if (!user) {
+  try {
+    const user = await userRepository.getById(id);
+
+    if (!user) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "User not found",
+      });
+    }
+
+    return user;
+  } catch (error: any) {
     throw createError({
-      statusCode: 404,
-      statusMessage: "User not found",
+      statusCode: error.statusCode || 500,
+      statusMessage: error.statusMessage || error.message || "Failed to fetch user",
     });
   }
-
-  return user;
 });

@@ -1,3 +1,32 @@
+import { UserRepository } from "~~/server/repositories/user.repository";
+import { validateWith, createValidationError } from "~~/server/lib/utils";
+import { updateUserScheme } from "~~/server/validations/users/updateUserScheme";
+
 export default defineEventHandler(async (event) => {
-  return 'Hello Nitro'
-})
+  if (event.context.user?.role !== "admin") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+    });
+  }
+
+  const { id } = getRouterParams(event);
+  const { data, error } = await validateWith(event, "body", updateUserScheme);
+
+  if (error) {
+    throw createValidationError(error);
+  }
+
+  const userRepository = new UserRepository();
+
+  try {
+    await userRepository.update(id as string, data);
+    return { success: true };
+  } catch (error: any) {
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage:
+        error.statusMessage || error.message || "Failed to update user",
+    });
+  }
+});
