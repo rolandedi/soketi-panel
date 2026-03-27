@@ -39,3 +39,20 @@ export function logError(context: string, error: any) {
     ...error,
   });
 }
+
+export function handleError(
+  context: string,
+  error: any,
+  defaultMessage = "An error occurred",
+) {
+  consola.error(`[${context}]`, {
+    message: error?.message || "Unknown error",
+    stack: error?.stack,
+    ...error,
+  });
+
+  return createError({
+    statusCode: error.statusCode || 500,
+    statusMessage: error.statusMessage || error.message || defaultMessage,
+  });
+}
