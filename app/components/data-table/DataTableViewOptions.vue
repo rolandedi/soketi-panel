@@ -1,5 +1,4 @@
 <script setup lang="ts" generic="TData">
-import { computed } from "vue";
 import { type Table } from "@tanstack/vue-table";
 import { LucideColumns3 } from "lucide-vue-next";
 
@@ -13,17 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableViewOptionsProps {
+interface Props {
   table: Table<TData>;
 }
 
-const props = defineProps<DataTableViewOptionsProps>();
-
-const columns = computed(() => {
-  // Force tracking of column visibility changes
-  const _ = props.table.getState().columnVisibility;
-  return props.table.getAllColumns().filter((column) => column.getCanHide());
-});
+defineProps<Props>();
 </script>
 
 <template>
@@ -38,11 +31,14 @@ const columns = computed(() => {
       <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem
-        v-for="column in columns"
+        v-for="column in table
+          .getAllColumns()
+          .filter((column) => column.getCanHide())"
         :key="column.id"
         class="capitalize"
-        :checked="column.getIsVisible()"
-        @update:checked="(value: boolean) => column.toggleVisibility(!!value)"
+        :model-value="column.getIsVisible()"
+        @update:model-value="(value) => column.toggleVisibility(!!value)"
+        @select="(event) => event.preventDefault()"
       >
         {{ column.id }}
       </DropdownMenuCheckboxItem>
