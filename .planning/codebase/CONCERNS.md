@@ -292,10 +292,10 @@
 ## Action Items
 
 ### Immediate (This Sprint)
-- [ ] Add global middleware to check user ban status
-- [ ] Create health check endpoint
-- [ ] Audit all collection endpoints for pagination
-- [ ] Document all environment variables in README
+- [x] Add global middleware to check user ban status
+- [x] Create health check endpoint
+- [x] Audit all collection endpoints for pagination
+- [x] Document all environment variables in README
 
 ### Short-term (Next 2 Sprints)
 - [ ] Setup Vitest and write tests for repositories
