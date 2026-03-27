@@ -54,15 +54,14 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue-sonner";
+import { PlusIcon } from "lucide-vue-next";
 import { useCsrfFetch } from "~/composables/useCsrfFetch";
 
 import type { PaginatedResponse, User } from "#shared/types";
 import { getUsersColumns } from "~/table-columns/usersColumns";
 import { DataTable } from "~/components/data-table";
 import PageHero from "~/components/PageHero.vue";
-import CreateUserModal from "~/components/modals/CreateUserModal.vue";
-import EditUserModal from "~/components/modals/EditUserModal.vue";
-import BanUserModal from "~/components/modals/BanUserModal.vue";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,8 +72,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
-import { toast } from "vue-sonner";
-import { PlusIcon } from "lucide-vue-next";
+
+import CreateUserModal from "~/components/modals/users/CreateUserModal.vue";
+import EditUserModal from "~/components/modals/users/EditUserModal.vue";
+import BanUserModal from "~/components/modals/users/BanUserModal.vue";
 
 useHead({ title: "Users" });
 
