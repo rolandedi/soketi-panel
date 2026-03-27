@@ -21,7 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table";
 
-const rowActions = (row: User) => {
+interface UsersTableOptions {
+  handleEdit?: (user: User) => void;
+  handleBan?: (user: User) => void;
+  handleDelete?: (user: User) => void;
+}
+
+const rowActions = (row: User, options?: UsersTableOptions) => {
   return h(DropdownMenu, () => [
     h(DropdownMenuTrigger, { asChild: true }, () =>
       h(
@@ -37,143 +43,182 @@ const rowActions = (row: User) => {
       ),
     ),
     h(DropdownMenuContent, { align: "end", class: "w-40" }, () => [
-      h(DropdownMenuItem, () => [h(PencilIcon, { size: 16 }), "Edit"]),
-      h(DropdownMenuItem, () => [h(BanIcon, { size: 16 }), "Ban"]),
+      h(DropdownMenuItem, { onClick: () => options?.handleEdit?.(row) }, () => [
+        h(PencilIcon, { size: 16 }),
+        "Edit",
+      ]),
+      h(DropdownMenuItem, { onClick: () => options?.handleBan?.(row) }, () => [
+        h(BanIcon, { size: 16 }),
+        row.banned ? "Unban" : "Ban",
+      ]),
       h(DropdownMenuSeparator),
-      h(DropdownMenuItem, () => [h(TrashIcon, { size: 16 }), "Delete"]),
+      h(
+        DropdownMenuItem,
+        {
+          class: "text-destructive focus:text-destructive",
+          onClick: () => options?.handleDelete?.(row),
+        },
+        () => [h(TrashIcon, { size: 16 }), "Delete"],
+      ),
     ]),
   ]);
 };
 
-export const usersColumns: ColumnDef<User>[] = [
-  {
-    id: "select",
-    header: ({ table }) =>
-      h(Checkbox, {
-        modelValue:
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate"),
-        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
-          table.toggleAllPageRowsSelected(!!value),
-        "aria-label": "Select all",
-      }),
-    cell: ({ row }) =>
-      h(Checkbox, {
-        modelValue: row.getIsSelected(),
-        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
-          row.toggleSelected(!!value),
-        "aria-label": "Select row",
-      }),
-    size: 28,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Name" }),
-    cell: ({ row }) =>
-      h(
-        "div",
-        { class: "max-w-[500px] truncate font-medium" },
-        row.getValue("name"),
-      ),
-    enableHiding: true,
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Email" }),
-    enableHiding: true,
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Role" }),
-    cell: ({ row }) => {
-      const role = row.getValue("role") as string;
-      return h(
-        Badge,
-        {
-          variant: "outline",
-          class:
-            role === "admin"
+export const getUsersColumns = (
+  options?: UsersTableOptions,
+): ColumnDef<User>[] => {
+  return [
+    {
+      id: "select",
+      header: ({ table }) =>
+        h(Checkbox, {
+          modelValue:
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate"),
+          "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+            table.toggleAllPageRowsSelected(!!value),
+          "aria-label": "Select all",
+        }),
+      cell: ({ row }) =>
+        h(Checkbox, {
+          modelValue: row.getIsSelected(),
+          "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+            row.toggleSelected(!!value),
+          "aria-label": "Select row",
+        }),
+      size: 28,
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Name" }),
+      cell: ({ row }) =>
+        h(
+          "div",
+          { class: "max-w-[500px] truncate font-medium" },
+          row.getValue("name"),
+        ),
+      enableHiding: false,
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Email" }),
+      enableHiding: false,
+    },
+    {
+      accessorKey: "role",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Role" }),
+      cell: ({ row }) => {
+        const role = row.getValue("role") as string;
+        return h(
+          Badge,
+          {
+            variant: "outline",
+            class:
+              role === "admin"
+                ? "bg-muted-foreground text-white"
+                : "bg-muted-foreground/10",
+          },
+          () => (role === "admin" ? "Admin" : "User"),
+        );
+      },
+      enableHiding: false,
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
+      cell: ({ row }) => {
+        const status = row.original.emailVerified;
+        return h(
+          Badge,
+          {
+            variant: "outline",
+            class: status
+              ? "bg-green-500 text-white border-0"
+              : "bg-yellow-500 text-white border-0",
+          },
+          () => (status ? "Verified" : "Unverified"),
+        );
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "banned",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Banned" }),
+      cell: ({ row }) => {
+        const banned = row.getValue("banned") as boolean;
+        return h(
+          Badge,
+          {
+            variant: "outline",
+            class: banned
               ? "bg-muted-foreground text-white"
               : "bg-muted-foreground/10",
-        },
-        () => (role === "admin" ? "Admin" : "User"),
-      );
+          },
+          () => (banned ? "Banned" : "Not banned"),
+        );
+      },
     },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
-    cell: ({ row }) => {
-      const status = row.original.emailVerified;
-      return h(
-        Badge,
-        {
-          variant: "outline",
-          class: status
-            ? "bg-green-500 text-white border-0"
-            : "bg-yellow-500 text-white border-0",
-        },
-        () => (status ? "Verified" : "Unverified"),
-      );
+    {
+      accessorKey: "banReason",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Ban Reason" }),
+      cell: ({ row }) => {
+        const banReason = row.getValue("banReason") as string | null;
+        return h(
+          "div",
+          { class: "max-w-[300px] text-muted-foreground truncate" },
+          banReason || "-",
+        );
+      },
+      enableHiding: true,
+      enableSorting: false,
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+    {
+      accessorKey: "createdAt",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Created At" }),
+      cell: ({ row }) => {
+        const createdAt = row.getValue("createdAt") as string;
+        return h(
+          "div",
+          { class: "max-w-[200px] text-muted-foreground truncate" },
+          formatDate(createdAt),
+        );
+      },
+      enableHiding: false,
     },
-  },
-  {
-    accessorKey: "banned",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Banned" }),
-    cell: ({ row }) => {
-      const banned = row.getValue("banned") as boolean;
-      return h(
-        Badge,
-        {
-          variant: "outline",
-          class: banned
-            ? "bg-muted-foreground text-white"
-            : "bg-muted-foreground/10",
-        },
-        () => (banned ? "Banned" : "Not banned"),
-      );
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, { column, title: "Updated At" }),
+      cell: ({ row }) => {
+        const updatedAt = row.getValue("updatedAt") as string | null;
+        return h(
+          "div",
+          { class: "max-w-[200px] text-muted-foreground truncate" },
+          updatedAt ? formatDate(updatedAt) : "-",
+        );
+      },
     },
-  },
-  {
-    accessorKey: "createdAt",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Created At" }),
-    cell: ({ row }) => {
-      const createdAt = row.getValue("createdAt") as string;
-      return h(
-        "div",
-        { class: "max-w-[200px] text-muted-foreground truncate" },
-        formatDate(createdAt),
-      );
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return h(
+          "div",
+          { class: "text-right" },
+          rowActions(row.original, options),
+        );
+      },
+      enableHiding: false,
     },
-  },
-  {
-    accessorKey: "updatedAt",
-    header: ({ column }) =>
-      h(DataTableColumnHeader<User, any>, { column, title: "Updated At" }),
-    cell: ({ row }) => {
-      const updatedAt = row.getValue("updatedAt") as string | null;
-      return h(
-        "div",
-        { class: "max-w-[200px] text-muted-foreground truncate" },
-        updatedAt ? formatDate(updatedAt) : "-",
-      );
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) =>
-      h("div", { class: "text-right" }, rowActions(row.original)),
-    enableHiding: false,
-  },
-];
+  ];
+};
