@@ -8,9 +8,6 @@ export default defineEventHandler(async (event) => {
     return {
       status: "ok",
       timestamp: new Date().toISOString(),
-      services: {
-        database: "connected",
-      },
     };
   } catch (error: any) {
     throw createError({
