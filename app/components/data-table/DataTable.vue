@@ -2,67 +2,81 @@
   <div class="space-y-4">
     <DataTableToolbar :table="table" :filter-column="filterColumn" />
     <div class="rounded-md border bg-card overflow-y-hidden overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow
-            v-for="headerGroup in table.getHeaderGroups()"
-            :key="headerGroup.id"
-          >
-            <TableHead
-              v-for="(header, idx) in headerGroup.headers"
-              :key="header.id"
-              :class="{
-                'pl-3': idx === 0,
-                'pr-3': idx === headerGroup.headers.length - 1,
-              }"
-            >
-              <FlexRender
-                v-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <template v-if="table.getRowModel().rows?.length">
+      <DataTableContainer v-slot="{ handleScroll }">
+        <Table
+          class="nds--table text-nowrap"
+          container-class="overflow-y-hidden overflow-x-auto whitespace-nowrap"
+          @scroll="handleScroll"
+        >
+          <TableHeader>
             <TableRow
-              v-for="row in table.getRowModel().rows"
-              :key="row.id"
-              :data-state="row.getIsSelected() && 'selected'"
+              v-for="headerGroup in table.getHeaderGroups()"
+              :key="headerGroup.id"
             >
-              <TableCell
-                v-for="(cell, idx) in row.getVisibleCells()"
-                :key="cell.id"
+              <TableHead
+                v-for="(header, idx) in headerGroup.headers"
+                :key="header.id"
                 :class="{
-                  'pl-3': idx === 0,
-                  'pr-3': idx === row.getVisibleCells().length - 1,
+                  'px-3': idx === 0 || idx === headerGroup.headers.length - 1,
+                  'left-sticky sticky left-0 z-10 p-2! rounded-tl-xl bg-card':
+                    leftSticky && idx === 0,
+                  'right-sticky sticky right-0 z-10 rounded-tr-xl bg-card':
+                    rightSticky && idx === headerGroup.headers.length - 1,
                 }"
               >
                 <FlexRender
-                  :render="cell.column.columnDef.cell"
-                  :props="cell.getContext()"
+                  v-if="!header.isPlaceholder"
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
                 />
-              </TableCell>
+              </TableHead>
             </TableRow>
-          </template>
-          <template v-else>
-            <TableRow v-if="!loading">
-              <TableCell :colspan="columns.length" class="h-24 text-center">
-                <div>No results.</div>
-              </TableCell>
-            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template v-if="table.getRowModel().rows?.length">
+              <TableRow
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                class="group"
+                :data-state="row.getIsSelected() && 'selected'"
+              >
+                <TableCell
+                  v-for="(cell, idx) in row.getVisibleCells()"
+                  :key="cell.id"
+                  :class="{
+                    'px-3':
+                      idx === 0 || idx === row.getVisibleCells().length - 1,
+                    'left-sticky sticky left-0 z-10 p-2! bg-card group-hover:bg-muted':
+                      leftSticky && idx === 0,
+                    'right-sticky sticky right-0 z-10 bg-card group-hover:bg-muted':
+                      rightSticky && idx === row.getVisibleCells().length - 1,
+                  }"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </TableCell>
+              </TableRow>
+            </template>
             <template v-else>
-              <template v-if="$slots.placeholder">
-                <slot name="placeholder" />
-              </template>
+              <TableRow v-if="!loading">
+                <TableCell :colspan="columns.length" class="h-24 text-center">
+                  <div>No results.</div>
+                </TableCell>
+              </TableRow>
               <template v-else>
-                <DataTableSkeleton :columns-length="columns.length" />
+                <template v-if="$slots.placeholder">
+                  <slot name="placeholder" />
+                </template>
+                <template v-else>
+                  <DataTableSkeleton :columns-length="columns.length" />
+                </template>
               </template>
             </template>
-          </template>
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </DataTableContainer>
     </div>
     <DataTablePagination :table="table" :pagination="pagination" />
   </div>
@@ -93,8 +107,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
+import DataTableContainer from "./DataTableContainer.vue";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
@@ -106,9 +122,14 @@ interface Props {
     perPage: number;
     total: number;
   };
+  leftSticky?: boolean;
+  rightSticky?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  leftSticky: false,
+  rightSticky: false,
+});
 const data = defineModel<TData[]>({ default: [] });
 
 const loading = computed(() => props.loading || false);
