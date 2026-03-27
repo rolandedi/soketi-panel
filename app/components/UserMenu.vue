@@ -4,10 +4,11 @@
       <Button variant="ghost" class="h-auto p-0 hover:bg-transparent">
         <Avatar>
           <AvatarImage
-            :src="user.image || './avatar.jpg'"
+            v-if="user.image"
+            :src="user.image"
             alt="Profile image"
           />
-          <AvatarFallback>{{ getInitials(user.name) }}</AvatarFallback>
+          <AvatarFallback v-else>{{ getInitials(user.name) }}</AvatarFallback>
         </Avatar>
         <LucideChevronDown class="size-4" aria-hidden="true" />
       </Button>
@@ -46,7 +47,7 @@
 <script setup lang="ts">
 import { LucideChevronDown, LucideLogOut, UserIcon } from "lucide-vue-next";
 
-import { getInitials } from "~/lib/utils";
+import { getInitials } from "#shared/utils";
 import { useAuth } from "~/composables/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

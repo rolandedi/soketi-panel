@@ -1,15 +1,43 @@
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import mysql from "mysql2/promise";
+import { Pool } from "pg";
+
+const {
+  APP_NAME = "Soketi Panel",
+  DB_DRIVER = "mysql",
+  DB_HOST = "localhost",
+  DB_PORT = "3306",
+  DB_USER = "soketi",
+  DB_PASSWORD = "",
+  DB_NAME = "soketi_db",
+} = process.env;
+
+function createDbPool() {
+  if (DB_DRIVER === "mysql") {
+    return mysql.createPool({
+      host: DB_HOST,
+      port: Number(DB_PORT),
+      user: DB_USER,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+    });
+  } else if (DB_DRIVER === "pg" || DB_DRIVER === "postgres") {
+    return new Pool({
+      host: DB_HOST,
+      port: Number(DB_PORT),
+      user: DB_USER,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+    });
+  }
+
+  throw new Error(`Unsupported database driver: ${DB_DRIVER}`);
+}
 
 export const auth = betterAuth({
-  appName: process.env.APP_NAME || "Soketi Panel",
-  database: mysql.createPool({
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || process.env.DB_USERNAME || "soketi",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "soketi_db",
-  }),
+  appName: APP_NAME,
+  database: createDbPool(),
   emailAndPassword: {
     enabled: true,
   },
@@ -31,4 +59,9 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minute cache
     },
   },
+  plugins: [admin()],
 });
+
+export const useAuth = () => {
+  return auth.api;
+};

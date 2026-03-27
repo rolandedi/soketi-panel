@@ -17,7 +17,12 @@ export default defineNuxtConfig({
     classSuffix: "",
   },
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "shadcn-nuxt", "@nuxtjs/color-mode"],
+  modules: [
+    "@nuxt/eslint",
+    "shadcn-nuxt",
+    "@nuxtjs/color-mode",
+    "vue-sonner/nuxt",
+  ],
   css: ["~/assets/css/tailwind.css"],
   vite: {
     plugins: [tailwindcss()],
