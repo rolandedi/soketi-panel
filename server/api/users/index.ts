@@ -1,8 +1,9 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
+import { logError } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
   // Vérification de rôle centralisée pour l'admin
-  if (!event.context.user || event.context.user.role !== "admin") {
+  if (event.context.user?.role !== "admin") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -18,6 +19,7 @@ export default defineEventHandler(async (event) => {
   try {
     return await userRepository.getAll(page, limit);
   } catch (error: any) {
+    logError("users.getAll", error);
     return createError({
       statusCode: 500,
       statusMessage: error?.message || "Failed to fetch users",

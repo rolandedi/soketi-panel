@@ -1,5 +1,9 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { validateWith, createValidationError } from "~~/server/lib/utils";
+import {
+  validateWith,
+  createValidationError,
+  logError,
+} from "~~/server/lib/utils";
 import { updateUserScheme } from "~~/server/validations/users/updateUserScheme";
 
 export default defineEventHandler(async (event) => {
@@ -23,6 +27,7 @@ export default defineEventHandler(async (event) => {
     await userRepository.update(id as string, data);
     return { success: true };
   } catch (error: any) {
+    logError("users.update", error);
     throw createError({
       statusCode: error.statusCode || 500,
       statusMessage:

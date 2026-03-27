@@ -1,9 +1,13 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { validateWith, createValidationError } from "~~/server/lib/utils";
+import {
+  validateWith,
+  createValidationError,
+  logError,
+} from "~~/server/lib/utils";
 import { banUserScheme } from "~~/server/validations/users/banUserScheme";
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user || event.context.user.role !== "admin") {
+  if (event.context.user?.role !== "admin") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -26,12 +30,19 @@ export default defineEventHandler(async (event) => {
   const userRepository = new UserRepository();
 
   try {
-    await userRepository.ban(data.userId, data.banned, data.banReason, data.banExpires);
+    await userRepository.ban(
+      data.userId,
+      data.banned,
+      data.banReason,
+      data.banExpires,
+    );
     return { success: true };
   } catch (error: any) {
+    logError("users.ban", error);
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.statusMessage || error.message || "Failed to ban/unban user",
+      statusMessage:
+        error.statusMessage || error.message || "Failed to ban/unban user",
     });
   }
 });

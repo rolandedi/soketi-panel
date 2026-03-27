@@ -1,4 +1,5 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
+import { logError } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
   if (event.context.user?.role !== "admin") {
@@ -23,6 +24,7 @@ export default defineEventHandler(async (event) => {
     await userRepository.delete(id as string);
     return { success: true };
   } catch (error: any) {
+    logError("users.delete", error);
     throw createError({
       statusCode: error.statusCode || 500,
       statusMessage:

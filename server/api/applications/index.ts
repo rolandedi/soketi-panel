@@ -1,5 +1,6 @@
 import { auth } from "~~/server/lib/auth";
 import { Application } from "~~/server/models/application";
+import { logError } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
   const session = await auth.api.getSession({
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
   try {
     return await Application.paginate(page, limit);
   } catch (error: any) {
-    console.error(error);
+    logError("applications.getAll", error);
     return createError({
       statusCode: 500,
       statusMessage: error?.message || "Failed to fetch applications",
