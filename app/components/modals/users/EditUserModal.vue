@@ -62,12 +62,12 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import { z } from "zod";
 import { toast } from "vue-sonner";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 
+import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import type { User } from "#shared/types";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -94,9 +94,7 @@ import {
 } from "~/components/ui/dialog";
 
 const props = defineProps<{ user: User | null }>();
-const emit = defineEmits<{
-  success: [user: User];
-}>();
+const emit = defineEmits<{ success: [user: User] }>();
 
 const isOpen = defineModel<boolean>("open", { default: false });
 const isSaving = ref(false);

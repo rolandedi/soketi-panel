@@ -17,12 +17,10 @@
         <div v-if="!user?.banned" class="py-6">
           <FieldGroup>
             <Field>
-              <FieldLabel for="ban-reason"
-                >Reason
-                <span class="text-muted-foreground"
-                  >(optional)</span
-                ></FieldLabel
-              >
+              <FieldLabel for="ban-reason">
+                Reason
+                <span class="text-muted-foreground">(optional)</span>
+              </FieldLabel>
               <Input
                 id="ban-reason"
                 v-model="banReason"
@@ -35,17 +33,16 @@
               />
             </Field>
             <Field>
-              <FieldLabel for="ban-expires"
-                >Expiration date
-                <span class="text-muted-foreground"
-                  >(optional)</span
-                ></FieldLabel
-              >
-              <Input
-                id="ban-expires"
+              <FieldLabel for="ban-expires">
+                Expiration date
+                <span class="text-muted-foreground">(optional)</span>
+              </FieldLabel>
+              <DatePicker
                 v-model="banExpires"
                 v-bind="banExpiresAttrs"
-                type="datetime-local"
+                placeholder="Select expiration date"
+                :min-value="todayDate"
+                :max-value="maxExpiresDate"
               />
               <FieldError
                 v-if="errors.banExpires"
@@ -64,9 +61,9 @@
             :variant="user?.banned ? 'default' : 'destructive'"
           >
             <span v-if="!isBanning">{{ user?.banned ? "Unban" : "Ban" }}</span>
-            <span v-else>{{
-              user?.banned ? "Unbanning..." : "Banning..."
-            }}</span>
+            <span v-else>
+              {{ user?.banned ? "Unbanning..." : "Banning..." }}
+            </span>
           </Button>
         </DialogFooter>
       </form>
@@ -76,15 +73,17 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import { z } from "zod";
 import { toast } from "vue-sonner";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 import type { User } from "#shared/types";
-import { Button } from "~/components/ui/button";
+import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { DatePicker } from "~/components/ui/date-picker";
 import {
   FieldError,
   FieldGroup,
@@ -107,6 +106,9 @@ const emit = defineEmits<{
 
 const isOpen = defineModel<boolean>("open", { default: false });
 const isBanning = ref(false);
+
+const todayDate = today(getLocalTimeZone());
+const maxExpiresDate = computed(() => todayDate.add({ years: 50 }));
 
 const { errors, handleSubmit, resetForm, defineField } = useForm({
   validationSchema: toTypedSchema(
