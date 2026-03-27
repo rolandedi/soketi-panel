@@ -47,7 +47,7 @@ export class UserRepository {
     });
   }
 
-  async delete(id: string, headers?: Headers) {
+  async delete(id: string[], headers?: Headers) {
     return await auth.api.removeUser({
       headers,
       body: {
@@ -68,7 +68,7 @@ export class UserRepository {
         userId: id,
         banReason: reason ?? undefined,
         banExpiresIn: expires
-          ? new Date(expires).getTime() - Date.now()
+          ? Math.floor((new Date(expires).getTime() - Date.now()) / 1000)
           : undefined,
       },
     });
