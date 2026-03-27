@@ -183,6 +183,23 @@ export const getUsersColumns = (
       enableSorting: false,
     },
     {
+      accessorKey: "banExpires",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<User, any>, {
+          column,
+          title: "Ban Expires At",
+        }),
+      cell: ({ row }) => {
+        const banExpires = row.getValue("banExpires") as string;
+        return h(
+          "div",
+          { class: "max-w-[200px] text-muted-foreground truncate" },
+          banExpires ? formatDate(banExpires) : "-",
+        );
+      },
+      enableHiding: true,
+    },
+    {
       accessorKey: "createdAt",
       header: ({ column }) =>
         h(DataTableColumnHeader<User, any>, { column, title: "Created At" }),
