@@ -1,5 +1,5 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { banUserScheme } from "~~/server/validations/users/banUserScheme";
+import { unbanUserScheme } from "~~/server/validations/users/unbanUserScheme";
 import {
   validateWith,
   createValidationError,
@@ -7,7 +7,7 @@ import {
 } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
-  const { data, error } = await validateWith(event, "body", banUserScheme);
+  const { data, error } = await validateWith(event, "body", unbanUserScheme);
 
   if (error) {
     throw createValidationError(error);
@@ -16,21 +16,16 @@ export default defineEventHandler(async (event) => {
   if (event.context.user?.id === data.userId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "You cannot ban your own account",
+      statusMessage: "You cannot unban your own account",
     });
   }
 
   const userRepository = new UserRepository();
 
   try {
-    await userRepository.ban(
-      data.userId,
-      data.banReason,
-      data.banExpires,
-      event.headers,
-    );
+    await userRepository.unban(data.userId, event.headers);
     return { success: true };
   } catch (error: any) {
-    throw handleError("users.ban", error, "Failed to ban user");
+    throw handleError("users.unban", error, "Failed to unban user");
   }
 });

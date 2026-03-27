@@ -1,9 +1,7 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { logError } from "~~/server/lib/utils";
+import { handleError } from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
-  // Protection admin via middleware user-admin.ts
-
   const { id } = getRouterParams(event);
 
   if (event.context.user?.id === id) {
@@ -16,14 +14,9 @@ export default defineEventHandler(async (event) => {
   const userRepository = new UserRepository();
 
   try {
-    await userRepository.delete(id as string);
+    await userRepository.delete(id as string, event.headers);
     return { success: true };
   } catch (error: any) {
-    logError("users.delete", error);
-    throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage:
-        error.statusMessage || error.message || "Failed to delete user",
-    });
+    throw handleError("users.delete", error, "Failed to delete user");
   }
 });
