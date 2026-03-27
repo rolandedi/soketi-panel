@@ -2,8 +2,9 @@ import type { Message as MessageType } from "#shared/types";
 import { Model } from "../lib/orm/model";
 
 export class Message extends Model implements MessageType {
-  public static table = "sktp_messages";
-  public static casts = {
+  public static override table = "sktp_messages";
+
+  public static override casts = {
     payload: "json" as const,
   };
 

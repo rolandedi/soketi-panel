@@ -2,8 +2,9 @@ import type { Application as ApplicationType } from "#shared/types";
 import { Model } from "../lib/orm/model";
 
 export class Application extends Model implements ApplicationType {
-  public static table = "sktp_applications";
-  public static casts = {
+  public static override readonly table = "sktp_applications";
+
+  public static override readonly casts = {
     max_connections: "number" as const,
     enable_client_messages: "boolean" as const,
     enabled: "boolean" as const,

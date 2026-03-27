@@ -2,9 +2,9 @@ import type { User as UserType } from "#shared/types";
 import { Model } from "../lib/orm/model";
 
 export class User extends Model implements UserType {
-  public static table = "sktp_users";
+  public static override table = "sktp_users";
 
-  public static casts = {
+  public static override casts = {
     emailVerified: "boolean" as const,
     banned: "boolean" as const,
   };

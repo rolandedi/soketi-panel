@@ -4,7 +4,6 @@ import type { User as UserType } from "#shared/types";
 
 export class UserRepository {
   async getAll(page: number = 1, limit: number = 10) {
-    // Utiliser le modèle personnalisé pour la pagination car Better Auth ne propose pas de pagination native simple pour sktp_users
     return await User.paginate(page, limit);
   }
 
@@ -14,7 +13,7 @@ export class UserRepository {
   }
 
   async create(data: any) {
-    // L'API de Better Auth attend un objet body avec les paramètres
+    // Le plugin admin expose ses propres méthodes sur auth.api
     const res = await auth.api.createUser({
       body: {
         email: data.email,
@@ -28,6 +27,8 @@ export class UserRepository {
   }
 
   async update(id: string, data: any) {
+    // Pour mettre à jour un autre utilisateur en tant qu'admin, on utilise le plugin admin s'il est exposé
+    // Sinon on peut utiliser le modèle directement ou les méthodes admin de l'API
     return await auth.api.updateUser({
       body: {
         userId: id,
@@ -37,21 +38,37 @@ export class UserRepository {
   }
 
   async delete(id: string) {
-    return await auth.api.deleteUser({
+    return await auth.api.removeUser({
       body: {
         userId: id,
       },
     });
   }
 
-  async ban(id: string, banned: boolean, reason?: string | null, expires?: string | null) {
-    return await auth.api.banUser({
-      body: {
-        userId: id,
-        banned,
-        banReason: reason ?? undefined,
-        banExpires: expires ?? undefined,
-      },
-    });
+  async ban(
+    id: string,
+    banned: boolean,
+    reason?: string | null,
+    expires?: string | null,
+  ) {
+    if (banned) {
+      return await auth.api.banUser({
+        body: {
+          userId: id,
+          banReason: reason ?? undefined,
+          // Better Auth attend banExpiresIn (ms) ou une date selon la version,
+          // mais ici l'erreur TS disait banExpiresIn?: number
+          banExpiresIn: expires
+            ? new Date(expires).getTime() - Date.now()
+            : undefined,
+        },
+      });
+    } else {
+      return await auth.api.unbanUser({
+        body: {
+          userId: id,
+        },
+      });
+    }
   }
 }
