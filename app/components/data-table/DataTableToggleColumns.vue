@@ -3,16 +3,14 @@
     <DropdownMenuTrigger asChild>
       <Button variant="outline" class="hidden lg:flex">
         <LucideColumns3 class="size-4" />
-        View
+        {{ triggerLabel }}
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="min-w-37.5">
-      <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+      <DropdownMenuLabel>{{ header }}</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuCheckboxItem
-        v-for="column in table
-          .getAllColumns()
-          .filter((column) => column.getCanHide())"
+        v-for="column in items"
         :key="column.id"
         class="capitalize"
         :model-value="column.getIsVisible()"
@@ -26,6 +24,7 @@
 </template>
 
 <script setup lang="ts" generic="TData">
+import { computed, inject } from "vue";
 import { type Table } from "@tanstack/vue-table";
 import { LucideColumns3 } from "lucide-vue-next";
 
@@ -40,8 +39,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface Props {
-  table: Table<TData>;
+  header?: string;
+  triggerLabel?: string;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  header: "Toggle columns",
+  triggerLabel: "View",
+});
+
+const table = inject<Table<TData>>("table");
+
+const items = computed(
+  () => table?.getAllColumns().filter((i) => i.getCanHide()) ?? [],
+);
 </script>

@@ -1,25 +1,23 @@
 <template>
   <div class="space-y-4">
-    <DataTableToolbar :table="table" :filter-column="filterColumn">
-      <template #afterSearch>
-        <DataTableFacetedFilter
+    <DataTableToolbar>
+      <DataTableToolbarStart>
+        <DataTableSearchInput :filter-column="filterColumn" />
+        <DataTableFilter
           v-if="statusColumns.length && table.getColumn('status')"
           :title="filterLabel"
           :column="table.getColumn('status')"
           :options="statusColumns"
         />
-        <DataTableDeleteItems
-          :table="table"
-          @remove:rows="emit('remove:rows', $event)"
-        />
+        <DataTableDeleteItems @remove:rows="emit('remove:rows', $event)" />
 
         <slot name="toolbarAfterSearch" />
-      </template>
-      <template #end>
-        <DataTableViewOptions v-if="canToggleColumns" :table="table" />
+      </DataTableToolbarStart>
+      <DataTableToolbarEnd>
+        <DataTableToggleColumns v-if="canToggleColumns" />
 
         <slot name="toolbarEnd" />
-      </template>
+      </DataTableToolbarEnd>
     </DataTableToolbar>
     <div
       class="rounded-md border bg-card relative wrap-break-word overflow-hidden"
@@ -118,12 +116,12 @@ import {
 } from "@/components/ui/table";
 
 import { useDataTable } from "./index";
+import DataTableFilter from "./DataTableFilter.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
 import DataTableContainer from "./DataTableContainer.vue";
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableDeleteItems from "./DataTableDeleteItems.vue";
-import DataTableViewOptions from "./DataTableViewOptions.vue";
-import DataTableFacetedFilter from "./DataTableFacetedFilter.vue";
+import DataTableToggleColumns from "./DataTableToggleColumns.vue";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
@@ -160,4 +158,5 @@ const canToggleColumns = computed(() => table.getAllColumns().length > 0);
 const { table } = useDataTable<TData, TValue>(data, props.columns);
 
 defineExpose({ table });
+provide("table", table);
 </script>

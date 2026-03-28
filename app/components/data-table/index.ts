@@ -17,10 +17,15 @@ export { default as DataTable } from "./DataTable.vue";
 export { default as DataTableColumnHeader } from "./DataTableColumnHeader.vue";
 export { default as DataTablePagination } from "./DataTablePagination.vue";
 export { default as DataTableToolbar } from "./DataTableToolbar.vue";
-export { default as DataTableViewOptions } from "./DataTableViewOptions.vue";
-export { default as DataTableFacetedFilter } from "./DataTableFacetedFilter.vue";
+export { default as DataTableToolbarEnd } from "./DataTableToolbarEnd.vue";
+export { default as DataTableToolbarStart } from "./DataTableToolbarStart.vue";
+export { default as DataTableToggleColumns } from "./DataTableToggleColumns.vue";
+export { default as DataTableFilter } from "./DataTableFilter.vue";
 export { default as DataTableRowActions } from "./DataTableRowActions.vue";
 export { default as DataTableSkeleton } from "./DataTableSkeleton.vue";
+export { default as DataTableSearchInput } from "./DataTableSearchInput.vue";
+export { default as DataTableDeleteItems } from "./DataTableDeleteItems.vue";
+export { default as DataTableContainer } from "./DataTableContainer.vue";
 
 export const useDataTable = <TData, TValue>(
   items: Ref<TData[]>,
