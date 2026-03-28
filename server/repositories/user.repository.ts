@@ -47,13 +47,23 @@ export class UserRepository {
     });
   }
 
-  async delete(id: string[], headers?: Headers) {
-    return await auth.api.removeUser({
-      headers,
-      body: {
-        userId: id,
-      },
-    });
+  async delete(ids: string | string[], headers?: Headers) {
+    const deleteds = [];
+
+    if (!Array.isArray(ids)) {
+      ids = [ids];
+    }
+
+    for (const userId of ids) {
+      const res = await auth.api.removeUser({
+        headers,
+        body: { userId },
+      });
+
+      deleteds.push(res);
+    }
+
+    return deleteds;
   }
 
   async ban(
