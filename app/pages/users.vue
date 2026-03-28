@@ -44,6 +44,7 @@ import { toast } from "vue-sonner";
 import { PlusIcon } from "lucide-vue-next";
 
 import type { PaginatedResponse, User } from "#shared/types";
+import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import { getUsersColumns } from "~/table-columns/usersColumns";
 import { DataTable } from "~/components/data-table";
 import PageHero from "~/components/PageHero.vue";
@@ -54,6 +55,8 @@ import BanUserModal from "~/components/modals/users/BanUserModal.vue";
 import DeleteUserAlert from "~/components/modals/users/DeleteUserAlert.vue";
 
 useHead({ title: "Users" });
+
+const { csrfFetch } = useCsrfFetch();
 
 const statuses = [
   { label: "User", value: "user" },
@@ -132,14 +135,25 @@ function handleUpdated(updated: User) {
   data.value = [...data.value];
 }
 
-function handleDeleteRows(items: User[]) {
-  console.log(
-    "Deleting rows",
-    items.map((i) => i.id),
-  );
-  // TODO: Implement bulk delete API and call it here instead of just filtering out the deleted items from the table
-  data.value = data.value.filter((u) => !items.some((i) => i.id === u.id));
-  table.value?.resetRowSelection();
+async function handleDeleteRows(items: User[]) {
+  const ids = items.map((i) => i.id);
+  loading.value = true;
+
+  try {
+    await csrfFetch("/api/users", {
+      method: "DELETE",
+      body: { ids },
+    });
+
+    data.value = data.value.filter((u) => !ids.includes(u.id));
+    data.value = [...data.value];
+    toast.success("Users deleted");
+  } catch (err: any) {
+    toast.error(err?.message || "Failed to delete users");
+  } finally {
+    loading.value = false;
+    table.value?.resetRowSelection();
+  }
 }
 
 async function confirmDelete(user: User) {
