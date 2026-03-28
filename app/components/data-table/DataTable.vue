@@ -130,7 +130,7 @@ import DataTableToggleColumns from "./DataTableToggleColumns.vue";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
-  searchColumn?: string;
+  searchColumn?: string | string[];
   filterColumn?: string;
   filterOptions?: { label: string; value: string }[];
   loading?: boolean;
@@ -158,7 +158,13 @@ const emit = defineEmits<{
 }>();
 
 const data = defineModel<TData[]>({ default: [] });
-const { table } = useDataTable<TData, TValue>(data, props.columns);
+const { table } = useDataTable<TData, TValue>(data, props.columns, {
+  globalFilterColumns: props.searchColumn
+    ? Array.isArray(props.searchColumn)
+      ? props.searchColumn
+      : [props.searchColumn]
+    : [],
+});
 
 const loading = computed(() => props.loading || false);
 const canToggleColumns = computed(() => table.getAllColumns().length > 0);

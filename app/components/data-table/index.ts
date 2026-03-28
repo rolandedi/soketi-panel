@@ -30,11 +30,13 @@ export { default as DataTableContainer } from "./DataTableContainer.vue";
 export const useDataTable = <TData, TValue>(
   items: Ref<TData[]>,
   columns: ColumnDef<TData, TValue>[],
+  options?: { globalFilterColumns?: string[] },
 ) => {
   const sorting = ref<SortingState>([]);
   const columnFilters = ref<ColumnFiltersState>([]);
   const columnVisibility = ref<VisibilityState>({});
   const rowSelection = ref({});
+  const globalFilter = ref("");
 
   const table = useVueTable<TData>({
     get data() {
@@ -55,6 +57,9 @@ export const useDataTable = <TData, TValue>(
       },
       get rowSelection() {
         return rowSelection.value;
+      },
+      get globalFilter() {
+        return globalFilter.value;
       },
     },
     onSortingChange: (updaterOrValue) => {
@@ -81,6 +86,22 @@ export const useDataTable = <TData, TValue>(
           ? updaterOrValue(rowSelection.value)
           : updaterOrValue;
     },
+    onGlobalFilterChange: (updaterOrValue) => {
+      globalFilter.value =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(globalFilter.value)
+          : updaterOrValue;
+    },
+    globalFilterFn: (row, _columnIds, filterValue) => {
+      const q = String(filterValue ?? "").toLowerCase();
+      const cols = options?.globalFilterColumns ?? [];
+      if (!q || !cols.length) return true;
+      return cols.some((id) =>
+        String(row.getValue(id) ?? "")
+          .toLowerCase()
+          .includes(q),
+      );
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -95,5 +116,6 @@ export const useDataTable = <TData, TValue>(
     columnFilters,
     columnVisibility,
     rowSelection,
+    globalFilter,
   };
 };
