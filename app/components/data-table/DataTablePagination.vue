@@ -2,20 +2,13 @@
   <div class="flex items-center justify-between px-2">
     <div class="flex items-center space-x-2">
       <p class="text-sm font-medium">Rows per page</p>
-      <Select
-        :model-value="`${state?.pagination.pageSize}`"
-        @update:model-value="(value) => table?.setPageSize(Number(value))"
-      >
+      <Select v-model="pageSize">
         <SelectTrigger class="h-8 w-17.5">
-          <SelectValue :placeholder="`${state?.pagination.pageSize}`" />
+          <SelectValue :placeholder="`${pagination.perPage}`" />
         </SelectTrigger>
         <SelectContent side="top">
-          <SelectItem
-            v-for="pageSize in pageSizes"
-            :key="pageSize"
-            :value="`${pageSize}`"
-          >
-            {{ pageSize }}
+          <SelectItem v-for="item in pageSizes" :key="item" :value="`${item}`">
+            {{ item }}
           </SelectItem>
         </SelectContent>
       </Select>
@@ -28,21 +21,12 @@
           class="text-muted-foreground text-sm whitespace-nowrap"
           aria-live="polite"
         >
-          <span v-if="state && rowCount" class="text-foreground">
-            {{ state.pagination.pageIndex * state.pagination.pageSize + 1 }}-{{
-              Math.min(
-                Math.max(
-                  state.pagination.pageIndex * state.pagination.pageSize +
-                    state.pagination.pageSize,
-                  0,
-                ),
-                rowCount,
-              )
-            }}
+          <span v-if="pagination" class="text-foreground">
+            {{ start }}-{{ end }}
           </span>
           of
           <span class="text-foreground">
-            {{ rowCount?.toString() }}
+            {{ pagination.total }}
           </span>
         </p>
       </div>
@@ -50,32 +34,34 @@
         <Button
           variant="outline"
           class="hidden lg:flex size-9"
-          :disabled="!table?.getCanPreviousPage()"
-          @click="table?.setPageIndex(0)"
+          :disabled="pagination.currentPage <= 1"
+          @click="emit('paginate', 1)"
         >
           <LucideChevronFirst class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="size-9"
-          :disabled="!table?.getCanPreviousPage()"
-          @click="table?.previousPage()"
+          :disabled="pagination.currentPage <= 1"
+          @click="emit('paginate', Math.max(1, pagination.currentPage - 1))"
         >
           <LucideChevronLeft class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="size-9"
-          :disabled="!table?.getCanNextPage()"
-          @click="table?.nextPage()"
+          :disabled="pagination.currentPage >= lastPage"
+          @click="
+            emit('paginate', Math.min(lastPage, pagination.currentPage + 1))
+          "
         >
           <LucideChevronRight class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="hidden lg:flex size-9"
-          :disabled="!table?.getCanNextPage()"
-          @click="table?.setPageIndex(table.getPageCount() - 1)"
+          :disabled="pagination.currentPage >= lastPage"
+          @click="emit('paginate', lastPage)"
         >
           <LucideChevronLast class="h-4 w-4" />
         </Button>
@@ -85,7 +71,6 @@
 </template>
 
 <script setup lang="ts" generic="TData">
-import { type Table } from "@tanstack/vue-table";
 import {
   LucideChevronFirst,
   LucideChevronLast,
@@ -103,27 +88,49 @@ import {
 } from "@/components/ui/select";
 
 interface Props {
+  pageSizes?: number[];
   pagination?: {
     currentPage: number;
-    lastPage: number;
     perPage: number;
     total: number;
   };
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  pageSizes: () => [10, 25, 50, 100],
   pagination: () => ({
     currentPage: 1,
-    lastPage: 1,
     perPage: 10,
     total: 0,
   }),
 });
 
-const pageSizes = [10, 25, 50, 100];
+const emit = defineEmits<{
+  (e: "change:size", perPage: number): void;
+  (e: "paginate", currentPage: number): void;
+}>();
 
-const table = inject<Table<TData>>("table");
+const pageSize = ref(props.pagination.perPage);
 
-const state = computed(() => table?.getState());
-const rowCount = computed(() => table?.getRowCount());
+const lastPage = computed(() => {
+  const per = props.pagination.perPage || 1;
+  return Math.max(1, Math.ceil(props.pagination.total / per));
+});
+
+const start = computed(() => {
+  if (!props.pagination || props.pagination.total === 0) return 0;
+  return (props.pagination.currentPage - 1) * props.pagination.perPage + 1;
+});
+
+const end = computed(() => {
+  if (!props.pagination) return 0;
+  return Math.min(
+    props.pagination.currentPage * props.pagination.perPage,
+    props.pagination.total,
+  );
+});
+
+watch(pageSize, (newSize) => {
+  emit("change:size", Number(newSize));
+});
 </script>

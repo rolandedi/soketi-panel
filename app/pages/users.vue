@@ -17,6 +17,8 @@
         :loading="loading"
         :left-sticky="true"
         :right-sticky="true"
+        :pagination="pagination"
+        :page-sizes="[2, 3, 5]"
         @remove:rows="handleDeleteRows"
         @update:pagination="handleFetch"
       />
@@ -34,7 +36,7 @@
       @success="handleUpdated"
     />
 
-    <DeleteUserAlert ref="deleteModal" @confirm:delete="confirmDelete" />
+    <DeleteUserAlert ref="deleteModal" @confirm:delete="handleSyncDelete" />
   </div>
 </template>
 
@@ -65,8 +67,11 @@ const statuses = [
 
 const loading = ref(false);
 const data = ref<User[]>([]);
-const perPage = ref(10);
-const currentPage = ref(1);
+const pagination = ref({
+  currentPage: 1,
+  perPage: 3,
+  total: 0,
+});
 
 const editModal = ref<{ open: boolean; user: User | null }>({
   open: false,
@@ -98,21 +103,21 @@ onMounted(() => {
   handleFetch();
 });
 
-async function handleFetch(itemsPerPage?: number, page?: number) {
+async function handleFetch(perPage?: number, page?: number) {
   loading.value = true;
-
-  perPage.value = itemsPerPage || perPage.value;
-  currentPage.value = page || currentPage.value;
 
   try {
     const res = await $fetch<PaginatedResponse<User>>("/api/users", {
       params: {
-        limit: perPage.value,
-        page: currentPage.value,
+        limit: perPage || pagination.value.perPage,
+        page: page || pagination.value.currentPage,
       },
     });
 
     data.value = res.data;
+    pagination.value.currentPage = res.meta.currentPage;
+    pagination.value.perPage = res.meta.perPage;
+    pagination.value.total = res.meta.total;
   } catch (err: any) {
     toast.error(err?.message || "Failed to fetch users");
   } finally {
@@ -135,6 +140,11 @@ function handleUpdated(updated: User) {
   data.value = [...data.value];
 }
 
+function handleSyncDelete(user: User) {
+  data.value = data.value.filter((u) => u.id !== user.id);
+  data.value = [...data.value];
+}
+
 async function handleDeleteRows(items: User[]) {
   const ids = items.map((i) => i.id);
   loading.value = true;
@@ -154,11 +164,5 @@ async function handleDeleteRows(items: User[]) {
     loading.value = false;
     table.value?.resetRowSelection();
   }
-}
-
-async function confirmDelete(user: User) {
-  data.value = data.value.filter((u) => u.id !== user.id);
-  data.value = [...data.value];
-  table.value?.resetRowSelection();
 }
 </script>

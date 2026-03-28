@@ -98,7 +98,12 @@
         </Table>
       </DataTableContainer>
     </div>
-    <DataTablePagination :table="table" :pagination="pagination" />
+    <DataTablePagination
+      :pagination="pagination"
+      :page-sizes="pageSizes"
+      @paginate="handlePageChange"
+      @change:size="handlePageSizeChange"
+    />
   </div>
 </template>
 
@@ -132,9 +137,9 @@ interface Props {
   leftSticky?: boolean;
   rightSticky?: boolean;
   filterLabel?: string;
+  pageSizes?: number[];
   pagination?: {
     currentPage: number;
-    lastPage: number;
     perPage: number;
     total: number;
   };
@@ -145,6 +150,7 @@ const props = withDefaults(defineProps<Props>(), {
   rightSticky: false,
   filterLabel: "Filter",
   filterOptions: () => [],
+  pageSizes: () => [10, 25, 50, 100],
 });
 const emit = defineEmits<{
   (e: "update:pagination", perPage: number, currentPage: number): void;
@@ -152,11 +158,18 @@ const emit = defineEmits<{
 }>();
 
 const data = defineModel<TData[]>({ default: [] });
+const { table } = useDataTable<TData, TValue>(data, props.columns);
 
 const loading = computed(() => props.loading || false);
 const canToggleColumns = computed(() => table.getAllColumns().length > 0);
 
-const { table } = useDataTable<TData, TValue>(data, props.columns);
+function handlePageChange(newPage: number) {
+  emit("update:pagination", props.pagination?.perPage || 10, newPage);
+}
+
+function handlePageSizeChange(newSize: number) {
+  emit("update:pagination", newSize, props.pagination?.currentPage || 1);
+}
 
 defineExpose({ table });
 provide("table", table);
