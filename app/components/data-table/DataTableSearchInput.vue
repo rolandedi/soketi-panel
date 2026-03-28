@@ -1,14 +1,14 @@
 <template>
   <div class="relative">
     <Input
-      v-if="filterColumn"
-      :placeholder="`Search by ${filterColumn}...`"
+      v-if="props.column"
+      :placeholder="`Search by ${props.column}...`"
       :class="cn('peer ps-9 min-w-72', props.class)"
       :model-value="
-        (table?.getColumn(filterColumn)?.getFilterValue() as string) ?? ''
+        (table?.getColumn(props.column)?.getFilterValue() as string) ?? ''
       "
       @input="
-        table?.getColumn(filterColumn)?.setFilterValue($event.target.value)
+        table?.getColumn(props.column)?.setFilterValue($event.target.value)
       "
     />
     <div
@@ -17,7 +17,7 @@
       <LucideListFilter :size="16" aria-hidden="true" />
     </div>
     <button
-      v-if="Boolean(table?.getColumn('name')?.getFilterValue())"
+      v-if="Boolean(table?.getColumn(props.column)?.getFilterValue())"
       class="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 inset-e-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
       aria-label="Clear filter"
       @click="() => table?.resetColumnFilters()"
@@ -37,7 +37,7 @@ import { Input } from "@/components/ui/input";
 
 interface Props {
   class?: HTMLAttributes["class"];
-  filterColumn?: string;
+  column: string;
   placeholder?: string;
 }
 

@@ -3,13 +3,11 @@
     <div class="flex items-center space-x-2">
       <p class="text-sm font-medium">Rows per page</p>
       <Select
-        :model-value="`${table.getState().pagination.pageSize}`"
-        @update:model-value="(value) => table.setPageSize(Number(value))"
+        :model-value="`${state?.pagination.pageSize}`"
+        @update:model-value="(value) => table?.setPageSize(Number(value))"
       >
         <SelectTrigger class="h-8 w-17.5">
-          <SelectValue
-            :placeholder="`${table.getState().pagination.pageSize}`"
-          />
+          <SelectValue :placeholder="`${state?.pagination.pageSize}`" />
         </SelectTrigger>
         <SelectContent side="top">
           <SelectItem
@@ -30,26 +28,21 @@
           class="text-muted-foreground text-sm whitespace-nowrap"
           aria-live="polite"
         >
-          <span class="text-foreground">
-            {{
-              table.getState().pagination.pageIndex *
-                table.getState().pagination.pageSize +
-              1
-            }}-{{
+          <span v-if="state && rowCount" class="text-foreground">
+            {{ state.pagination.pageIndex * state.pagination.pageSize + 1 }}-{{
               Math.min(
                 Math.max(
-                  table.getState().pagination.pageIndex *
-                    table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
+                  state.pagination.pageIndex * state.pagination.pageSize +
+                    state.pagination.pageSize,
                   0,
                 ),
-                table.getRowCount(),
+                rowCount,
               )
             }}
           </span>
           of
           <span class="text-foreground">
-            {{ table.getRowCount().toString() }}
+            {{ rowCount?.toString() }}
           </span>
         </p>
       </div>
@@ -57,32 +50,32 @@
         <Button
           variant="outline"
           class="hidden lg:flex size-9"
-          :disabled="!table.getCanPreviousPage()"
-          @click="table.setPageIndex(0)"
+          :disabled="!table?.getCanPreviousPage()"
+          @click="table?.setPageIndex(0)"
         >
           <LucideChevronFirst class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="size-9"
-          :disabled="!table.getCanPreviousPage()"
-          @click="table.previousPage()"
+          :disabled="!table?.getCanPreviousPage()"
+          @click="table?.previousPage()"
         >
           <LucideChevronLeft class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="size-9"
-          :disabled="!table.getCanNextPage()"
-          @click="table.nextPage()"
+          :disabled="!table?.getCanNextPage()"
+          @click="table?.nextPage()"
         >
           <LucideChevronRight class="h-4 w-4" />
         </Button>
         <Button
           variant="outline"
           class="hidden lg:flex size-9"
-          :disabled="!table.getCanNextPage()"
-          @click="table.setPageIndex(table.getPageCount() - 1)"
+          :disabled="!table?.getCanNextPage()"
+          @click="table?.setPageIndex(table.getPageCount() - 1)"
         >
           <LucideChevronLast class="h-4 w-4" />
         </Button>
@@ -110,7 +103,6 @@ import {
 } from "@/components/ui/select";
 
 interface Props {
-  table: Table<TData>;
   pagination?: {
     currentPage: number;
     lastPage: number;
@@ -129,4 +121,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const pageSizes = [10, 25, 50, 100];
+
+const table = inject<Table<TData>>("table");
+
+const state = computed(() => table?.getState());
+const rowCount = computed(() => table?.getRowCount());
 </script>

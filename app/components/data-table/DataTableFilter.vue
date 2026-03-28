@@ -1,57 +1,9 @@
-<script setup lang="ts" generic="TData, TValue">
-import { computed, type Component } from "vue";
-import {
-  LucideFilter,
-  LucidePlusCircle,
-} from "lucide-vue-next";
-import type { Column } from "@tanstack/vue-table";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-interface DataTableFacetedFilterProps {
-  column?: Column<TData, TValue>;
-  title?: string;
-  options: {
-    label: string;
-    value: string;
-    icon?: Component;
-  }[];
-}
-
-const props = defineProps<DataTableFacetedFilterProps>();
-
-const selectedValues = computed(
-  () => new Set(props.column?.getFilterValue() as string[]),
-);
-
-function handleSelect(value: string, checked: boolean) {
-  if (checked) {
-    selectedValues.value.add(value);
-  } else {
-    selectedValues.value.delete(value);
-  }
-  const filterValues = Array.from(selectedValues.value);
-  props.column?.setFilterValue(filterValues.length ? filterValues : undefined);
-}
-
-const facets = computed(() => props.column?.getFacetedUniqueValues());
-</script>
-
 <template>
   <Popover>
     <PopoverTrigger asChild>
       <Button variant="outline">
         <LucideFilter class="size-4" />
-        {{ title }}
+        {{ label }}
         <template v-if="selectedValues.size > 0">
           <Separator orientation="vertical" class="mx-2 h-4" />
           <Badge
@@ -133,3 +85,48 @@ const facets = computed(() => props.column?.getFacetedUniqueValues());
     </PopoverContent>
   </Popover>
 </template>
+
+<script setup lang="ts" generic="TData, TValue">
+import { computed, type Component } from "vue";
+import { LucideFilter } from "lucide-vue-next";
+import type { Column } from "@tanstack/vue-table";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+interface DataTableFacetedFilterProps {
+  column?: Column<TData, TValue>;
+  label?: string;
+  options: {
+    label: string;
+    value: string;
+    icon?: Component;
+  }[];
+}
+
+const props = defineProps<DataTableFacetedFilterProps>();
+
+const selectedValues = computed(
+  () => new Set(props.column?.getFilterValue() as string[]),
+);
+
+function handleSelect(value: string, checked: boolean) {
+  if (checked) {
+    selectedValues.value.add(value);
+  } else {
+    selectedValues.value.delete(value);
+  }
+  const filterValues = Array.from(selectedValues.value);
+  props.column?.setFilterValue(filterValues.length ? filterValues : undefined);
+}
+
+const facets = computed(() => props.column?.getFacetedUniqueValues());
+</script>

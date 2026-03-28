@@ -2,12 +2,12 @@
   <div class="space-y-4">
     <DataTableToolbar>
       <DataTableToolbarStart>
-        <DataTableSearchInput :filter-column="filterColumn" />
+        <DataTableSearchInput v-if="searchColumn" :column="searchColumn" />
         <DataTableFilter
-          v-if="statusColumns.length && table.getColumn('status')"
-          :title="filterLabel"
-          :column="table.getColumn('status')"
-          :options="statusColumns"
+          v-if="filterOptions.length && filterColumn"
+          :label="filterLabel"
+          :column="table.getColumn(filterColumn)"
+          :options="filterOptions"
         />
         <DataTableDeleteItems @remove:rows="emit('remove:rows', $event)" />
 
@@ -125,8 +125,9 @@ import DataTableToggleColumns from "./DataTableToggleColumns.vue";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
+  searchColumn?: string;
   filterColumn?: string;
-  statusColumns?: { label: string; value: string }[];
+  filterOptions?: { label: string; value: string }[];
   loading?: boolean;
   leftSticky?: boolean;
   rightSticky?: boolean;
@@ -143,7 +144,7 @@ const props = withDefaults(defineProps<Props>(), {
   leftSticky: false,
   rightSticky: false,
   filterLabel: "Filter",
-  statusColumns: () => [],
+  filterOptions: () => [],
 });
 const emit = defineEmits<{
   (e: "update:pagination", perPage: number, currentPage: number): void;
