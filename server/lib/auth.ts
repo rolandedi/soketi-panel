@@ -59,7 +59,13 @@ export const auth = betterAuth({
       maxAge: 60 * 5, // 5 minute cache
     },
   },
-  plugins: [admin()],
+  plugins: [
+    admin({
+      defaultBanReason: "Admin choice",
+      bannedUserMessage:
+        "Your account has been banned. Please contact Admin for more information.",
+    }),
+  ],
 });
 
 export const useAuth = () => {

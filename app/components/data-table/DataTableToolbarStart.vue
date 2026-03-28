@@ -1,10 +1,10 @@
 <template>
-  <div :class="cn('flex items-center justify-between', props.class)">
+  <div :class="cn('flex flex-1 items-center gap-3', props.class)">
     <slot />
   </div>
 </template>
 
-<script setup lang="ts" generic="TData">
+<script lang="ts" setup>
 import type { HTMLAttributes } from "vue";
 
 import { cn } from "@/lib/utils";

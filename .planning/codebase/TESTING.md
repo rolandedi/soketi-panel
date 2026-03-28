@@ -1,335 +1,465 @@
-# Testing & Quality Assurance
+# Testing Patterns
 
-## Current Testing Status
+**Analysis Date:** 2026-03-27
 
-**Testing Framework:** None currently configured
-- No `vitest`, `jest`, or other test runners installed
-- No test files (`.test.ts`, `.spec.ts`) present in codebase
+## Test Framework
 
-## Recommended Testing Strategy
+**Runner:**
+- Vitest 4.1.2
+- Config: `vitest.config.ts`
 
-### Frontend Unit Tests (Recommended Setup)
-- **Framework:** Vitest (similar API to Jest, Vite-native)
-- **Component Testing:** @vue/test-utils (official Vue testing library)
-- **Utilities:** Happy-dom or jsdom for DOM simulation
-- **What to test:**
-  - Composables (`useAuth.ts`)
-  - Utility functions (`cn()`, `utils.ts`)
-  - Component props and events (Navbar, UserMenu, modals)
+**Assertion Library:**
+- Vitest built-in assertions (Jest-compatible API)
 
-### Backend Unit Tests (Recommended Setup)
-- **Framework:** Vitest
-- **Mocking:** Vitest mocking, or msw for HTTP mocks
-- **What to test:**
-  - Repository methods (database queries)
-  - Validation schemas (Zod)
-  - API route handlers (create, update, delete)
-  - Service logic (if services are added)
+**Environment:**
+- Happy DOM for DOM simulation
+- Setup file: `test/setup.ts`
 
-### E2E Tests (Future)
-- **Framework:** Playwright or Cypress
-- **What to test:**
-  - Login/logout flow
-  - Application CRUD workflow
-  - User management workflow
-  - Real-time messaging (via Pusher)
-
-## Code Quality
-
-### Linting
-- **Tool:** ESLint (configured via `@nuxt/eslint`)
-- **Config File:** `eslint.config.mjs` (flat config format)
-- **Current Status:** Minimal configuration (inherits Nuxt defaults)
-- **Severity:** Errors only (no warnings as errors)
-
-### Type Checking
-- **Tool:** TypeScript 5.9.3
-- **Mode:** Strict mode enabled
-- **Checker:** Vue TSC 3.2.3 for component types
-- **Validation Schemas:** Zod for runtime validation
-
-### Build Process
+**Run Commands:**
 ```bash
-pnpm build     # Nuxt production build (includes type checking)
-pnpm dev       # Nuxt dev server with HMR
-pnpm preview   # Preview production build locally
+pnpm test              # Run all tests in watch mode
+pnpm test:run          # Run all tests once
+pnpm test:ui           # Open Vitest UI
+pnpm test:coverage     # Run tests with coverage report
 ```
 
-### Pre-commit Hooks (Not Currently Set Up)
-Would typically use `husky` + `lint-staged` to:
-- Run ESLint on staged files
-- Run TypeScript type check
-- Run tests on affected files
-- Prevent commits with violations
+## Test File Organization
 
-## Known Code Issues & TODOs
+**Location:**
+- Tests in `test/` directory at project root
+- Co-located with source structure (e.g., `test/repositories/user.repository.test.ts`)
 
-### Documented TODOs
-- **Location:** `app/components/ui/chart/ChartTooltipContent.vue`
-- **Issue:** Currently using `createElement` and `render` for tooltip rendering
-- **Reason:** Template-based rendering not suitable for dynamic content
-- **Priority:** Low (chart component working, but could be optimized)
+**Naming:**
+- Pattern: `[name].test.ts`
+- Example: `user.repository.test.ts`, `utils.test.ts`
 
-## Quality Metrics (Baseline)
-
-### Coverage Gaps
-- **No unit tests** → 0% coverage
-- **No integration tests** → Manual testing required
-- **No E2E tests** → QA relies on manual flows
-
-### Codebase Health Indicators
-- **TypeScript Strict Mode:** ✅ Enabled (good type safety)
-- **No `any` Types:** ✅ Generally clean (no unsafe types observed)
-- **ESLint:** ✅ Configured (minimal violations expected)
-- **Component Structure:** ✅ Well-organized (pages, components, composables)
-- **API Route Structure:** ✅ Follows conventions (REST patterns)
-
-## Testing Strategy Moving Forward
-
-### Phase 1: Setup & Infrastructure
-1. Install Vitest and dependencies
-2. Configure `vitest.config.ts`
-3. Add testing utilities and test helpers
-4. Create test template files
-
-### Phase 2: Composables & Utils
-1. Test `useAuth.ts` (session state, login, logout)
-2. Test `cn()` utility (class merging)
-3. Test shared `types.ts` (type guards if added)
-
-### Phase 3: API Routes
-1. Test user routes (GET, POST, PUT, DELETE)
-2. Test application routes
-3. Test auth route delegation
-4. Test error handling (401, 403, 404)
-
-### Phase 4: Repositories
-1. Test `UserRepository` (query methods)
-2. Test `ApplicationRepository`
-3. Test `MessageRepository`
-4. Test pagination logic
-
-### Phase 5: Models
-1. Test ORM `Model` base class (casting, instantiation)
-2. Test model properties and relationships
-
-### Phase 6: E2E
-1. Setup Playwright
-2. Test complete user workflows
-3. Test data consistency across flows
-
-## Testing Best Practices
-
-### Unit Test Pattern
-```typescript
-// tests/server/repositories/user.repository.test.ts
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { UserRepository } from '~/server/repositories/user.repository';
-import { db } from '~/server/lib/orm/db';
-
-describe('UserRepository', () => {
-  let repo: UserRepository;
-
-  beforeEach(async () => {
-    repo = new UserRepository();
-    // Setup test data
-  });
-
-  afterEach(async () => {
-    // Cleanup test data
-  });
-
-  it('should get user by id', async () => {
-    const user = await repo.getById('123');
-    expect(user).toBeDefined();
-    expect(user?.email).toBe('test@example.com');
-  });
-
-  it('should return null for non-existent user', async () => {
-    const user = await repo.getById('invalid-id');
-    expect(user).toBeNull();
-  });
-});
+**Structure:**
+```
+test/
+├── setup.ts                  # Global test setup
+├── utils.test.ts            # Utility function tests
+└── repositories/
+    └── user.repository.test.ts  # Repository tests
 ```
 
-### Component Test Pattern
-```typescript
-// tests/app/composables/useAuth.test.ts
-import { describe, it, expect } from 'vitest';
-import { useAuth } from '~/app/composables/useAuth';
+## Test Structure
 
-describe('useAuth', () => {
-  it('should return auth state and methods', () => {
-    const { user, isAuthenticated, signIn, signOut } = useAuth();
-    
-    expect(user).toBeDefined();
-    expect(isAuthenticated).toBeDefined();
-    expect(typeof signIn).toBe('function');
-    expect(typeof signOut).toBe('function');
+**Suite Organization:**
+```typescript
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { UserRepository } from "../../server/repositories/user.repository";
+import { User } from "../../server/models/user";
+
+describe("UserRepository", () => {
+  let repository: UserRepository;
+
+  beforeEach(() => {
+    repository = new UserRepository();
+    vi.clearAllMocks();
   });
-});
-```
 
-### API Route Test Pattern
-```typescript
-// tests/server/api/users/index.test.ts
-import { describe, it, expect } from 'vitest';
-import { createEventHandler } from 'h3';
-import handler from '~/server/api/users/index.ts';
+  describe("getAll", () => {
+    it("should return paginated users with default parameters", async () => {
+      const mockUsers = [
+        { id: "1", email: "test1@example.com", name: "Test 1" },
+      ];
 
-describe('GET /api/users', () => {
-  it('should return paginated users', async () => {
-    const result = await handler({
-      /* mock event */
+      vi.mocked(User.paginate).mockResolvedValue({
+        data: mockUsers,
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 2,
+          totalPages: 1,
+        },
+      });
+
+      const result = await repository.getAll();
+
+      expect(User.paginate).toHaveBeenCalledWith(1, 10);
+      expect(result).toEqual({
+        data: mockUsers,
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 2,
+          totalPages: 1,
+        },
+      });
     });
-    
-    expect(result.data).toBeInstanceOf(Array);
-    expect(result.meta.total).toBeGreaterThanOrEqual(0);
-  });
-
-  it('should return 401 if not authenticated', async () => {
-    // Test without auth
   });
 });
 ```
 
-## Manual Testing Checklist
+**Patterns:**
+- Use `describe` blocks for logical grouping
+- `beforeEach` for test isolation
+- `vi.clearAllMocks()` to reset mocks between tests
+- Arrange-Act-Assert pattern in test cases
 
-### Authentication
-- [ ] User registration with valid email/password
-- [ ] User login with correct credentials
-- [ ] Login fails with incorrect password
-- [ ] Logout clears session
-- [ ] Protected routes redirect to login
-- [ ] Admin-only routes block non-admin users
+## Mocking
 
-### Users Management
-- [ ] List all users with pagination
-- [ ] Search/filter users
-- [ ] Create new user (admin only)
-- [ ] Edit user details
-- [ ] Delete user account
-- [ ] Ban/unban user functionality
-- [ ] Role assignment (admin/user)
+**Framework:** Vitest mocking utilities
 
-### Applications Management
-- [ ] Create new application
-- [ ] View application details (key, secret)
-- [ ] Edit application settings
-- [ ] Delete application
-- [ ] Configure WebSocket settings (max connections, events per second, etc.)
-- [ ] Enable/disable application
+**Patterns:**
+```typescript
+// Mock modules
+vi.mock("../../server/models/user", () => ({
+  User: {
+    paginate: vi.fn(),
+    find: vi.fn(),
+  },
+}));
 
-### Messages & Real-time
-- [ ] View message history
-- [ ] Messages paginated correctly
-- [ ] Real-time message updates via Pusher
-- [ ] WebSocket playground connects to Soketi
-- [ ] Event broadcasting works
+vi.mock("../../server/lib/auth", () => ({
+  auth: {
+    api: {
+      createUser: vi.fn(),
+      updateUser: vi.fn(),
+      removeUser: vi.fn(),
+      banUser: vi.fn(),
+      unbanUser: vi.fn(),
+    },
+  },
+}));
 
-### UI/UX
-- [ ] Dark/light mode toggle works
-- [ ] Responsive design (mobile, tablet, desktop)
-- [ ] Form validation messages display correctly
-- [ ] Error toasts appear for failed operations
-- [ ] Success toasts appear for completed operations
-- [ ] Loading states show during async operations
+// Mock typed functions
+vi.mocked(User.paginate).mockResolvedValue({
+  data: mockUsers,
+  pagination: { ... },
+});
 
-### Database
-- [ ] Migrations run without errors
-- [ ] All tables created with correct schema
-- [ ] Foreign key relationships work
-- [ ] Data persists after page reload
-- [ ] Pagination queries are performant
+// Mock console
+const originalWarn = console.warn;
+console.warn = vi.fn();
 
-## Performance Considerations
-
-### Database
-- **N+1 Query Problem:** Could occur when fetching users with applications
-  - Solution: Use Knex joins or implement eager loading
-  - Example: `select().from('users').join('applications', ...)`
-
-### Real-time
-- **WebSocket Scalability:** Single Soketi instance may bottleneck at scale
-  - Solution: Use Redis adapter for multi-instance Soketi
-  - Future: Implement pub/sub for server-to-client messaging
-
-### Frontend
-- **Bundle Size:** Shadcn components imported but unused will bloat bundle
-  - Solution: Use tree-shaking and component-level imports
-  - Monitor: Check build output with `pnpm build`
-
-### Monitoring
-- No built-in monitoring/metrics yet
-- Could add:
-  - Sentry for error tracking
-  - Application metrics (API response times, error rates)
-  - Database query profiling
-
-## Security Considerations
-
-### Current Implementation
-- ✅ Auth via Better Auth (secure session management)
-- ✅ TypeScript prevents some class of bugs
-- ✅ Zod validation on all inputs
-- ✅ HTTP-only cookies for sessions
-- ⚠️ No CSRF protection explicitly mentioned
-- ⚠️ No rate limiting on APIs
-- ⚠️ No SQL injection prevention (Knex builder is safe, but worth verifying)
-
-### Recommendations
-- Add CSRF token validation
-- Implement rate limiting (e.g., `express-rate-limit` or Nuxt middleware)
-- Audit sensitive operations (user deletion, ban, secret generation)
-- Use HTTPS in production (enforce via `nuxt.config.ts`)
-- Sanitize user inputs (especially for message payloads)
-
-## CI/CD & Automation
-
-### Current Status
-- No CI pipeline configured (no GitHub Actions, GitLab CI, etc.)
-
-### Recommended Pipeline
-```yaml
-name: CI/CD
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'pnpm'
-      - run: pnpm install
-      - run: pnpm lint
-      - run: pnpm test
-      - run: pnpm build
-
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - # Deploy to production
+// Restore after tests
+afterAll(() => {
+  console.warn = originalWarn;
+});
 ```
 
-## Documentation Gaps
+**What to Mock:**
+- Database models and queries
+- External APIs (Better Auth, Pusher)
+- File system operations
+- Time-dependent functions (use `vi.useFakeTimers()`)
 
-### Missing Documentation
-- No API documentation (OpenAPI/Swagger)
-- No database schema diagram
-- No deployment guide
-- No troubleshooting guide for common issues
-- No contributing guidelines
+**What NOT to Mock:**
+- Utility functions being tested
+- Pure functions with no side effects
+- Test helpers and fixtures
 
-### Recommended Additions
-- Add README with quick start guide
-- Document all environment variables
-- Create deployment guide for Docker/Kubernetes
-- Document Soketi integration details
-- API documentation (could use Swagger or OpenAPI)
+## Fixtures and Factories
+
+**Test Data:**
+```typescript
+const mockUsers = [
+  { id: "1", email: "test1@example.com", name: "Test 1" },
+  { id: "2", email: "test2@example.com", name: "Test 2" },
+];
+
+const mockUser = {
+  id: "user-123",
+  email: "test@example.com",
+  name: "Test User",
+  role: "admin",
+};
+```
+
+**Location:**
+- Inline in test files for simple cases
+- Consider `test/fixtures/` for complex shared fixtures (not yet implemented)
+
+## Coverage
+
+**Requirements:** Not currently enforced
+
+**Configuration:**
+```typescript
+coverage: {
+  provider: "v8",
+  reporter: ["text", "json", "html"],
+  include: ["server/**/*.{ts,js}", "app/**/*.{ts,vue}"],
+  exclude: [
+    "test/**",
+    "**/node_modules/**",
+    "**/.nuxt/**",
+    "**/dist/**",
+    "**/*.d.ts",
+    "**/*.config.ts",
+  ],
+}
+```
+
+**View Coverage:**
+```bash
+pnpm test:coverage
+# Opens HTML report in browser
+```
+
+## Test Types
+
+**Unit Tests:**
+- **Scope:** Individual functions, classes, composables
+- **Approach:** Mock dependencies, test in isolation
+- **Examples:**
+  - Repository methods (`UserRepository.getAll()`)
+  - Utility functions (`cn()` class merger)
+  - Validation schemas (Zod schemes)
+
+**Integration Tests:**
+- **Scope:** Multiple components working together
+- **Approach:** Minimal mocking, test interactions
+- **Not yet implemented** - future opportunity
+
+**E2E Tests:**
+- **Framework:** Not configured
+- **Future:** Consider Playwright or Cypress
+- **Test flows:**
+  - Login/logout
+  - User CRUD operations
+  - Application management
+
+## What's Being Tested
+
+**Currently Covered:**
+
+1. **Repositories** (`test/repositories/user.repository.test.ts`):
+   - `UserRepository.getAll()` - pagination
+   - `UserRepository.getById()` - single fetch
+   - Mocking of User model and Better Auth API
+
+2. **Utilities** (`test/utils.test.ts`):
+   - `cn()` className merger function
+   - Conditional class handling
+   - Tailwind merge behavior
+   - Validation helper existence checks
+
+**Test Infrastructure:**
+- Setup file mocks console.error to reduce noise
+- Vitest configured with globals enabled
+- Happy DOM for lightweight DOM simulation
+
+## Missing Test Coverage
+
+**High Priority:**
+
+1. **API Routes:**
+   - `server/api/users/index.post.ts`
+   - `server/api/users/[id].put.ts`
+   - `server/api/users/[id].delete.ts`
+   - `server/api/users/ban.ts`
+   - `server/api/applications/*`
+   - `server/api/auth/[...all].ts`
+
+2. **Validation Schemas:**
+   - `createUserScheme`
+   - `updateUserScheme`
+   - `banUserScheme`
+   - Test valid/invalid inputs
+
+3. **Composables:**
+   - `useAuth()` - authentication state
+   - Test reactive behavior
+
+4. **Models:**
+   - `User` model methods
+   - `Application` model methods
+   - `Model` base class pagination
+
+5. **Middleware:**
+   - `auth.ts` - session handling
+   - `user-admin.ts` - admin protection
+   - `rate-limit.ts` - rate limiting
+   - `csrf.ts` - CSRF protection
+
+**Medium Priority:**
+
+6. **Services:**
+   - `server/services/kv.ts` - key-value operations
+   - `server/services/crypto.ts` - crypto utilities
+
+7. **Frontend Components:**
+   - DataTable components
+   - Modal components
+   - Form components
+
+8. **Database Operations:**
+   - Knex queries
+   - Migrations (test rollback/apply)
+
+**Low Priority:**
+
+9. **Shared Utils:**
+   - `shared/utils.ts` functions
+
+10. **E2E Flows:**
+    - Complete user workflows
+    - Real-time features (Pusher integration)
+
+## Common Patterns
+
+**Async Testing:**
+```typescript
+it("should return paginated users", async () => {
+  vi.mocked(User.paginate).mockResolvedValue(mockData);
+  const result = await repository.getAll();
+  expect(result).toEqual(expected);
+});
+```
+
+**Error Testing:**
+```typescript
+it("should throw error on invalid input", async () => {
+  vi.mocked(User.find).mockRejectedValue(new Error("Not found"));
+  await expect(repository.getById("invalid")).rejects.toThrow("Not found");
+});
+```
+
+**Testing Validation:**
+```typescript
+import { createUserScheme } from "~/server/validations/users/createUserScheme";
+
+describe("createUserScheme", () => {
+  it("should accept valid user data", () => {
+    const validData = {
+      name: "John Doe",
+      email: "john@example.com",
+      password: "password123",
+      role: "user" as const,
+    };
+    const result = createUserScheme.safeParse(validData);
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject invalid email", () => {
+    const invalidData = { ...validData, email: "invalid" };
+    const result = createUserScheme.safeParse(invalidData);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].path).toEqual(["email"]);
+  });
+});
+```
+
+**Testing Composables:**
+```typescript
+import { renderHook, act } from "@testing-library/vue";
+import { useAuth } from "~/composables/useAuth";
+
+describe("useAuth", () => {
+  it("should return authentication state", () => {
+    const { result } = renderHook(() => useAuth());
+    expect(result.value.isAuthenticated.value).toBe(false);
+  });
+
+  it("should sign in successfully", async () => {
+    const { result } = renderHook(() => useAuth());
+    await act(async () => {
+      await result.value.signIn("test@example.com", "password");
+    });
+    expect(result.value.isAuthenticated.value).toBe(true);
+  });
+});
+```
+
+## Vitest Configuration
+
+**Config File:** `vitest.config.ts`
+```typescript
+import { defineVitestConfig } from "@nuxt/test-utils/config";
+
+export default defineVitestConfig({
+  test: {
+    globals: true,
+    environment: "happy-dom",
+    setupFiles: ["./test/setup.ts"],
+    include: ["test/**/*.test.{ts,js}"],
+    exclude: [
+      "**/node_modules/**",
+      "**/.nuxt/**",
+      "**/dist/**",
+      "**/playwright/**",
+      "**/e2e/**",
+    ],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      include: ["server/**/*.{ts,js}", "app/**/*.{ts,vue}"],
+    },
+  },
+});
+```
+
+## Test Setup
+
+**File:** `test/setup.ts`
+```typescript
+import { afterAll } from "vitest";
+
+// Mock console.error during tests to avoid noise
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  // Only log errors that are not expected during tests
+  if (args[0]?.toString().includes("CSRF") || 
+      args[0]?.toString().includes("Rate limit")) {
+    originalConsoleError(...args);
+  }
+};
+
+// Cleanup after all tests
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+```
+
+## Running Tests
+
+**Development:**
+```bash
+pnpm test              # Watch mode - reruns on file changes
+pnpm test:ui           # Open Vitest dashboard
+```
+
+**CI/Production:**
+```bash
+pnpm test:run          # Run once and exit
+pnpm test:coverage     # Run with coverage report
+```
+
+**Filter Tests:**
+```bash
+pnpm test user         # Run tests matching "user"
+pnpm test -- --grep "should return"  # Run tests matching pattern
+```
+
+## Future Testing Improvements
+
+1. **Add Integration Tests:**
+   - Test API routes with real database (test container)
+   - Test middleware chains
+   - Test validation + repository integration
+
+2. **Component Testing:**
+   - Add `@testing-library/vue` for Vue component tests
+   - Test user interactions
+   - Test prop validation and events
+
+3. **E2E Testing:**
+   - Set up Playwright
+   - Test critical user flows
+   - Visual regression testing
+
+4. **Test Coverage Enforcement:**
+   - Set minimum coverage thresholds
+   - Add coverage badge to README
+   - Block PRs below threshold
+
+5. **Test Utilities:**
+   - Create test factories for mock data
+   - Add test helpers for common setups
+   - Mock Better Auth consistently
+
+---
+
+*Testing analysis: 2026-03-27*

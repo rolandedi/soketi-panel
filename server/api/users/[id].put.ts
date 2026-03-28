@@ -1,15 +1,12 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { validateWith, createValidationError } from "~~/server/lib/utils";
 import { updateUserScheme } from "~~/server/validations/users/updateUserScheme";
+import {
+  validateWith,
+  createValidationError,
+  handleError,
+} from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
-  if (event.context.user?.role !== "admin") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
-
   const { id } = getRouterParams(event);
   const { data, error } = await validateWith(event, "body", updateUserScheme);
 
@@ -20,13 +17,9 @@ export default defineEventHandler(async (event) => {
   const userRepository = new UserRepository();
 
   try {
-    await userRepository.update(id as string, data);
+    await userRepository.updateAdmin(id as string, data, event.headers);
     return { success: true };
   } catch (error: any) {
-    throw createError({
-      statusCode: error.statusCode || 500,
-      statusMessage:
-        error.statusMessage || error.message || "Failed to update user",
-    });
+    throw handleError("users.update", error, "Failed to update user");
   }
 });

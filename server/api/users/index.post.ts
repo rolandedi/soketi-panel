@@ -1,15 +1,12 @@
 import { UserRepository } from "~~/server/repositories/user.repository";
-import { createValidationError, validateWith } from "~~/server/lib/utils";
 import { createUserScheme } from "~~/server/validations/users/createUserScheme";
+import {
+  createValidationError,
+  validateWith,
+  handleError,
+} from "~~/server/lib/utils";
 
 export default defineEventHandler(async (event) => {
-  if (!event.context.user || event.context.user.role !== "admin") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
-
   const { data, error } = await validateWith(event, "body", createUserScheme);
 
   if (error) {
@@ -19,11 +16,8 @@ export default defineEventHandler(async (event) => {
   const userRepository = new UserRepository();
 
   try {
-    return await userRepository.create(data);
+    return await userRepository.create(data, event.headers);
   } catch (err: any) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: err.message || "Failed to create user",
-    });
+    throw handleError("users.create", err, "Failed to create user");
   }
 });

@@ -88,10 +88,11 @@
 import { ref } from "vue";
 import { z } from "zod";
 import { toast } from "vue-sonner";
-import { PlusIcon, EyeIcon, EyeOffIcon } from "lucide-vue-next";
+import { EyeIcon, EyeOffIcon } from "lucide-vue-next";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 
+import { useCsrfFetch } from "~/composables/useCsrfFetch";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -115,7 +116,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "~/components/ui/dialog";
 
 const emit = defineEmits(["success"]);
@@ -152,7 +152,8 @@ const onSubmit = handleSubmit(async (formData) => {
   isCreating.value = true;
 
   try {
-    const newUser = await $fetch("/api/users", {
+    const { csrfFetch } = useCsrfFetch();
+    const newUser = await csrfFetch("/api/users", {
       method: "POST",
       body: formData,
     });

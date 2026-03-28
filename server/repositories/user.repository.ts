@@ -12,9 +12,10 @@ export class UserRepository {
     return user as unknown as UserType | undefined;
   }
 
-  async create(data: any) {
+  async create(data: any, headers?: Headers) {
     // Le plugin admin expose ses propres méthodes sur auth.api
     const res = await auth.api.createUser({
+      headers,
       body: {
         email: data.email,
         password: data.password,
@@ -26,10 +27,9 @@ export class UserRepository {
     return res;
   }
 
-  async update(id: string, data: any) {
-    // Pour mettre à jour un autre utilisateur en tant qu'admin, on utilise le plugin admin s'il est exposé
-    // Sinon on peut utiliser le modèle directement ou les méthodes admin de l'API
+  async update(id: string, data: any, headers?: Headers) {
     return await auth.api.updateUser({
+      headers,
       body: {
         userId: id,
         ...data,
@@ -37,38 +37,59 @@ export class UserRepository {
     });
   }
 
-  async delete(id: string) {
-    return await auth.api.removeUser({
+  async updateAdmin(id: string, data: any, headers?: Headers) {
+    return await auth.api.adminUpdateUser({
+      headers,
       body: {
         userId: id,
+        data,
       },
     });
   }
 
+  async delete(ids: string | string[], headers?: Headers) {
+    const deleteds = [];
+
+    if (!Array.isArray(ids)) {
+      ids = [ids];
+    }
+
+    for (const userId of ids) {
+      const res = await auth.api.removeUser({
+        headers,
+        body: { userId },
+      });
+
+      deleteds.push(res);
+    }
+
+    return deleteds;
+  }
+
   async ban(
     id: string,
-    banned: boolean,
     reason?: string | null,
     expires?: string | null,
+    headers?: Headers,
   ) {
-    if (banned) {
-      return await auth.api.banUser({
-        body: {
-          userId: id,
-          banReason: reason ?? undefined,
-          // Better Auth attend banExpiresIn (ms) ou une date selon la version,
-          // mais ici l'erreur TS disait banExpiresIn?: number
-          banExpiresIn: expires
-            ? new Date(expires).getTime() - Date.now()
-            : undefined,
-        },
-      });
-    } else {
-      return await auth.api.unbanUser({
-        body: {
-          userId: id,
-        },
-      });
-    }
+    return await auth.api.banUser({
+      headers,
+      body: {
+        userId: id,
+        banReason: reason ?? undefined,
+        banExpiresIn: expires
+          ? Math.floor((new Date(expires).getTime() - Date.now()) / 1000)
+          : undefined,
+      },
+    });
+  }
+
+  async unban(id: string, headers?: Headers) {
+    return await auth.api.unbanUser({
+      headers,
+      body: {
+        userId: id,
+      },
+    });
   }
 }

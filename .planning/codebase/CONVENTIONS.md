@@ -1,471 +1,402 @@
-# Code Style & Conventions
+# Coding Conventions
 
-## TypeScript
+**Analysis Date:** 2026-03-27
 
-### Strict Mode
-- **Enabled:** Yes (via tsconfig.json)
-- **No `any`:** Prohibited; always type parameters and return values
-- **Null Safety:** Explicit nullability with `T | null` or `T | undefined`
+## TypeScript Usage
 
-### Type Definitions
-- **Interface vs Type:** Prefer `interface` for object shapes, `type` for unions/aliases
-- **Shared Types:** All user-facing models in `shared/types.ts`
-- **File Naming:** Entity types use filenames matching the entity (e.g., `server/models/user.ts`)
+**Strict Mode:**
+- TypeScript is configured with strict typing via Nuxt's auto-generated tsconfig
+- Root `tsconfig.json` references `.nuxt/tsconfig.*` configs for app, server, shared, and node contexts
+- Avoid `any` type - use proper type definitions from `#shared/types`
 
-### Example Patterns
+**Type Safety:**
+- All API endpoints use Zod schemas for runtime validation
+- Models implement shared interfaces for type consistency
+- Composables and utilities are fully typed with TypeScript
+
+## Naming Conventions
+
+**Files:**
+- **API routes**: `[resource]/[action].httpMethod.ts` (e.g., `users/index.post.ts`, `users/[id].put.ts`)
+- **Components**: PascalCase (e.g., `CreateUserModal.vue`, `DataTable.vue`)
+- **Composables**: camelCase with `use` prefix (e.g., `useAuth.ts`)
+- **Models**: PascalCase matching entity name (e.g., `user.ts`, `application.ts`)
+- **Repositories**: `[Entity]Repository.ts` (e.g., `user.repository.ts`)
+- **Validations**: `[action]Scheme.ts` (e.g., `createUserScheme.ts`)
+- **Utils**: camelCase (e.g., `utils.ts`)
+
+**Functions:**
+- camelCase for all functions
+- Descriptive names indicating action (e.g., `handleFetch`, `handleCreated`, `validateWith`)
+- Async functions use `async/await` pattern
+
+**Variables:**
+- camelCase for variables and constants
+- Const used for immutable values
+- Reactive refs use `ref()` with descriptive names
+
+**Components:**
+- PascalCase for Vue component filenames
+- Single-file components (`.vue`) for UI components
+- Export main component as default in `index.ts` barrel files
+
+## Code Organization Patterns
+
+**Project Structure:**
+```
+soketi-panel/
+├── app/                    # Frontend application
+│   ├── components/        # Vue components
+│   │   ├── ui/           # Shadcn Vue base components
+│   │   ├── data-table/   # DataTable components
+│   │   └── modals/       # Modal components
+│   ├── composables/       # Reusable Vue logic
+│   ├── layouts/          # Layout components
+│   ├── lib/              # Frontend utilities
+│   ├── pages/            # File-based routing
+│   └── table-columns/    # DataTable column definitions
+├── server/                # Nitro backend
+│   ├── api/              # REST API endpoints
+│   ├── lib/              # Server utilities
+│   │   ├── auth.ts      # Better Auth configuration
+│   │   ├── orm/         # Custom ORM layer
+│   │   └── utils.ts     # Server helpers
+│   ├── middleware/       # API middleware
+│   ├── models/           # Database models
+│   ├── repositories/     # Data access layer
+│   ├── services/         # Business logic
+│   └── validations/      # Zod schemas
+├── shared/               # Shared code
+│   ├── types.ts         # TypeScript interfaces
+│   └── utils.ts         # Shared utilities
+├── database/             # Knex migrations & seeds
+└── test/                 # Vitest tests
+```
+
+**Layer Separation:**
+- **Frontend (`app/`)**: UI components, composables, pages, client-side logic
+- **Backend (`server/`)**: API routes, repositories, services, validations
+- **Shared (`shared/`)**: Type definitions, constants, utilities used by both
+
+## Import/Export Patterns
+
+**Path Aliases:**
+- `@/` or `~/` - Maps to `app/` directory
+- `~~/` - Maps to project root (used in server files)
+- `#shared/` - Maps to `shared/` directory
+
+**Import Organization:**
+1. External dependencies (Vue, libraries)
+2. Internal imports (using aliases)
+3. Relative imports (components, utils)
+
+**Example:**
 ```typescript
-// ✅ Proper typing
+import { ref, onMounted } from "vue";
+import type { PaginatedResponse, User } from "#shared/types";
+import { usersColumns } from "~/table-columns/usersColumns";
+import { DataTable } from "~/components/data-table";
+import CreateUserModal from "~/components/modals/CreateUserModal.vue";
+```
+
+**Barrel Exports:**
+- UI components use `index.ts` for named exports
+- Example: `app/components/ui/button/index.ts` exports `Button` component and `buttonVariants`
+
+**Default vs Named Exports:**
+- Vue components: Default export (`export default defineComponent(...)`)
+- Utilities: Named exports (`export function cn(...)`)
+- Types: Named exports (`export interface User { ... }`)
+
+## Error Handling Approaches
+
+**API Error Handling:**
+- Use `createError()` from H3/Nitro for API errors
+- Always include `statusCode` and `statusMessage`
+- Log errors with context using `logError()` helper
+
+**Pattern:**
+```typescript
+try {
+  return await userRepository.create(data);
+} catch (err: any) {
+  logError("users.create", err);
+  throw createError({
+    statusCode: 500,
+    statusMessage: err.message || "Failed to create user",
+  });
+}
+```
+
+**Validation Errors:**
+- Use `createValidationError()` helper for Zod validation failures
+- Returns 400 status with first validation issue message
+
+**Logging:**
+- Use `consola` for structured logging
+- `logError(context, error)` helper includes context tag and error details
+- Console errors mocked during tests to avoid noise
+
+**Frontend Error Handling:**
+- Use `try/catch/finally` with loading states
+- Display errors via toast notifications (`vue-sonner`)
+
+```typescript
+async function handleFetch() {
+  loading.value = true;
+  try {
+    const res = await $fetch<PaginatedResponse<User>>("/api/users");
+    data.value = res.data;
+  } catch (err: any) {
+    toast.error(err?.message || "Failed to fetch users");
+  } finally {
+    loading.value = false;
+  }
+}
+```
+
+## Validation Patterns (Zod)
+
+**Schema Definition:**
+- All API request validation uses Zod schemas
+- Schemas located in `server/validations/[entity]/[action]Scheme.ts`
+- Export both schema and inferred type
+
+**Example:**
+```typescript
+import { z } from "zod";
+
+export const createUserScheme = z.object({
+  name: z
+    .string()
+    .min(3, "Name must be at least 3 characters long")
+    .max(255, "Name must be at most 255 characters long"),
+  email: z.email("Invalid email address"),
+  role: z.enum(["user", "admin"], "Invalid role"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .max(255, "Password must be at most 255 characters long"),
+});
+
+export type CreateUserScheme = z.infer<typeof createUserScheme>;
+```
+
+**Validation Helper:**
+```typescript
+export async function validateWith(
+  event: H3Event,
+  source: "body" | "query" | "params",
+  schema: z.ZodType<any>
+) {
+  let data: any;
+  switch (source) {
+    case "body":
+      data = await readBody(event);
+      break;
+    case "query":
+      data = getQuery(event);
+      break;
+    case "params":
+      data = getRouterParams(event);
+      break;
+  }
+  return schema.safeParse(data);
+}
+```
+
+**Usage in API Routes:**
+```typescript
+const { data, error } = await validateWith(event, "body", createUserScheme);
+if (error) {
+  throw createValidationError(error);
+}
+```
+
+## Type Definitions and Models
+
+**Shared Types:**
+- Core interfaces defined in `shared/types.ts`
+- Used by both frontend and backend for type consistency
+- Includes: `User`, `Application`, `Message`, `PaginatedResponse<T>`
+
+**Example:**
+```typescript
 export interface User {
   id: string;
+  name: string;
   email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: string;
+  updatedAt: string;
   role: "admin" | "user";
   banned: boolean;
+  banReason: string | null;
   banExpires: string | null;
 }
 
-// ✅ Function signatures
-async function getUser(id: string): Promise<User | null> {
-  // ...
-}
-
-// ❌ Avoid any
-function processData(data: any): void { } // BAD
-
-// ✅ Use generics instead
-function processData<T>(data: T): T { }
-```
-
-## Vue Components
-
-### Structure
-```vue
-<script setup lang="ts">
-// Import statements
-// Ref/reactive state
-// Computed properties
-// Methods
-// Lifecycle hooks
-</script>
-
-<template>
-  <!-- Component markup -->
-</template>
-
-<style scoped>
-/* Component styles (scoped) */
-</style>
-```
-
-### Naming
-- **File names:** PascalCase (`Navbar.vue`, `UserMenu.vue`)
-- **Component names:** Auto-imported, use full name when necessary
-- **Props:** Defined with explicit types
-
-### Props Pattern
-```typescript
-interface Props {
-  label: string;
-  disabled?: boolean;
-  variant?: "default" | "primary" | "danger";
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  disabled: false,
-  variant: "default",
-});
-```
-
-### Event Handling
-- **Emits:** Define all events with `defineEmits<{ eventName: [args] }>()`
-- **Naming:** kebab-case in templates, camelCase in TypeScript
-
-## Composables
-
-### Pattern
-```typescript
-export function useMyFeature() {
-  const state = ref("");
-  const computed = computed(() => state.value.toUpperCase());
-  
-  const method = () => {
-    // ...
-  };
-  
-  return { state, computed, method };
-}
-```
-
-### Return Values
-- Always return an object with named exports
-- Provide clear public API
-- Prefix private state with underscore if needed
-
-## Backend Routes
-
-### File Organization
-```typescript
-// server/api/[resource]/[id].ts
-import { useAuth } from "~/server/lib/auth";
-import { ApplicationRepository } from "~/server/repositories/application.repository";
-
-export default defineEventHandler(async (event) => {
-  // 1. Validate auth
-  const session = await useAuth().getSession(event);
-  if (!session) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
-  }
-
-  // 2. Validate input
-  const { id } = getRouterParams(event);
-  if (!id) {
-    throw createError({ statusCode: 400, message: "ID required" });
-  }
-
-  // 3. Execute business logic
-  const repo = new ApplicationRepository();
-  const app = await repo.getById(id);
-  
-  if (!app || app.user_id !== session.user.id) {
-    throw createError({ statusCode: 403, message: "Forbidden" });
-  }
-
-  // 4. Return response
-  return { data: app };
-});
-```
-
-### HTTP Method Conventions
-- `index.ts` → GET (list)
-- `index.post.ts` → POST (create)
-- `[id].ts` → GET (fetch single)
-- `[id].put.ts` → PUT (update)
-- `[id].delete.ts` → DELETE (delete)
-- `action.ts` → POST (custom action, e.g., `ban.ts`)
-
-### Error Handling
-```typescript
-// Use H3 createError for HTTP errors
-throw createError({
-  statusCode: 404,
-  statusMessage: "Not Found",
-  message: "Application not found"
-});
-
-// Status codes
-// 200 OK, 201 Created
-// 400 Bad Request (validation)
-// 401 Unauthorized (auth)
-// 403 Forbidden (permission)
-// 404 Not Found
-// 500 Server Error
-```
-
-### Response Format
-```typescript
-// Single resource
-return { data: user };
-
-// Collection with pagination
-return {
-  data: users,
+export interface PaginatedResponse<T> {
+  data: T[];
   meta: {
-    total: 100,
-    perPage: 10,
-    currentPage: 1,
-    lastPage: 10
-  }
-};
-
-// Error
-throw createError({ statusCode: 400, message: "..." });
+    total: number;
+    perPage: number;
+    currentPage: number;
+    lastPage: number;
+  };
+}
 ```
 
-## Database & ORM
+**Database Models:**
+- Extend base `Model` class from `server/lib/orm/model.ts`
+- Define static `table` property for table name
+- Define static `casts` for type conversion (boolean, number, string, json)
+- Implement shared interface for type safety
 
-### Model Definition
+**Example:**
 ```typescript
-import { Model } from "~/server/lib/orm/model";
 import type { User as UserType } from "#shared/types";
+import { Model } from "../lib/orm/model";
 
 export class User extends Model implements UserType {
-  public static table = "sktp_users";
-  
-  public static casts = {
+  public static override table = "sktp_users";
+
+  public static override casts = {
     emailVerified: "boolean" as const,
     banned: "boolean" as const,
   };
 
   public id!: string;
+  public name!: string;
   public email!: string;
-  public emailVerified!: boolean;
   // ... other properties
 }
 ```
 
-### Repository Pattern
+**Model Pattern:**
+- Repository pattern for data access (`UserRepository`)
+- Models handle database queries via Knex
+- Repositories encapsulate business logic and auth operations
+
+## Comment and Documentation Standards
+
+**JSDoc Comments:**
+- Use JSDoc for composables and complex functions
+- Include description, params, and return type
+
+**Example:**
 ```typescript
-export class UserRepository {
-  async getById(id: string): Promise<User | null> {
-    const row = await db.select().from("sktp_users").where("id", id).first();
-    return row ? new User(row) : null;
-  }
-
-  async getAll(page = 1, perPage = 10) {
-    const query = db.select().from("sktp_users");
-    const total = await query.count("* as count").first();
-    
-    const users = await query
-      .limit(perPage)
-      .offset((page - 1) * perPage);
-
-    return {
-      data: users.map(row => new User(row)),
-      meta: { total: total.count, perPage, currentPage: page, lastPage: Math.ceil(total.count / perPage) }
-    };
-  }
-
-  async create(data: Partial<User>): Promise<User> {
-    const [id] = await db.insert(data).into("sktp_users");
-    return this.getById(id) as Promise<User>;
-  }
+/**
+ * Reactive composable wrapping Better Auth client methods.
+ * Exposes session state and auth actions for use in components and middleware.
+ */
+export function useAuth() {
+  // ...
 }
 ```
 
-### Query Patterns
-```typescript
-// Always use Knex builder (no raw SQL)
-const users = await db.select("*").from("sktp_users");
-const user = await db.select().from("sktp_users").where("id", userId).first();
-const count = await db.count("* as count").from("sktp_users").first();
+**Inline Comments:**
+- Use sparingly - code should be self-documenting
+- French comments present in some files (middleware, auth)
+- Prefer English for consistency
 
-// Joins
-const apps = await db
-  .select("a.*", "u.name as user_name")
-  .from("sktp_applications as a")
-  .join("sktp_users as u", "a.user_id", "u.id");
+**Test Comments:**
+- Describe test setup and purpose
+- Use `describe` blocks for organization
+- Include comments for mock restoration
 
-// Pagination
-const page = 1, perPage = 10;
-const results = await db
-  .select()
-  .from("sktp_users")
-  .limit(perPage)
-  .offset((page - 1) * perPage);
-```
+**TODO Comments:**
+- Track technical debt with inline comments
+- Documented in `.planning/codebase/CONCERNS.md`
 
-## Form Validation
+## Component Patterns
 
-### Zod Schemas
-```typescript
-import { z } from "zod";
+**Vue 3 Composition API:**
+- Use `<script setup lang="ts">` syntax
+- Define props with `defineProps<Props>()`
+- Use `withDefaults()` for prop defaults
 
-export const createUserSchema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
-  name: z.string().min(1, "Name required"),
-});
-
-export type CreateUserInput = z.infer<typeof createUserSchema>;
-```
-
-### Usage in Routes
-```typescript
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  
-  try {
-    const data = createUserSchema.parse(body);
-    // Process validated data
-  } catch (error) {
-    throw createError({
-      statusCode: 400,
-      message: error.issues.map(i => i.message).join(", ")
-    });
-  }
-});
-```
-
-## Styling
-
-### Tailwind CSS v4
-- **Syntax:** Use `class=""` directly, no need for `@apply` in most cases
-- **Responsive:** Prefix with breakpoint: `md:text-lg`, `lg:flex`
-- **Dark Mode:** Prefix with `dark:`: `dark:bg-slate-900`
-- **Variants:** Use built-in variants: `hover:`, `focus:`, `disabled:`
-
-### Component Classes
+**Example:**
 ```vue
-<template>
-  <!-- ✅ Descriptive and semantic -->
-  <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-    Click me
-  </button>
-
-  <!-- ✅ Use cn() helper for conditional classes -->
-  <div :class="cn('p-4 rounded', isActive && 'bg-blue-100 border-blue-500')">
-    Content
-  </div>
-
-  <!-- ❌ Avoid @apply, use classes directly -->
-  <style scoped>
-    .btn { @apply px-4 py-2 rounded; } /* Not preferred */
-  </style>
-</template>
-```
-
-### Color Palette
-- **Primary:** `blue-600` (links, primary buttons)
-- **Success:** `green-600`
-- **Warning:** `amber-600`
-- **Danger:** `red-600`
-- **Background:** `white`, `gray-50`, `gray-900` (dark mode)
-- **Text:** `gray-900` (light), `white` (dark mode)
-- **Borders:** `gray-200` (light), `gray-700` (dark mode)
-
-### Shadcn Vue Components
-```vue
-<template>
-  <!-- Use Shadcn components from auto-imports -->
-  <Button variant="default" size="lg">Default</Button>
-  <Button variant="secondary">Secondary</Button>
-  <Button variant="outline">Outline</Button>
-  <Button variant="destructive">Delete</Button>
-  <Button disabled>Disabled</Button>
-
-  <!-- Card layout -->
-  <Card>
-    <CardHeader>
-      <CardTitle>Title</CardTitle>
-    </CardHeader>
-    <CardContent>Content</CardContent>
-  </Card>
-
-  <!-- Dialog/Modal -->
-  <Dialog>
-    <DialogTrigger>Open</DialogTrigger>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Confirm</DialogTitle>
-      </DialogHeader>
-      Dialog content
-    </DialogContent>
-  </Dialog>
-</template>
-
-<!-- ✅ Use cn() for merging custom classes with component defaults -->
 <script setup lang="ts">
-const customClass = cn("text-sm", props.isSmall && "text-xs");
+import type { PrimitiveProps } from "reka-ui"
+import type { HTMLAttributes } from "vue"
+import { Primitive } from "reka-ui"
+import { cn } from "@/lib/utils"
+
+interface Props extends PrimitiveProps {
+  variant?: ButtonVariants["variant"]
+  size?: ButtonVariants["size"]
+  class?: HTMLAttributes["class"]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  as: "button",
+})
 </script>
+
+<template>
+  <Primitive
+    :class="cn(buttonVariants({ variant, size }), props.class)"
+  >
+    <slot />
+  </Primitive>
+</template>
 ```
 
-## Auth Patterns
+**UI Components:**
+- Use Shadcn Vue components from `app/components/ui/`
+- Use `cn()` helper for class merging
+- Use `lucide-vue-next` for icons
+- Support variants via `class-variance-authority` (cva)
 
-### Client-Side
+**Data Tables:**
+- Use `@tanstack/vue-table` via custom DataTable components
+- Column definitions in `app/table-columns/[entity]Columns.ts`
+- Reusable components: `DataTable`, `DataTableColumnHeader`, `DataTableRowActions`
+
+## State Management
+
+**Composables:**
+- Use `useAuth()` for authentication state
+- Reactive state via Vue's `ref()` and `computed()`
+- No global state management library (Pinia/Vuex) - use composables
+
+**Example:**
 ```typescript
-// app/composables/useAuth.ts pattern
-const { user, isAuthenticated, signIn, signOut } = useAuth();
-
-// Route protection
-if (!isAuthenticated.value) {
-  navigateTo("/login");
+export function useAuth() {
+  const session = authClient.useSession();
+  const user = computed(() => session.value?.data?.user ?? null);
+  const isAuthenticated = computed(() => !!session.value?.data?.session);
+  
+  return {
+    session,
+    user,
+    isAuthenticated,
+    signIn,
+    signOut,
+  };
 }
 ```
 
-### Server-Side
+## Utility Functions
+
+**Class Name Merger:**
 ```typescript
-// Check auth in route handler
-const session = await useAuth().getSession(event);
-if (!session?.user) {
-  throw createError({ statusCode: 401 });
+import type { ClassValue } from "clsx";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
-
-// Use session data
-const userId = session.user.id;
 ```
 
-## Naming Conventions
-
-### Variables & Functions
-- **camelCase:** `userName`, `getUserData()`, `isLoading`
-- **Constants:** `UPPERCASE_SNAKE_CASE` only if truly constant
-- **Boolean flags:** Prefix with `is`, `has`, `can`: `isLoading`, `hasError`
-
-### Files & Directories
-- **Directories:** kebab-case: `data-table/`, `ui/components/`
-- **Components:** PascalCase: `Navbar.vue`, `UserCard.vue`
-- **Composables:** camelCase + `use` prefix: `useAuth.ts`
-- **Utils:** camelCase: `utils.ts`, `helpers.ts`
-- **Models/Classes:** PascalCase: `User.ts`, `Model.ts`
-- **Routes:** kebab-case or index pattern: `[id].ts`, `index.post.ts`
-
-### Database
-- **Tables:** snake_case with prefix: `sktp_users`, `sktp_applications`
-- **Columns:** snake_case: `user_id`, `created_at`, `max_connections`
-- **Relationships:** snake_case foreign keys: `user_id`, `app_id`
-
-## Comments
-
-### When to Comment
-- **Complex logic:** Explain the "why" not the "what"
-- **Workarounds:** Document why a non-obvious solution was chosen
-- **Gotchas:** Note potential issues or side effects
-
-### When NOT to Comment
-- Self-explanatory code
-- Type hints that speak for themselves
-- One-liners or obvious assignments
-
-### Example
+**Usage:**
 ```typescript
-// ✅ Good: explains the why
-// Cache results for 5 minutes to reduce database hits
-const cachedUser = memo(() => getUser(id), { maxAge: 5 * 60 * 1000 });
-
-// ❌ Bad: obvious what the code does
-// Get the user's email
-const email = user.email;
-
-// ✅ Good: documents a gotcha
-// Must compare role before checking permissions—role is transformed in middleware
-if (user.role === "admin" && hasPermission(user.id)) { ... }
+: class="cn(buttonVariants({ variant, size }), props.class)"
 ```
 
-## Code Organization
+---
 
-### Import Order
-1. External libraries (`vue`, `zod`, etc.)
-2. Nuxt utilities (`#app`, `#shared`)
-3. Local modules (`~/server`, `~/app`)
-4. Types and interfaces
-
-```typescript
-import { ref, computed } from "vue";
-import { z } from "zod";
-import { defineEventHandler, useAuth } from "#app";
-import type { User } from "#shared/types";
-import { UserRepository } from "~/server/repositories/user.repository";
-```
-
-### Avoid Circular Imports
-- Models import types, types don't import models
-- Repositories use models, routes use repositories
-- Composables use utils, utils don't use composables
-
-## Performance Guidelines
-
-### Frontend
-- Lazy-load routes: `defineRouteRules` in component
-- Memoize expensive computed properties
-- Use `<ClientOnly>` for components that need SSR hydration mismatch workarounds
-- Prefer `const` over `let` when possible
-
-### Backend
-- Use repository pattern for testability
-- Batch database queries where possible
-- Implement pagination for large collections (10-25 items per page)
-- Cache expensive queries if data doesn't change frequently
-
-### Database
-- Add indexes on frequently queried columns (`user_id`, `app_id`)
-- Use `limit()` and `offset()` for pagination
-- Avoid N+1 queries (use eager loading via joins)
+*Convention analysis: 2026-03-27*
