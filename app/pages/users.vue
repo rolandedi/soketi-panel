@@ -10,8 +10,9 @@
       <DataTable
         ref="tableRef"
         v-model="data"
-        filter-column="name"
-        :status-columns="statuses"
+        search-column="name"
+        filter-column="role"
+        :filter-options="statuses"
         :columns="columns"
         :loading="loading"
         :left-sticky="true"
@@ -55,9 +56,8 @@ import DeleteUserAlert from "~/components/modals/users/DeleteUserAlert.vue";
 useHead({ title: "Users" });
 
 const statuses = [
-  { label: "Active", value: "Active" },
-  { label: "Inactive", value: "Inactive" },
-  { label: "Pending", value: "Pending" },
+  { label: "User", value: "user" },
+  { label: "Admin", value: "admin" },
 ];
 
 const loading = ref(false);
@@ -109,8 +109,6 @@ async function handleFetch(itemsPerPage?: number, page?: number) {
       },
     });
 
-    console.log(res);
-
     data.value = res.data;
   } catch (err: any) {
     toast.error(err?.message || "Failed to fetch users");
@@ -134,6 +132,10 @@ function handleBanUpdated(updated: User) {
 }
 
 function handleDeleteRows(items: User[]) {
+  console.log(
+    "Deleting rows",
+    items.map((i) => i.id),
+  );
   // TODO: Implement bulk delete API and call it here instead of just filtering out the deleted items from the table
   data.value = data.value.filter((u) => !items.some((i) => i.id === u.id));
   table.value?.resetRowSelection();
