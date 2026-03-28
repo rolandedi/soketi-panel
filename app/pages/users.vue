@@ -10,7 +10,7 @@
       <DataTable
         ref="tableRef"
         v-model="data"
-        search-column="name"
+        :search-column="['name', 'email', 'role', 'banReason']"
         filter-column="role"
         :filter-options="statuses"
         :columns="columns"
@@ -18,7 +18,7 @@
         :left-sticky="true"
         :right-sticky="true"
         :pagination="pagination"
-        :page-sizes="[2, 3, 5]"
+        :page-sizes="[10, 25, 50, 100]"
         @remove:rows="handleDeleteRows"
         @update:pagination="handleFetch"
       />
@@ -69,7 +69,7 @@ const loading = ref(false);
 const data = ref<User[]>([]);
 const pagination = ref({
   currentPage: 1,
-  perPage: 3,
+  perPage: 10,
   total: 0,
 });
 
