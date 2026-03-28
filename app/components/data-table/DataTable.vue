@@ -1,6 +1,26 @@
 <template>
   <div class="space-y-4">
-    <DataTableToolbar :table="table" :filter-column="filterColumn" />
+    <DataTableToolbar :table="table" :filter-column="filterColumn">
+      <template #afterSearch>
+        <DataTableFacetedFilter
+          v-if="statusColumns.length && table.getColumn('status')"
+          :title="filterLabel"
+          :column="table.getColumn('status')"
+          :options="statusColumns"
+        />
+        <DataTableDeleteItems
+          :table="table"
+          @remove:rows="emit('remove:rows', $event)"
+        />
+
+        <slot name="toolbarAfterSearch" />
+      </template>
+      <template #end>
+        <DataTableViewOptions v-if="canToggleColumns" :table="table" />
+
+        <slot name="toolbarEnd" />
+      </template>
+    </DataTableToolbar>
     <div
       class="rounded-md border bg-card relative wrap-break-word overflow-hidden"
     >
@@ -85,21 +105,8 @@
 </template>
 
 <script setup lang="ts" generic="TData, TValue">
-import { ref } from "vue";
-import {
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useVueTable,
-  FlexRender,
-  type ColumnDef,
-  type SortingState,
-  type ColumnFiltersState,
-  type VisibilityState,
-} from "@tanstack/vue-table";
+import { computed } from "vue";
+import { FlexRender, type ColumnDef } from "@tanstack/vue-table";
 
 import {
   Table,
@@ -110,95 +117,47 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import DataTablePagination from "./DataTablePagination.vue";
+import { useDataTable } from "./index";
 import DataTableToolbar from "./DataTableToolbar.vue";
 import DataTableContainer from "./DataTableContainer.vue";
+import DataTablePagination from "./DataTablePagination.vue";
+import DataTableDeleteItems from "./DataTableDeleteItems.vue";
+import DataTableViewOptions from "./DataTableViewOptions.vue";
+import DataTableFacetedFilter from "./DataTableFacetedFilter.vue";
 
 interface Props {
   columns: ColumnDef<TData, TValue>[];
   filterColumn?: string;
+  statusColumns?: { label: string; value: string }[];
   loading?: boolean;
+  leftSticky?: boolean;
+  rightSticky?: boolean;
+  filterLabel?: string;
   pagination?: {
     currentPage: number;
     lastPage: number;
     perPage: number;
     total: number;
   };
-  leftSticky?: boolean;
-  rightSticky?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   leftSticky: false,
   rightSticky: false,
+  filterLabel: "Filter",
+  statusColumns: () => [],
 });
+const emit = defineEmits<{
+  (e: "update:pagination", perPage: number, currentPage: number): void;
+  (e: "remove:rows", items: TData[]): void;
+}>();
+
 const data = defineModel<TData[]>({ default: [] });
 
 const loading = computed(() => props.loading || false);
-const sorting = ref<SortingState>([]);
-const columnFilters = ref<ColumnFiltersState>([]);
-const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({});
+const canToggleColumns = computed(() => table.getAllColumns().length > 0);
 
-const table = useVueTable({
-  get data() {
-    return data.value;
-  },
-  get columns() {
-    return props.columns;
-  },
-  state: {
-    get sorting() {
-      return sorting.value;
-    },
-    get columnFilters() {
-      return columnFilters.value;
-    },
-    get columnVisibility() {
-      return columnVisibility.value;
-    },
-    get rowSelection() {
-      return rowSelection.value;
-    },
-  },
-  onSortingChange: (updaterOrValue) => {
-    sorting.value =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(sorting.value)
-        : updaterOrValue;
-  },
-  onColumnFiltersChange: (updaterOrValue) => {
-    columnFilters.value =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(columnFilters.value)
-        : updaterOrValue;
-  },
-  onColumnVisibilityChange: (updaterOrValue) => {
-    columnVisibility.value =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(columnVisibility.value)
-        : updaterOrValue;
-  },
-  onRowSelectionChange: (updaterOrValue) => {
-    rowSelection.value =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(rowSelection.value)
-        : updaterOrValue;
-  },
-  getCoreRowModel: getCoreRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getPaginationRowModel: getPaginationRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getFacetedRowModel: getFacetedRowModel(),
-  getFacetedUniqueValues: getFacetedUniqueValues(),
-});
+const { table } = useDataTable<TData, TValue>(data, props.columns);
 
-const handleDeleteRows = () => {
-  const selectedRows = table.getSelectedRowModel().rows;
-  const updatedData = data.value.filter((item: any) => {
-    return !selectedRows.some((row: any) => row.original.id === item.id);
-  });
-  data.value = updatedData;
-  table.resetRowSelection();
-};
+defineExpose({ table });
 </script>

@@ -4,7 +4,7 @@
       <div class="relative">
         <Input
           v-if="filterColumn"
-          placeholder="Filter..."
+          :placeholder="`Search by ${filterColumn}...`"
           class="peer ps-9 min-w-72"
           :model-value="
             (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ''
@@ -28,18 +28,12 @@
         </button>
       </div>
 
-      <DataTableFacetedFilter
-        v-if="table.getColumn('status')"
-        title="Status"
-        :column="table.getColumn('status')"
-        :options="statuses"
-      />
-      <DataTableDeleteItems :table="table" @delete="emit('delete')" />
+      <slot name="afterSearch" />
     </div>
     <div class="flex items-center gap-2">
-      <DataTableViewOptions :table="table" />
+      <DataTableViewOptions v-if="isFiltered" :table="table" />
 
-      <slot />
+      <slot name="end" />
     </div>
   </div>
 </template>
@@ -51,8 +45,6 @@ import { LucideCircleX, LucideListFilter } from "lucide-vue-next";
 
 import { Input } from "@/components/ui/input";
 import DataTableViewOptions from "./DataTableViewOptions.vue";
-import DataTableFacetedFilter from "./DataTableFacetedFilter.vue";
-import DataTableDeleteItems from "./DataTableDeleteItems.vue";
 
 interface Props {
   table: Table<TData>;
@@ -60,16 +52,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["delete"]);
+const emit = defineEmits(["remove:rows"]);
 
-const isFiltered = computed(
-  () => props.table.getState().columnFilters.length > 0,
-);
-
-// Status options for the faceted filter (specific to User table but could be abstracted)
-const statuses = [
-  { label: "Active", value: "Active" },
-  { label: "Inactive", value: "Inactive" },
-  { label: "Pending", value: "Pending" },
-];
+const isFiltered = computed(() => props.table.getAllColumns().length > 0);
 </script>

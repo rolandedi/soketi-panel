@@ -35,7 +35,17 @@
       </div>
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction @click="emit('delete')">Delete</AlertDialogAction>
+        <AlertDialogAction
+          class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          @click="
+            emit(
+              'remove:rows',
+              table.getSelectedRowModel().rows.map((row) => row.original),
+            )
+          "
+        >
+          Delete
+        </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
@@ -50,5 +60,5 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["delete"]);
+const emit = defineEmits(["remove:rows"]);
 </script>

@@ -8,10 +8,16 @@
 
     <div class="space-y-4">
       <DataTable
+        ref="tableRef"
         v-model="data"
         filter-column="name"
+        :status-columns="statuses"
         :columns="columns"
         :loading="loading"
+        :left-sticky="true"
+        :right-sticky="true"
+        @remove:rows="handleDeleteRows"
+        @update:pagination="handleFetch"
       />
     </div>
 
@@ -27,28 +33,7 @@
       @success="handleBanUpdated"
     />
 
-    <AlertDialog v-model:open="deleteModal.open">
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete user</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete
-            <strong>{{ deleteModal.user?.name }}</strong
-            >? This action cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            :disabled="isDeleting"
-            @click="confirmDelete"
-          >
-            {{ isDeleting ? "Deleting..." : "Delete" }}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <DeleteUserAlert ref="deleteModal" @confirm:delete="confirmDelete" />
   </div>
 </template>
 
@@ -56,32 +41,29 @@
 import { ref, onMounted, computed } from "vue";
 import { toast } from "vue-sonner";
 import { PlusIcon } from "lucide-vue-next";
-import { useCsrfFetch } from "~/composables/useCsrfFetch";
 
 import type { PaginatedResponse, User } from "#shared/types";
 import { getUsersColumns } from "~/table-columns/usersColumns";
 import { DataTable } from "~/components/data-table";
 import PageHero from "~/components/PageHero.vue";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
 
 import CreateUserModal from "~/components/modals/users/CreateUserModal.vue";
 import EditUserModal from "~/components/modals/users/EditUserModal.vue";
 import BanUserModal from "~/components/modals/users/BanUserModal.vue";
+import DeleteUserAlert from "~/components/modals/users/DeleteUserAlert.vue";
 
 useHead({ title: "Users" });
 
+const statuses = [
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+  { label: "Pending", value: "Pending" },
+];
+
 const loading = ref(false);
-const isDeleting = ref(false);
 const data = ref<User[]>([]);
+const perPage = ref(10);
+const currentPage = ref(1);
 
 const editModal = ref<{ open: boolean; user: User | null }>({
   open: false,
@@ -91,12 +73,9 @@ const banModal = ref<{ open: boolean; user: User | null }>({
   open: false,
   user: null,
 });
-const deleteModal = ref<{ open: boolean; user: User | null }>({
-  open: false,
-  user: null,
-});
-
-const { csrfFetch } = useCsrfFetch();
+const deleteModal = useTemplateRef("deleteModal");
+const tableRef = useTemplateRef("tableRef");
+const table = computed(() => tableRef.value?.table);
 
 const columns = computed(() =>
   getUsersColumns({
@@ -107,7 +86,7 @@ const columns = computed(() =>
       banModal.value = { open: true, user };
     },
     handleDelete: (user) => {
-      deleteModal.value = { open: true, user };
+      deleteModal.value?.present(user);
     },
   }),
 );
@@ -115,6 +94,30 @@ const columns = computed(() =>
 onMounted(() => {
   handleFetch();
 });
+
+async function handleFetch(itemsPerPage?: number, page?: number) {
+  loading.value = true;
+
+  perPage.value = itemsPerPage || perPage.value;
+  currentPage.value = page || currentPage.value;
+
+  try {
+    const res = await $fetch<PaginatedResponse<User>>("/api/users", {
+      params: {
+        limit: perPage.value,
+        page: currentPage.value,
+      },
+    });
+
+    console.log(res);
+
+    data.value = res.data;
+  } catch (err: any) {
+    toast.error(err?.message || "Failed to fetch users");
+  } finally {
+    loading.value = false;
+  }
+}
 
 function handleCreated(item: User) {
   data.value.push(item);
@@ -130,35 +133,13 @@ function handleBanUpdated(updated: User) {
   if (index !== -1) data.value[index] = updated;
 }
 
-async function confirmDelete() {
-  if (!deleteModal.value.user) return;
-  isDeleting.value = true;
-
-  try {
-    await csrfFetch(`/api/users/${deleteModal.value.user.id}`, {
-      method: "DELETE",
-    });
-
-    data.value = data.value.filter((u) => u.id !== deleteModal.value.user!.id);
-    deleteModal.value.open = false;
-    toast.success("User deleted successfully");
-  } catch (error: any) {
-    toast.error(error.data?.statusMessage || "Failed to delete user");
-  } finally {
-    isDeleting.value = false;
-  }
+function handleDeleteRows(items: User[]) {
+  // TODO: Implement bulk delete API and call it here instead of just filtering out the deleted items from the table
+  data.value = data.value.filter((u) => !items.some((i) => i.id === u.id));
+  table.value?.resetRowSelection();
 }
 
-async function handleFetch() {
-  loading.value = true;
-
-  try {
-    const res = await $fetch<PaginatedResponse<User>>("/api/users");
-    data.value = res.data;
-  } catch (err: any) {
-    toast.error(err?.message || "Failed to fetch users");
-  } finally {
-    loading.value = false;
-  }
+async function confirmDelete(user: User) {
+  data.value = data.value.filter((u) => u.id !== user.id);
 }
 </script>
