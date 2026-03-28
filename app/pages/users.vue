@@ -31,7 +31,7 @@
     <BanUserModal
       v-model:open="banModal.open"
       :user="banModal.user"
-      @success="handleBanUpdated"
+      @success="handleUpdated"
     />
 
     <DeleteUserAlert ref="deleteModal" @confirm:delete="confirmDelete" />
@@ -119,16 +119,17 @@ async function handleFetch(itemsPerPage?: number, page?: number) {
 
 function handleCreated(item: User) {
   data.value.push(item);
+  data.value = [...data.value];
 }
 
 function handleUpdated(updated: User) {
   const index = data.value.findIndex((u) => u.id === updated.id);
-  if (index !== -1) data.value[index] = updated;
-}
 
-function handleBanUpdated(updated: User) {
-  const index = data.value.findIndex((u) => u.id === updated.id);
-  if (index !== -1) data.value[index] = updated;
+  if (index !== -1) {
+    data.value[index] = updated;
+  }
+
+  data.value = [...data.value];
 }
 
 function handleDeleteRows(items: User[]) {
@@ -143,5 +144,7 @@ function handleDeleteRows(items: User[]) {
 
 async function confirmDelete(user: User) {
   data.value = data.value.filter((u) => u.id !== user.id);
+  data.value = [...data.value];
+  table.value?.resetRowSelection();
 }
 </script>
