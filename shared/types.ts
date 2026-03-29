@@ -44,7 +44,7 @@ export interface Message {
   app_id: string;
   channel: string;
   event: string;
-  payload: string;
+  payload: unknown;
   created_at: string;
 }
 
