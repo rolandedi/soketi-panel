@@ -5,6 +5,7 @@ import { toast } from "vue-sonner";
 
 import type { Message } from "#shared/types";
 import { formatDate } from "#shared/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/data-table";
@@ -63,6 +64,28 @@ export const getMessagesColumns = (
 ): ColumnDef<Message>[] => {
   return [
     {
+      id: "select",
+      header: ({ table }) =>
+        h(Checkbox, {
+          modelValue:
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate"),
+          "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+            table.toggleAllPageRowsSelected(!!value),
+          "aria-label": "Select all",
+        }),
+      cell: ({ row }) =>
+        h(Checkbox, {
+          modelValue: row.getIsSelected(),
+          "onUpdate:modelValue": (value: boolean | "indeterminate") =>
+            row.toggleSelected(!!value),
+          "aria-label": "Select row",
+        }),
+      size: 28,
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
       accessorKey: "id",
       header: ({ column }) =>
         h(DataTableColumnHeader<Message, any>, { column, title: "ID" }),
@@ -120,46 +143,6 @@ export const getMessagesColumns = (
           },
           () => event,
         );
-      },
-      enableHiding: false,
-    },
-    {
-      accessorKey: "payload",
-      header: ({ column }) =>
-        h(DataTableColumnHeader<Message, any>, { column, title: "Payload" }),
-      cell: ({ row }) => {
-        const payload = row.getValue("payload") as Message["payload"];
-
-        let preview = "{}";
-        try {
-          preview =
-            typeof payload === "string"
-              ? payload
-              : JSON.stringify(payload ?? {}, null, 0);
-        } catch {
-          preview = String(payload ?? "{}");
-        }
-
-        return h("div", { class: "flex items-center gap-2" }, [
-          h(
-            "span",
-            {
-              class:
-                "max-w-[360px] truncate font-mono text-xs text-muted-foreground",
-            },
-            preview,
-          ),
-          h(
-            Button,
-            {
-              variant: "secondary",
-              size: "sm",
-              class: "h-8 gap-1.5",
-              onClick: () => options?.handleViewPayload?.(row.original),
-            },
-            () => [h(EyeIcon, { class: "size-3.5" }), "View"],
-          ),
-        ]);
       },
       enableHiding: false,
     },
