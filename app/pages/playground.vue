@@ -48,10 +48,7 @@
           <Label for="payload">
             Payload<span class="text-destructive">*</span>
           </Label>
-          <textarea
-            id="payload"
-            class="flex min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          ></textarea>
+          <Textarea id="payload" class="w-full min-h-20 max-h-72" />
         </div>
 
         <Button class="w-full">
@@ -65,6 +62,21 @@
 
 <script lang="ts" setup>
 import { Send } from "lucide-vue-next";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+} from "@/components/ui/select";
+import PageHero from "@/components/PageHero.vue";
 
 useHead({ title: "Playground" });
 </script>
