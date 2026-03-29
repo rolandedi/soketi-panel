@@ -11,18 +11,33 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const query = getQuery(event);
-  const page = Math.max(1, Number(query.page) || 1);
-  const limit = Math.max(1, Number(query.limit) || 10);
+  const { id } = getRouterParams(event);
+
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Application ID is required",
+    });
+  }
+
   const applicationRepository = new ApplicationRepository();
 
   try {
-    return await applicationRepository.getAll(user.id, page, limit);
+    const application = await applicationRepository.getById(id, user.id);
+
+    if (!application) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Application not found",
+      });
+    }
+
+    return application;
   } catch (error: any) {
     throw handleError(
-      "applications.getAll",
+      "applications.getById",
       error,
-      "Failed to fetch applications",
+      "Failed to fetch application",
     );
   }
 });
