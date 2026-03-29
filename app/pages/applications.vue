@@ -74,12 +74,12 @@ import type { Application, PaginatedResponse } from "#shared/types";
 import { DataTable } from "@/components/data-table";
 import { useCsrfFetch } from "@/composables/useCsrfFetch";
 import { Button } from "@/components/ui/button";
-import PageHero from "~/components/PageHero.vue";
-import { getApplicationsColumns } from "~/table-columns/applicationsColumns";
-import ApplicationsDataTableFilters from "~/components/filters/ApplicationsDataTableFilters.vue";
-import CreateApplicationModal from "~/components/modals/applications/CreateApplicationModal.vue";
-import EditApplicationModal from "~/components/modals/applications/EditApplicationModal.vue";
-import DeleteApplicationAlert from "~/components/modals/applications/DeleteApplicationAlert.vue";
+import PageHero from "@/components/PageHero.vue";
+import { getApplicationsColumns } from "@/table-columns/applicationsColumns";
+import ApplicationsDataTableFilters from "@/components/filters/ApplicationsDataTableFilters.vue";
+import CreateApplicationModal from "@/components/modals/applications/CreateApplicationModal.vue";
+import EditApplicationModal from "@/components/modals/applications/EditApplicationModal.vue";
+import DeleteApplicationAlert from "@/components/modals/applications/DeleteApplicationAlert.vue";
 
 useHead({ title: "Applications" });
 
