@@ -34,7 +34,9 @@
                   Allow the application to receive traffic.
                 </p>
               </div>
-              <Switch id="enabled" v-model="enabled" v-bind="enabledAttrs" />
+              <div>
+                <Switch id="enabled" v-model="enabled" v-bind="enabledAttrs" />
+              </div>
             </Field>
 
             <Field
@@ -48,11 +50,13 @@
                   Allow clients to send events.
                 </p>
               </div>
-              <Switch
-                id="enable-client-messages"
-                v-model="enableClientMessages"
-                v-bind="enableClientMessagesAttrs"
-              />
+              <div>
+                <Switch
+                  id="enable-client-messages"
+                  v-model="enableClientMessages"
+                  v-bind="enableClientMessagesAttrs"
+                />
+              </div>
             </Field>
           </FieldGroup>
         </div>
