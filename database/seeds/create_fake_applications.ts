@@ -3,15 +3,15 @@ import { randomBytes } from "node:crypto";
 import consola from "consola";
 
 function generateKey(): string {
-  return randomBytes(12).toString("hex");
+  return randomBytes(32).toString("hex");
 }
 
 function generateSecret(): string {
-  return randomBytes(24).toString("hex");
+  return randomBytes(32).toString("hex");
 }
 
 function generateId(): string {
-  return randomBytes(8).toString("hex");
+  return randomBytes(16).toString("hex");
 }
 
 const appNames = [

@@ -1,11 +1,11 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 export function generateAppId() {
-  return randomUUID();
+  return randomBytes(16).toString("hex");
 }
 
 export function generateAppKey() {
-  return randomBytes(16).toString("hex");
+  return randomBytes(23).toString("hex");
 }
 
 export function generateAppSecret() {
