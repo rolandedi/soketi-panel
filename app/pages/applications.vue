@@ -57,6 +57,10 @@
       :application="editModal.application"
       @success="handleUpdated"
     />
+    <DeleteApplicationAlert
+      ref="deleteModal"
+      @confirm:delete="handleSyncDelete"
+    />
   </div>
 </template>
 
@@ -75,6 +79,7 @@ import { getApplicationsColumns } from "~/table-columns/applicationsColumns";
 import ApplicationsDataTableFilters from "~/components/filters/ApplicationsDataTableFilters.vue";
 import CreateApplicationModal from "~/components/modals/applications/CreateApplicationModal.vue";
 import EditApplicationModal from "~/components/modals/applications/EditApplicationModal.vue";
+import DeleteApplicationAlert from "~/components/modals/applications/DeleteApplicationAlert.vue";
 
 useHead({ title: "Applications" });
 
@@ -96,6 +101,7 @@ const editModal = ref<{ open: boolean; application: Application | null }>({
 });
 
 const tableRef = useTemplateRef<any>("tableRef");
+const deleteModal = useTemplateRef("deleteModal");
 const table = computed<Table<Application> | null>(
   () => tableRef.value?.table || null,
 );
@@ -109,7 +115,7 @@ const columns = computed(() =>
       void handleRegenerate(application);
     },
     handleDelete: (application) => {
-      void handleDeleteRows([application]);
+      deleteModal.value?.present(application);
     },
   }),
 );
@@ -223,6 +229,12 @@ async function handleDeleteRows(rows: Application[]) {
   } finally {
     loading.value = false;
   }
+}
+
+async function handleSyncDelete(application: Application) {
+  // Refresh list to keep pagination & counts accurate after a single delete
+  await handleFetch(pagination.value.perPage, pagination.value.currentPage);
+  tableRef.value?.table?.resetRowSelection();
 }
 
 async function handleRegenerate(application: Application) {
