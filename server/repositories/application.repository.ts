@@ -50,6 +50,10 @@ const defaultApplicationValues = {
   "id" | "name" | "key" | "secret" | "created_at" | "updated_at" | "user_id"
 >;
 
+function toSQLDatetime(date: Date): string {
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
 function serializeWebhooks(webhooks: ApplicationInput["webhooks"]) {
   if (webhooks === undefined) {
     return undefined;
@@ -143,7 +147,7 @@ export class ApplicationRepository {
       secret: generateAppSecret(),
       name: data.name,
       user_id: userId,
-      created_at: new Date().toISOString(),
+      created_at: toSQLDatetime(new Date()),
       updated_at: null,
       ...defaultApplicationValues,
       ...data,
@@ -158,7 +162,7 @@ export class ApplicationRepository {
   async update(id: string, userId: string, data: ApplicationInput) {
     const payload: Record<string, any> = {
       ...data,
-      updated_at: new Date().toISOString(),
+      updated_at: toSQLDatetime(new Date()),
     };
 
     if (data.webhooks !== undefined) {
@@ -191,7 +195,7 @@ export class ApplicationRepository {
     const payload = {
       key: generateAppKey(),
       secret: generateAppSecret(),
-      updated_at: new Date().toISOString(),
+      updated_at: toSQLDatetime(new Date()),
     };
 
     const updated = await useDB()
