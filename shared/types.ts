@@ -55,5 +55,7 @@ export interface PaginatedResponse<T> {
     perPage: number;
     currentPage: number;
     lastPage: number;
+    enabledTotal?: number;
+    disabledTotal?: number;
   };
 }

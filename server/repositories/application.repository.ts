@@ -107,10 +107,21 @@ export class ApplicationRepository {
       query.where({ user_id: userId });
     }
 
-    const countResult = await query
-      .clone()
-      .count<{ count: string | number }[]>("* as count");
+    const [countResult, enabledResult, disabledResult] = await Promise.all([
+      query.clone().count<{ count: string | number }[]>("* as count"),
+      query
+        .clone()
+        .where({ enabled: true })
+        .count<{ count: string | number }[]>("* as count"),
+      query
+        .clone()
+        .where({ enabled: false })
+        .count<{ count: string | number }[]>("* as count"),
+    ]);
+
     const total = Number(countResult[0]?.count || 0);
+    const enabledTotal = Number(enabledResult[0]?.count || 0);
+    const disabledTotal = Number(disabledResult[0]?.count || 0);
     const lastPage = Math.ceil(total / limit);
 
     const data = await query
@@ -126,6 +137,8 @@ export class ApplicationRepository {
         perPage: limit,
         currentPage: page,
         lastPage,
+        enabledTotal,
+        disabledTotal,
       },
     };
   }

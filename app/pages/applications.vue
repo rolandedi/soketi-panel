@@ -25,7 +25,7 @@
       <Card>
         <CardHeader>
           <CardTitle class="text-sm font-medium text-muted-foreground">
-            Enabled on page
+            Enabled
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -37,7 +37,7 @@
       <Card>
         <CardHeader>
           <CardTitle class="text-sm font-medium text-muted-foreground">
-            Disabled on page
+            Disabled
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -100,6 +100,8 @@ const pagination = ref({
   currentPage: 1,
   perPage: 10,
   total: 0,
+  enabledTotal: 0,
+  disabledTotal: 0,
 });
 
 const editModal = ref<{ open: boolean; application: Application | null }>({
@@ -123,13 +125,9 @@ const columns = computed(() =>
   }),
 );
 
-const enabledCount = computed(
-  () => applications.value.filter((application) => application.enabled).length,
-);
+const enabledCount = computed(() => pagination.value.enabledTotal);
 
-const disabledCount = computed(
-  () => applications.value.filter((application) => !application.enabled).length,
-);
+const disabledCount = computed(() => pagination.value.disabledTotal);
 
 onMounted(() => {
   handleFetch();
@@ -153,6 +151,8 @@ async function handleFetch(perPage?: number, page?: number) {
     pagination.value.currentPage = response.meta.currentPage;
     pagination.value.perPage = response.meta.perPage;
     pagination.value.total = response.meta.total;
+    pagination.value.enabledTotal = response.meta.enabledTotal ?? 0;
+    pagination.value.disabledTotal = response.meta.disabledTotal ?? 0;
   } catch (error: any) {
     toast.error(error?.data?.statusMessage || "Failed to fetch applications");
   } finally {
