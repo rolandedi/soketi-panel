@@ -164,9 +164,37 @@ function handleUpdated(application: Application) {
   const index = applications.value.findIndex(({ id }) => id === application.id);
 
   if (index !== -1) {
+    const previousApplication = applications.value[index];
+
     applications.value[index] = application;
     applications.value = [...applications.value];
+
+    syncApplicationTotals(previousApplication, application);
   }
+}
+
+function syncApplicationTotals(
+  previousApplication: Application,
+  nextApplication: Application,
+) {
+  if (previousApplication.enabled === nextApplication.enabled) {
+    return;
+  }
+
+  if (nextApplication.enabled) {
+    pagination.value.enabledTotal += 1;
+    pagination.value.disabledTotal = Math.max(
+      0,
+      pagination.value.disabledTotal - 1,
+    );
+    return;
+  }
+
+  pagination.value.disabledTotal += 1;
+  pagination.value.enabledTotal = Math.max(
+    0,
+    pagination.value.enabledTotal - 1,
+  );
 }
 
 async function handleDeleteRows(rows: Application[]) {
