@@ -1,5 +1,6 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
+import { toast } from "vue-sonner";
 import {
   Copy,
   PencilIcon,
@@ -13,6 +14,7 @@ import { formatDate } from "#shared/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DataTableColumnHeader } from "@/components/data-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DataTableColumnHeader } from "@/components/data-table";
-import { toast } from "vue-sonner";
 
 interface ApplicationsTableOptions {
   handleEdit?: (application: Application) => void;
