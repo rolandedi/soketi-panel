@@ -1,6 +1,6 @@
 import type { Knex } from "knex";
+import { randomBytes } from "node:crypto";
 import consola from "consola";
-import { randomBytes } from "crypto";
 
 function generateKey(): string {
   return randomBytes(12).toString("hex");
