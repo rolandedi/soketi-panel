@@ -1,5 +1,5 @@
 <template>
-  <DropdownMenu>
+  <DropdownMenu v-if="items.length > 0">
     <DropdownMenuTrigger asChild>
       <Button variant="outline" class="hidden lg:flex">
         <LucideColumns3 class="size-4" />
