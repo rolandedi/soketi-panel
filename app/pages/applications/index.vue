@@ -117,6 +117,9 @@ const columns = computed(() =>
     handleDelete: (application) => {
       deleteModal.value?.present(application);
     },
+    handleShowMessages: (application) => {
+      navigateTo(`/applications/${application.id}/messages`);
+    },
   }),
 );
 

@@ -7,6 +7,7 @@ import {
   RotateCcw,
   TrashIcon,
   LucideEllipsis,
+  MessageSquareTextIcon,
 } from "lucide-vue-next";
 
 import type { Application } from "#shared/types";
@@ -27,6 +28,7 @@ interface ApplicationsTableOptions {
   handleEdit?: (application: Application) => void;
   handleRegenerate?: (application: Application) => void;
   handleDelete?: (application: Application) => void;
+  handleShowMessages?: (application: Application) => void;
 }
 
 function copyValue(value: string, label: string) {
@@ -34,7 +36,7 @@ function copyValue(value: string, label: string) {
   toast.success(`${label} copied`);
 }
 
-const rowActions = (row: Application, options?: ApplicationsTableOptions) => {
+const rowActions = (row: Application, options: ApplicationsTableOptions) => {
   return h(DropdownMenu, () => [
     h(DropdownMenuTrigger, { asChild: true }, () =>
       h(
@@ -56,8 +58,15 @@ const rowActions = (row: Application, options?: ApplicationsTableOptions) => {
       ]),
       h(
         DropdownMenuItem,
-        { onClick: () => options?.handleRegenerate?.(row) },
+        { onClick: () => options.handleRegenerate?.(row) },
         () => [h(RotateCcw, { size: 16 }), "Regenerate credentials"],
+      ),
+      h(
+        DropdownMenuItem,
+        {
+          onClick: () => options.handleShowMessages?.(row),
+        },
+        () => [h(MessageSquareTextIcon, { size: 16 }), "Show messages"],
       ),
       h(DropdownMenuSeparator),
       h(
@@ -280,11 +289,9 @@ export const getApplicationsColumns = (
     {
       id: "actions",
       cell: ({ row }) =>
-        h(
-          "div",
-          { class: "flex justify-end" },
+        h("div", { class: "flex justify-end gap-2" }, [
           rowActions(row.original, options),
-        ),
+        ]),
       enableHiding: false,
     },
   ];
