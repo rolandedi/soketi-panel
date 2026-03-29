@@ -203,6 +203,20 @@ export const getApplicationsColumns = (
           column,
           title: "Created",
         }),
+      filterFn: (row, id, value: string) => {
+        const createdAt = new Date(row.getValue(id) as string);
+        const now = new Date();
+        const diffDays =
+          (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (value === "7d") return diffDays <= 7;
+        if (value === "30d") return diffDays <= 30;
+        if (value === "3m") return diffDays <= 90;
+        if (value === "6m") return diffDays <= 180;
+        if (value === "1y") return diffDays <= 365;
+
+        return true;
+      },
       cell: ({ row }) =>
         h(
           "div",

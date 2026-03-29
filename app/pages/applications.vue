@@ -46,9 +46,9 @@
       @update:pagination="handleFetch"
     >
       <template #toolbarStart>
-        <div class="text-sm text-muted-foreground">
-          Search, copy credentials, regenerate, or manage application access.
-        </div>
+        <template v-if="table">
+          <ApplicationsDataTableFilters :table="table" />
+        </template>
       </template>
     </DataTable>
 
@@ -62,6 +62,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
+import type { Table } from "@tanstack/vue-table";
 import { PlusIcon } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 
@@ -71,6 +72,7 @@ import { useCsrfFetch } from "@/composables/useCsrfFetch";
 import { Button } from "@/components/ui/button";
 import PageHero from "~/components/PageHero.vue";
 import { getApplicationsColumns } from "~/table-columns/applicationsColumns";
+import ApplicationsDataTableFilters from "~/components/filters/ApplicationsDataTableFilters.vue";
 import CreateApplicationModal from "~/components/modals/applications/CreateApplicationModal.vue";
 import EditApplicationModal from "~/components/modals/applications/EditApplicationModal.vue";
 
@@ -94,6 +96,9 @@ const editModal = ref<{ open: boolean; application: Application | null }>({
 });
 
 const tableRef = useTemplateRef<any>("tableRef");
+const table = computed<Table<Application> | null>(
+  () => tableRef.value?.table || null,
+);
 
 const columns = computed(() =>
   getApplicationsColumns({
