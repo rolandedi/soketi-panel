@@ -35,7 +35,7 @@
     <DataTable
       ref="tableRef"
       v-model="applications"
-      :search-column="['name', 'key', 'secret']"
+      :search-column="['id', 'name', 'key', 'secret']"
       :columns="columns"
       :loading="loading"
       :left-sticky="true"

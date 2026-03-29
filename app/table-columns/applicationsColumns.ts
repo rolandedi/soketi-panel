@@ -99,6 +99,37 @@ export const getApplicationsColumns = (
       enableHiding: false,
     },
     {
+      accessorKey: "id",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<Application, any>, { column, title: "ID" }),
+      cell: ({ row }) => {
+        const id = row.getValue("id") as string;
+
+        return h("div", { class: "flex items-center gap-2" }, [
+          h(
+            "span",
+            {
+              class:
+                "max-w-[220px] truncate font-mono text-xs text-muted-foreground",
+            },
+            id,
+          ),
+          h(
+            Button,
+            {
+              variant: "ghost",
+              size: "icon",
+              class: "size-7 text-muted-foreground hover:text-foreground",
+              onClick: () => copyValue(id, "Application ID"),
+            },
+            () => h(Copy, { class: "size-3.5" }),
+          ),
+        ]);
+      },
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
       accessorKey: "name",
       header: ({ column }) =>
         h(DataTableColumnHeader<Application, any>, { column, title: "Name" }),
@@ -138,6 +169,7 @@ export const getApplicationsColumns = (
           ),
         ]);
       },
+      enableHiding: false,
     },
     {
       accessorKey: "secret",
@@ -167,6 +199,7 @@ export const getApplicationsColumns = (
           ),
         ]);
       },
+      enableHiding: true,
     },
     {
       accessorKey: "enabled",
@@ -195,6 +228,7 @@ export const getApplicationsColumns = (
         if (value === "disabled") return enabled === false;
         return true;
       },
+      enableHiding: false,
     },
     {
       accessorKey: "created_at",
@@ -223,6 +257,7 @@ export const getApplicationsColumns = (
           { class: "max-w-[200px] text-muted-foreground truncate" },
           formatDate(row.getValue("created_at")),
         ),
+      enableHiding: false,
     },
     {
       accessorKey: "updated_at",
@@ -240,6 +275,7 @@ export const getApplicationsColumns = (
           updatedAt ? formatDate(updatedAt) : "-",
         );
       },
+      enableHiding: true,
     },
     {
       id: "actions",
