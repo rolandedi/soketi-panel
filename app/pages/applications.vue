@@ -10,40 +10,24 @@
     </PageHero>
 
     <div class="grid gap-4 md:grid-cols-3">
-      <Card>
-        <CardHeader>
+      <Card
+        v-for="card in kpiCards"
+        :key="card.label"
+        class="border-border/70 shadow-none"
+      >
+        <CardHeader class="gap-1.5 pb-3">
           <CardTitle class="text-sm font-medium text-muted-foreground">
-            Total applications
+            {{ card.label }}
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-3xl font-semibold text-foreground">
-            {{ pagination.total }}
+          <div class="text-3xl font-semibold tracking-tight text-foreground">
+            {{ card.value }}
           </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Enabled
-          </CardTitle>
         </CardHeader>
+
         <CardContent>
-          <div class="text-3xl font-semibold text-foreground">
-            {{ enabledCount }}
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Disabled
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-3xl font-semibold text-foreground">
-            {{ disabledCount }}
-          </div>
+          <p class="text-sm leading-5 text-muted-foreground">
+            {{ card.description }}
+          </p>
         </CardContent>
       </Card>
     </div>
@@ -128,6 +112,24 @@ const columns = computed(() =>
 const enabledCount = computed(() => pagination.value.enabledTotal);
 
 const disabledCount = computed(() => pagination.value.disabledTotal);
+
+const kpiCards = computed(() => [
+  {
+    label: "Total applications",
+    value: pagination.value.total,
+    description: "All applications available in the current workspace.",
+  },
+  {
+    label: "Enabled",
+    value: enabledCount.value,
+    description: "Applications currently allowed to receive traffic.",
+  },
+  {
+    label: "Disabled",
+    value: disabledCount.value,
+    description: "Applications currently paused or blocked from traffic.",
+  },
+]);
 
 onMounted(() => {
   handleFetch();
