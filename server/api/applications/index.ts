@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
   const applicationRepository = new ApplicationRepository();
 
   try {
-    return await applicationRepository.getAll(user.id, page, limit);
+    const userId = user.role === "admin" ? null : user.id;
+    return await applicationRepository.getAll(userId, page, limit);
   } catch (error: any) {
     throw handleError(
       "applications.getAll",

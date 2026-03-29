@@ -97,12 +97,15 @@ function castApplication(row: Record<string, any>): ApplicationType {
 
 export class ApplicationRepository {
   async getAll(
-    userId: string,
+    userId: string | null,
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginatedResponse<ApplicationType>> {
     const offset = (page - 1) * limit;
-    const query = useDB().from(Application.table).where({ user_id: userId });
+    const query = useDB().from(Application.table);
+    if (userId !== null) {
+      query.where({ user_id: userId });
+    }
 
     const countResult = await query
       .clone()
