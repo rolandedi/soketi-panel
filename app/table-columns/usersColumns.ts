@@ -112,6 +112,7 @@ export const getUsersColumns = (
       accessorKey: "role",
       header: ({ column }) =>
         h(DataTableColumnHeader<User, any>, { column, title: "Role" }),
+      filterFn: (row, id, value: string) => value === row.getValue(id),
       cell: ({ row }) => {
         const role = row.getValue("role") as string;
         return h(
@@ -130,10 +131,11 @@ export const getUsersColumns = (
     },
     {
       accessorKey: "status",
+      accessorFn: (row) => row.emailVerified,
       header: ({ column }) =>
         h(DataTableColumnHeader<User, any>, { column, title: "Status" }),
       cell: ({ row }) => {
-        const status = row.original.emailVerified;
+        const status = row.getValue("status") as boolean;
         return h(
           Badge,
           {
@@ -145,14 +147,23 @@ export const getUsersColumns = (
           () => (status ? "Verified" : "Unverified"),
         );
       },
-      filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id));
+      filterFn: (row, id, value: string) => {
+        const emailVerified = row.getValue(id) as boolean;
+        if (value === "verified") return emailVerified === true;
+        if (value === "unverified") return emailVerified === false;
+        return true;
       },
     },
     {
       accessorKey: "banned",
       header: ({ column }) =>
         h(DataTableColumnHeader<User, any>, { column, title: "Banned" }),
+      filterFn: (row, id, value: string) => {
+        const banned = row.getValue(id) as boolean;
+        if (value === "banned") return banned === true;
+        if (value === "not-banned") return banned === false;
+        return true;
+      },
       cell: ({ row }) => {
         const banned = row.getValue("banned") as boolean;
         return h(
@@ -203,6 +214,18 @@ export const getUsersColumns = (
       accessorKey: "createdAt",
       header: ({ column }) =>
         h(DataTableColumnHeader<User, any>, { column, title: "Created At" }),
+      filterFn: (row, id, value: string) => {
+        const createdAt = new Date(row.getValue(id) as string);
+        const now = new Date();
+        const diffDays =
+          (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+        if (value === "7d") return diffDays <= 7;
+        if (value === "30d") return diffDays <= 30;
+        if (value === "3m") return diffDays <= 90;
+        if (value === "6m") return diffDays <= 180;
+        if (value === "1y") return diffDays <= 365;
+        return true;
+      },
       cell: ({ row }) => {
         const createdAt = row.getValue("createdAt") as string;
         return h(

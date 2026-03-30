@@ -3,15 +3,9 @@
     <DataTableToolbar>
       <DataTableToolbarStart>
         <DataTableSearchInput v-if="searchColumn" :column="searchColumn" />
-        <DataTableFilter
-          v-if="filterOptions.length && filterColumn"
-          :label="filterLabel"
-          :column="table.getColumn(filterColumn)"
-          :options="filterOptions"
-        />
-        <DataTableDeleteItems @remove:rows="emit('remove:rows', $event)" />
+        <slot name="toolbarStart" />
 
-        <slot name="toolbarAfterSearch" />
+        <DataTableDeleteItems @remove:rows="emit('remove:rows', $event)" />
       </DataTableToolbarStart>
       <DataTableToolbarEnd>
         <DataTableToggleColumns v-if="canToggleColumns" />
@@ -121,7 +115,6 @@ import {
 } from "@/components/ui/table";
 
 import { useDataTable } from "./index";
-import DataTableFilter from "./DataTableFilter.vue";
 import DataTableToolbar from "./DataTableToolbar.vue";
 import DataTableContainer from "./DataTableContainer.vue";
 import DataTablePagination from "./DataTablePagination.vue";
@@ -131,12 +124,9 @@ import DataTableToggleColumns from "./DataTableToggleColumns.vue";
 interface Props {
   columns: ColumnDef<TData, TValue>[];
   searchColumn?: string | string[];
-  filterColumn?: string;
-  filterOptions?: { label: string; value: string }[];
   loading?: boolean;
   leftSticky?: boolean;
   rightSticky?: boolean;
-  filterLabel?: string;
   pageSizes?: number[];
   pagination?: {
     currentPage: number;
@@ -148,8 +138,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   leftSticky: false,
   rightSticky: false,
-  filterLabel: "Filter",
-  filterOptions: () => [],
   pageSizes: () => [10, 25, 50, 100],
 });
 const emit = defineEmits<{

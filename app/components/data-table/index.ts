@@ -1,4 +1,5 @@
-import { ref, type Ref } from "vue";
+import type { Ref } from "vue";
+import { ref } from "vue";
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -20,7 +21,6 @@ export { default as DataTableToolbar } from "./DataTableToolbar.vue";
 export { default as DataTableToolbarEnd } from "./DataTableToolbarEnd.vue";
 export { default as DataTableToolbarStart } from "./DataTableToolbarStart.vue";
 export { default as DataTableToggleColumns } from "./DataTableToggleColumns.vue";
-export { default as DataTableFilter } from "./DataTableFilter.vue";
 export { default as DataTableRowActions } from "./DataTableRowActions.vue";
 export { default as DataTableSkeleton } from "./DataTableSkeleton.vue";
 export { default as DataTableSearchInput } from "./DataTableSearchInput.vue";

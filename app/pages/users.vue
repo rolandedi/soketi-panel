@@ -11,8 +11,6 @@
         ref="tableRef"
         v-model="data"
         :search-column="['name', 'email', 'role', 'banReason']"
-        filter-column="role"
-        :filter-options="statuses"
         :columns="columns"
         :loading="loading"
         :left-sticky="true"
@@ -21,7 +19,13 @@
         :page-sizes="[10, 25, 50, 100]"
         @remove:rows="handleDeleteRows"
         @update:pagination="handleFetch"
-      />
+      >
+        <template #toolbarStart>
+          <template v-if="table">
+            <UsersDataTableFilters :table="table" />
+          </template>
+        </template>
+      </DataTable>
     </div>
 
     <EditUserModal
@@ -46,21 +50,24 @@ import { toast } from "vue-sonner";
 import { PlusIcon } from "lucide-vue-next";
 
 import type { PaginatedResponse, User } from "#shared/types";
-import { useCsrfFetch } from "~/composables/useCsrfFetch";
-import { getUsersColumns } from "~/table-columns/usersColumns";
-import { DataTable } from "~/components/data-table";
-import PageHero from "~/components/PageHero.vue";
+import { useCsrfFetch } from "@/composables/useCsrfFetch";
+import { getUsersColumns } from "@/table-columns/usersColumns";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/data-table";
+import PageHero from "@/components/PageHero.vue";
 
-import CreateUserModal from "~/components/modals/users/CreateUserModal.vue";
-import EditUserModal from "~/components/modals/users/EditUserModal.vue";
-import BanUserModal from "~/components/modals/users/BanUserModal.vue";
-import DeleteUserAlert from "~/components/modals/users/DeleteUserAlert.vue";
+import CreateUserModal from "@/components/modals/users/CreateUserModal.vue";
+import EditUserModal from "@/components/modals/users/EditUserModal.vue";
+import BanUserModal from "@/components/modals/users/BanUserModal.vue";
+import DeleteUserAlert from "@/components/modals/users/DeleteUserAlert.vue";
+import UsersDataTableFilters from "@/components/filters/UsersDataTableFilters.vue";
+import type { Table } from "@tanstack/vue-table";
 
 useHead({ title: "Users" });
 
 const { csrfFetch } = useCsrfFetch();
 
-const statuses = [
+const filterOptions = [
   { label: "User", value: "user" },
   { label: "Admin", value: "admin" },
 ];
@@ -82,8 +89,8 @@ const banModal = ref<{ open: boolean; user: User | null }>({
   user: null,
 });
 const deleteModal = useTemplateRef("deleteModal");
-const tableRef = useTemplateRef("tableRef");
-const table = computed(() => tableRef.value?.table);
+const tableRef = useTemplateRef<any>("tableRef");
+const table = computed<Table<User> | null>(() => tableRef.value?.table || null);
 
 const columns = computed(() =>
   getUsersColumns({

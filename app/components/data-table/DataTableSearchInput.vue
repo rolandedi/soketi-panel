@@ -4,6 +4,7 @@
       :placeholder="props.placeholder"
       :class="cn('peer ps-9 min-w-72', props.class)"
       :model-value="getFilterValue()"
+      :disabled="tableisEmpty"
       @input="onInput"
     />
     <div
@@ -42,6 +43,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const table = inject<Table<TData>>("table");
 
+const tableisEmpty = computed(() => {
+  const rowModel = table?.getRowModel();
+  return !rowModel || rowModel.rows.length === 0;
+});
+
 function getFilterValue(): string {
   if (Array.isArray(props.column)) {
     return (table?.getState().globalFilter as string) ?? "";
@@ -58,8 +64,9 @@ function onInput(e: Event) {
   if (Array.isArray(props.column)) {
     table?.setGlobalFilter(value);
   } else {
-    if (props.column)
+    if (props.column) {
       table?.getColumn(props.column as string)?.setFilterValue(value);
+    }
   }
 }
 
@@ -67,8 +74,9 @@ function clearFilter() {
   if (Array.isArray(props.column)) {
     table?.setGlobalFilter("");
   } else {
-    if (props.column)
+    if (props.column) {
       table?.getColumn(props.column as string)?.setFilterValue("");
+    }
   }
 }
 </script>

@@ -44,7 +44,7 @@ export interface Message {
   app_id: string;
   channel: string;
   event: string;
-  payload: string;
+  payload: unknown;
   created_at: string;
 }
 
@@ -55,5 +55,7 @@ export interface PaginatedResponse<T> {
     perPage: number;
     currentPage: number;
     lastPage: number;
+    enabledTotal?: number;
+    disabledTotal?: number;
   };
 }
