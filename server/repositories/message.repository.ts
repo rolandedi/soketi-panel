@@ -1,4 +1,5 @@
 import type { Message as MessageType, PaginatedResponse } from "#shared/types";
+import { randomUUID } from "node:crypto";
 import { Application } from "../models/application";
 import { Message } from "../models/message";
 import { useDB } from "../lib/orm/db";
@@ -32,7 +33,39 @@ function castMessage(row: Record<string, any>): MessageType {
   return casted as MessageType;
 }
 
+function toSQLDatetime(date: Date): string {
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
 export class MessageRepository {
+  async create(data: {
+    app_id: string;
+    channel: string;
+    event: string;
+    payload: unknown;
+  }): Promise<MessageType> {
+    const id = randomUUID();
+
+    await useDB()
+      .from(Message.table)
+      .insert({
+        id,
+        app_id: data.app_id,
+        channel: data.channel,
+        event: data.event,
+        payload: JSON.stringify(data.payload),
+        created_at: toSQLDatetime(new Date()),
+      });
+
+    const message = await useDB().from(Message.table).where({ id }).first();
+
+    if (!message) {
+      throw new Error("Failed to create message");
+    }
+
+    return castMessage(message);
+  }
+
   async getAll(
     page: number = 1,
     limit: number = 10,

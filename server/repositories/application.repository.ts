@@ -145,12 +145,15 @@ export class ApplicationRepository {
 
   async getById(
     id: string,
-    userId: string,
+    userId?: string | null,
   ): Promise<ApplicationType | undefined> {
-    const application = await useDB()
-      .from(Application.table)
-      .where({ id, user_id: userId })
-      .first();
+    const query = useDB().from(Application.table).where({ id });
+
+    if (userId !== undefined && userId !== null) {
+      query.where({ user_id: userId });
+    }
+
+    const application = await query.first();
 
     return application ? castApplication(application) : undefined;
   }
