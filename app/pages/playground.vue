@@ -5,7 +5,7 @@
       description="Test your Soketi server and applications."
     />
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)]">
+    <div class="grid gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)]">
       <Card>
         <CardHeader>
           <CardTitle class="text-base font-semibold">
