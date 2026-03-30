@@ -91,10 +91,11 @@
             </NavigationMenuItem>
             <NavigationMenuItem v-else>
               <NavigationMenuTrigger
-                class="hover:text-primary data-[state=open]:text-primary"
+                class="flex items-center gap-2 hover:text-primary data-[state=open]:text-primary"
                 :class="item.active ? 'text-primary' : ''"
               >
-                {{ item.label }}
+                <component :is="item.icon" :size="16" aria-hidden="true" />
+                <span class="text-nowrap">{{ item.label }}</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent align="end">
                 <ul class="grid w-50 gap-4">
@@ -132,7 +133,7 @@ import {
   LayoutDashboard,
   AppWindow,
   Play,
-  BookOpen,
+  BookOpenText,
   Users,
   type LucideIcon,
 } from "lucide-vue-next";
@@ -190,7 +191,7 @@ const menuItems = computed<MenuItem[]>(() => [
   {
     href: "#",
     label: "Documentation",
-    icon: BookOpen,
+    icon: BookOpenText,
     active: route.path.startsWith("/docs/"),
     children: [
       {
