@@ -5,7 +5,9 @@
       title="Dashboard"
       description="Overview of your Soketi server and applications."
     >
-      <Button><Plus /> Create App</Button>
+      <CreateApplicationModal @success="handleCreatedApplication">
+        <Button><Plus /> Create application</Button>
+      </CreateApplicationModal>
     </PageHero>
 
     <!-- Stats Cards -->
@@ -146,7 +148,14 @@ import {
   ChartColumn,
   Box,
 } from "lucide-vue-next";
-import PageHero from "~/components/PageHero.vue";
+
+import type { Application } from "#shared/types";
+import PageHero from "@/components/PageHero.vue";
+import CreateApplicationModal from "@/components/modals/applications/CreateApplicationModal.vue";
 
 useHead({ title: "Dashboard" });
+
+function handleCreatedApplication(app?: Application) {
+  navigateTo(`/applications`);
+}
 </script>
