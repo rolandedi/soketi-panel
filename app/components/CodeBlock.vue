@@ -28,7 +28,6 @@ import {
   type HTMLAttributes,
 } from "vue";
 import { codeToHtml } from "shiki";
-import { useColorMode } from "@vueuse/core";
 
 import { cn } from "~/lib/utils";
 
@@ -36,10 +35,12 @@ interface Props {
   class?: HTMLAttributes["class"];
   language?: string;
   theme?: string;
+  mode?: "light" | "dark";
 }
 
 const props = withDefaults(defineProps<Props>(), {
   language: "json",
+  mode: "light",
 });
 
 const slots = useSlots();
@@ -69,13 +70,12 @@ const code = computed(() => {
   return code;
 });
 
-const colorMode = useColorMode();
 const codeBlockTheme = computed(() => {
   if (props.theme) {
     return props.theme;
   }
 
-  return colorMode.value === "dark" ? "dark-plus" : "catppuccin-latte";
+  return props.mode === "dark" ? "dark-plus" : "catppuccin-latte";
 });
 
 const highlight = async () => {
