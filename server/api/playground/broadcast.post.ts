@@ -2,12 +2,12 @@ import Pusher from "pusher";
 
 import { ApplicationRepository } from "~~/server/repositories/application.repository";
 import { MessageRepository } from "~~/server/repositories/message.repository";
+import { broadcastScheme } from "~~/server/validations/playground/broadcastScheme";
 import {
   handleError,
   createValidationError,
   validateWith,
 } from "~~/server/lib/utils";
-import { broadcastScheme } from "~~/server/validations/playground/broadcastScheme";
 
 export default defineEventHandler(async (event) => {
   const user = event.context.user;
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
       secret: application.secret,
       cluster: runtimeConfig.pusherAppCluster,
       host: runtimeConfig.pusherHost,
-      port: Number(runtimeConfig.pusherPort),
+      port: runtimeConfig.pusherPort,
       useTLS: runtimeConfig.pusherTls === "1",
     });
 

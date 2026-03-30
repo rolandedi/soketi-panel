@@ -235,7 +235,7 @@ async function handleFetchApplications() {
     applications.value = response.data;
 
     if (!selectedApplicationId.value && response.data.length > 0) {
-      selectedApplicationId.value = response.data[0].id;
+      selectedApplicationId.value = response.data[0]?.id || "";
     }
   } catch (error: any) {
     toast.error(error?.data?.statusMessage || "Failed to fetch applications");
@@ -249,8 +249,9 @@ async function handleSubmit() {
     return;
   }
 
+  let parsedPayload: unknown;
   try {
-    JSON.parse(payload.value);
+    parsedPayload = JSON.parse(payload.value);
   } catch {
     toast.error("Payload must be valid JSON");
     return;
@@ -267,7 +268,7 @@ async function handleSubmit() {
           app_id: selectedApplicationId.value,
           channel: channel.value.trim(),
           event: eventName.value.trim(),
-          payload: payload.value,
+          payload: JSON.stringify(parsedPayload),
         },
       },
     );
