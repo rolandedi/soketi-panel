@@ -101,8 +101,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import type { Application } from "~~/shared/types";
 
-const emit = defineEmits<{ success: [] }>();
+const emit = defineEmits<{ (event: "success", app: Application): void }>();
 
 const isOpen = ref(false);
 const isCreating = ref(false);
@@ -133,7 +134,7 @@ const onSubmit = handleSubmit(async (formData) => {
 
   try {
     const { csrfFetch } = useCsrfFetch();
-    await csrfFetch("/api/applications", {
+    const app = await csrfFetch<Application>("/api/applications", {
       method: "POST",
       body: formData,
     });
@@ -141,7 +142,7 @@ const onSubmit = handleSubmit(async (formData) => {
     toast.success("Application created successfully");
     isOpen.value = false;
     resetForm();
-    emit("success");
+    emit("success", app);
   } catch (error: any) {
     toast.error(error.data?.statusMessage || "Failed to create application");
   } finally {

@@ -4,7 +4,7 @@
       title="Applications"
       description="Manage your Soketi applications."
     >
-      <CreateApplicationModal @success="handleFetch">
+      <CreateApplicationModal @success="handleUpdated">
         <Button><PlusIcon /> New application</Button>
       </CreateApplicationModal>
     </PageHero>
@@ -100,8 +100,8 @@ const editModal = ref<{ open: boolean; application: Application | null }>({
   application: null,
 });
 
-const tableRef = useTemplateRef<any>("tableRef");
 const deleteModal = useTemplateRef("deleteModal");
+const tableRef = useTemplateRef<any>("tableRef");
 const table = computed<Table<Application> | null>(
   () => tableRef.value?.table || null,
 );
@@ -124,7 +124,6 @@ const columns = computed(() =>
 );
 
 const enabledCount = computed(() => pagination.value.enabledTotal);
-
 const disabledCount = computed(() => pagination.value.disabledTotal);
 
 const kpiCards = computed(() => [
@@ -179,13 +178,25 @@ async function handleFetch(perPage?: number, page?: number) {
 function handleUpdated(application: Application) {
   const index = applications.value.findIndex(({ id }) => id === application.id);
 
-  if (index !== -1) {
+  if (index === -1) {
+    // Add new application to the top of the list if it's not already present
+    applications.value.unshift(application);
+    pagination.value.total += 1;
+
+    if (application.enabled) {
+      pagination.value.enabledTotal += 1;
+    } else {
+      pagination.value.disabledTotal += 1;
+    }
+  } else {
     const previousApplication = applications.value[index];
 
     applications.value[index] = application;
     applications.value = [...applications.value];
 
-    syncApplicationTotals(previousApplication, application);
+    if (previousApplication) {
+      syncApplicationTotals(previousApplication, application);
+    }
   }
 }
 
@@ -226,7 +237,7 @@ async function handleDeleteRows(rows: Application[]) {
 
     toast.success("Applications deleted");
     await handleFetch(pagination.value.perPage, pagination.value.currentPage);
-    tableRef.value?.table?.resetRowSelection();
+    table.value?.resetRowSelection();
   } catch (error: any) {
     toast.error(error.data?.statusMessage || "Failed to delete applications");
   } finally {
@@ -237,7 +248,7 @@ async function handleDeleteRows(rows: Application[]) {
 async function handleSyncDelete(application: Application) {
   // Refresh list to keep pagination & counts accurate after a single delete
   await handleFetch(pagination.value.perPage, pagination.value.currentPage);
-  tableRef.value?.table?.resetRowSelection();
+  table.value?.resetRowSelection();
 }
 
 async function handleRegenerate(application: Application) {
