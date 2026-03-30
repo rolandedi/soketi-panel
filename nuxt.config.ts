@@ -63,6 +63,7 @@ export default defineNuxtConfig({
     soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
 
     redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+    redisPassword: process.env.REDIS_PASSWORD || "",
 
     pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
     pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
