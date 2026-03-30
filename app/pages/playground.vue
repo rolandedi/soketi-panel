@@ -72,15 +72,7 @@
             <Label for="payload">
               Payload<span class="text-destructive">*</span>
             </Label>
-            <Textarea
-              id="payload"
-              v-model="payload"
-              class="min-h-56 w-full font-mono text-sm"
-              placeholder='{
-  "message": "Hello from Soketi",
-  "severity": "info"
-}'
-            />
+            <JsonEditor v-model="payload" />
             <p class="text-xs text-muted-foreground">
               Payload must be valid JSON. It will be stored in the messages
               history.
@@ -93,8 +85,8 @@
               :disabled="isSubmitting || !canSubmit"
               @click="handleSubmit"
             >
-              <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
-              <Send v-else class="mr-2 h-4 w-4" />
+              <Loader2 v-if="isSubmitting" class="size-4 animate-spin" />
+              <Send v-else class="size-4" />
               {{ isSubmitting ? "Sending..." : "Send Event" }}
             </Button>
           </div>
@@ -131,7 +123,7 @@
 
           <div class="space-y-2">
             <p class="text-muted-foreground">Payload preview</p>
-            <CodeBlock :code="payload" language="json" />
+            <CodeBlock language="json">{{ prettyPayload }}</CodeBlock>
           </div>
 
           <div
@@ -163,8 +155,8 @@ import { useCsrfFetch } from "@/composables/useCsrfFetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import JsonEditor from "@/components/JsonEditor.vue";
 import {
   Select,
   SelectTrigger,
@@ -204,6 +196,14 @@ const selectedApplication = computed(() => {
       (application) => application.id === selectedApplicationId.value,
     ) ?? null
   );
+});
+
+const prettyPayload = computed(() => {
+  try {
+    return JSON.stringify(JSON.parse(payload.value || "{}"), null, 2);
+  } catch {
+    return payload.value;
+  }
 });
 
 const canSubmit = computed(() =>
