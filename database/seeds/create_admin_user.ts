@@ -5,12 +5,14 @@ import { auth } from "../../server/lib/auth";
 export async function seed(knex: Knex): Promise<void> {
   consola.info("Seeding admin user...");
 
+  const { SOKETI_PANEL_EMAIL, SOKETI_PANEL_PASSWORD } = process.env;
+
   try {
     const res = await auth.api.signUpEmail({
       body: {
-        email: "admin@soketi-panel.app",
-        password: "P@ssw0rd123",
-        name: "John Doe",
+        email: SOKETI_PANEL_EMAIL || "admin@soketi-panel.app",
+        password: SOKETI_PANEL_PASSWORD || "P@ssw0rd123",
+        name: "Soketi Admin",
       },
     });
 
