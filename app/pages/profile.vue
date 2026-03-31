@@ -94,8 +94,12 @@
                   <p class="truncate text-sm text-muted-foreground">
                     {{ user?.email }}
                   </p>
-                  <p class="text-xs text-muted-foreground">
-                    Member since {{ formatLongDate(user?.createdAt) }}
+                  <p
+                    v-if="user?.createdAt"
+                    class="text-xs text-muted-foreground"
+                  >
+                    Member since
+                    {{ formatLongDate(user?.createdAt.toISOString()) }}
                   </p>
                 </div>
               </div>
@@ -456,7 +460,7 @@
                   <span v-else class="max-w-40 truncate">
                     Last seen:
                     {{
-                      formatLongDate(
+                      formatRelativeDate(
                         entry.updatedAt ?? entry.createdAt ?? entry.expiresAt,
                       )
                     }}
@@ -710,7 +714,7 @@ watch(
       name: currentUser.name,
       email: currentUser.email,
     });
-    avatarPreview.value = currentUser.image;
+    avatarPreview.value = currentUser.image as string;
   },
   { immediate: true },
 );
@@ -899,28 +903,6 @@ function getSessionIcon(userAgent?: string | null): Component {
   }
 
   return GlobeIcon;
-}
-
-function getSessionLabel(userAgent?: string | null) {
-  const normalizedUserAgent = (userAgent ?? "").toLowerCase();
-
-  if (
-    normalizedUserAgent.includes("iphone") ||
-    normalizedUserAgent.includes("android") ||
-    normalizedUserAgent.includes("mobile")
-  ) {
-    return "Mobile device";
-  }
-
-  if (
-    normalizedUserAgent.includes("windows") ||
-    normalizedUserAgent.includes("macintosh") ||
-    normalizedUserAgent.includes("linux")
-  ) {
-    return "Desktop device";
-  }
-
-  return "Connected session";
 }
 
 function getSessionEnvironment(userAgent: string | null | undefined = "") {
