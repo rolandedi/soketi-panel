@@ -1,84 +1,90 @@
-## Pusher SDK
+# Client Integration
 
-Pusher clients are fully compatible with the WebSocket protocol implemented by soketi, which means you can easily take advantage of amazing features like private channels, presence channels, and client events. You simply need to point the Pusher compatible client to the soketi server address:
+Soketi speaks the Pusher protocol, so any Pusher-compatible browser client can connect to it. The important part is to point the client to your Soketi host and keep WebSocket transports enabled.
+
+## Pusher JS
+
+Use the Soketi host and port configured in your panel or `.env` file:
 
 ```javascript
-const PusherJS = require('pusher-js');
+import Pusher from "pusher-js";
 
-let client = new PusherJS('app-key', {
-    wsHost: 'localhost',
-    wsPort: 6081,
-    forceTLS: false,
-    encrypted: true,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
+const client = new Pusher("app-key", {
+  wsHost: "127.0.0.1",
+  wsPort: 6001,
+  wssHost: "127.0.0.1",
+  wssPort: 6001,
+  forceTLS: false,
+  disableStats: true,
+  enabledTransports: ["ws", "wss"],
 });
 
-client.subscribe('chat-room').bind('message', (message) => {
-    alert(`${message.sender} says: ${message.content}`);
+client.subscribe("chat-room").bind("message", (message) => {
+  console.log(`${message.sender} says: ${message.content}`);
 });
 ```
 
-> Make sure that enabledTransports is set to ['ws', 'wss']. If not set, in case of connection failure, the client will try other transports such as XHR polling, which soketi doesn't support.
+The key settings are:
 
-### SSL Configuration
+- `wsHost` and `wsPort`: use these for plain WebSocket connections.
+- `wssHost` and `wssPort`: use these when Soketi is exposed over TLS.
+- `forceTLS`: set this to `true` when your app is served over HTTPS.
+- `enabledTransports`: keep this limited to `ws` and `wss`. Soketi does not support fallback transports such as XHR polling.
+- `disableStats`: safe to keep enabled in local and self-hosted setups.
 
-When running the server in SSL mode, you may consider setting the `forceTLS` client option to `true`. When this option is set to `true`, the client will connect to the `wss` protocol instead of `ws`:
+## Secure Connections
+
+When Soketi is behind HTTPS or a TLS terminator, switch the client to secure WebSockets:
 
 ```javascript
-const PusherJS = require('pusher-js');
+import Pusher from "pusher-js";
 
-let client = new PusherJS('app-key', {
-    wssHost: 'localhost',
-    wssPort: 6081,
-    forceTLS: true,
-    enabledTransports: ['wss'],
+const client = new Pusher("app-key", {
+  wssHost: "soketi.example.com",
+  wssPort: 6001,
+  forceTLS: true,
+  disableStats: true,
+  enabledTransports: ["wss"],
 });
 ```
 
-### Encrypted Private Channels
+## Private and Presence Channels
 
-[Pusher Encrypted Private Channels](https://pusher.com/docs/channels/using_channels/encrypted-channels/) are also supported, meaning that for private channels, you can encrypt your data symmetrically at both your client and backend applications, soketi NOT knowing at all what the actual data is set, acting just like a deliverer.
+Private and presence channels work the same way as with the hosted Pusher service. Your client still subscribes with the usual channel names, but the authorization endpoint must be available in your backend.
+
+```javascript
+client.subscribe("private-orders.42");
+client.subscribe("presence-orders.42");
+```
+
+If you use encrypted private channels, the payload is encrypted by your application and never interpreted by Soketi itself.
 
 ## Laravel Echo
 
-Laravel Echo is compatible with the PusherJS library. Therefore, its configuration resembles the typical configuration of a PusherJS client such as the example configuration in the previous section of documentation:
+Laravel Echo is just a thin wrapper around a Pusher-compatible client, so the same Soketi settings apply:
 
 ```javascript
-import Echo from 'laravel-echo';
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
-window.Pusher = require('pusher-js');
+window.Pusher = Pusher;
 
-let laravelEcho = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    wsHost: process.env.MIX_PUSHER_HOST,
-    wsPort: process.env.MIX_PUSHER_PORT,
-    wssPort: process.env.MIX_PUSHER_PORT,
-    forceTLS: false,
-    encrypted: true,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
+const echo = new Echo({
+  broadcaster: "pusher",
+  key: "app-key",
+  wsHost: "127.0.0.1",
+  wsPort: 6001,
+  wssPort: 6001,
+  forceTLS: false,
+  disableStats: true,
+  enabledTransports: ["ws", "wss"],
 });
 
-laravelEcho.private(`orders.${orderId}`)
-    .listen('OrderShipmentStatusUpdated', (e) => {
-        console.log(e.order);
-    });
+echo
+  .private(`orders.${orderId}`)
+  .listen("OrderShipmentStatusUpdated", (event) => {
+    console.log(event.order);
+  });
 ```
 
-> Make sure that enabledTransports is set to ['ws', 'wss']. If not set, in case of connection failure, the client will try other transports such as XHR polling, which soketi doesn't support.
-
-The `MIX_*` environment variables are typically declared in your Laravel application's `.env` file:
-
-```bash
-PUSHER_APP_KEY=app-key
-PUSHER_APP_ID=app-id
-PUSHER_APP_SECRET=app-secret
-PUSHER_HOST=localhost
-PUSHER_PORT=6081
-
-MIX_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-MIX_PUSHER_HOST="${PUSHER_HOST}"
-MIX_PUSHER_PORT="${PUSHER_PORT}"
-```
+In practice, you usually mirror these values in environment variables so the same config can be reused across local, staging, and production deployments.

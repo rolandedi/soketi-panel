@@ -43,6 +43,10 @@ export const auth = betterAuth({
   },
   user: {
     modelName: "sktp_users",
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: true,
+    },
   },
   account: {
     modelName: "sktp_accounts",

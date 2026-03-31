@@ -49,15 +49,21 @@ export default defineNuxtConfig({
     betterAuthSecret: process.env.BETTER_AUTH_SECRET,
     betterAuthUrl: process.env.BETTER_AUTH_URL,
 
-    dbDriver: process.env.DB_DRIVER,
-    dbHost: process.env.DB_HOST,
-    dbPort: process.env.DB_PORT,
-    dbName: process.env.DB_NAME,
-    dbUser: process.env.DB_USER,
-    dbPassword: process.env.DB_PASSWORD,
+    dbDriver: process.env.DB_DRIVER || "mysql",
+    dbHost: process.env.DB_HOST || "127.0.0.1",
+    dbPort: process.env.DB_PORT || "3306",
+    dbName: process.env.DB_NAME || "soketi",
+    dbUser: process.env.DB_USER || "soketi",
+    dbPassword: process.env.DB_PASSWORD || "",
+    dbSchema: process.env.DB_SCHEMA || "public",
 
+    soketiHost: process.env.SOKETI_HOST || "127.0.0.1",
+    soketiPort: process.env.SOKETI_PORT || "6001",
     soketiMetricsHost: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
     soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
+
+    redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+    redisPassword: process.env.REDIS_PASSWORD || "",
 
     pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
     pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
@@ -67,13 +73,6 @@ export default defineNuxtConfig({
 
     public: {
       betterAuthUrl: process.env.BETTER_AUTH_URL,
-      soketiHost: process.env.SOKETI_HOST || "127.0.0.1",
-      soketiPort: process.env.SOKETI_PORT || "6001",
-      pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
-      pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
-      pusherPort: process.env.PUSHER_PORT || "6001",
-      pusherScheme: process.env.PUSHER_SCHEME || "http",
-      pusherTls: process.env.PUSHER_TLS || "0",
     },
   },
 });

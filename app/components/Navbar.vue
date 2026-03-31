@@ -1,12 +1,12 @@
 <template>
   <header
-    class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 md:px-6"
+    class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
   >
     <div
       class="flex h-16 items-center justify-between gap-4 max-w-6xl mx-auto px-4 md:px-6"
     >
       <!-- Left side -->
-      <div class="flex flex-1 items-center gap-2">
+      <div class="flex items-center gap-2">
         <!-- Mobile menu trigger -->
         <Popover>
           <PopoverTrigger as-child>
@@ -38,31 +38,64 @@
               </svg>
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" class="w-36 p-1 md:hidden">
-            <NavigationMenu class="max-w-none *:w-full">
-              <NavigationMenuList class="flex-col items-start gap-0 md:gap-2">
-                <NavigationMenuItem
-                  v-for="(link, index) in menuItems"
-                  :key="index"
-                  class="w-full"
+          <PopoverContent align="start" class="w-48 p-1 md:hidden">
+            <nav class="flex flex-col gap-0.5">
+              <template v-for="(link, index) in menuItems" :key="index">
+                <!-- Item sans enfants -->
+                <NuxtLink
+                  v-if="!link.children"
+                  :to="link.href"
+                  class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                  :class="
+                    link.active ? 'text-primary font-medium' : 'text-foreground'
+                  "
                 >
-                  <NavigationMenuLink
-                    as-child
-                    class="flex-row items-center gap-2 py-1.5"
-                    :active="link.active"
+                  <component :is="link.icon" :size="16" aria-hidden="true" />
+                  <span>{{ link.label }}</span>
+                </NuxtLink>
+                <!-- Item avec enfants -->
+                <Collapsible v-else>
+                  <CollapsibleTrigger
+                    class="group flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                    :class="
+                      link.active
+                        ? 'text-primary font-medium'
+                        : 'text-foreground'
+                    "
                   >
-                    <NuxtLink :to="link.href">
+                    <span class="flex items-center gap-2">
                       <component
                         :is="link.icon"
                         :size="16"
                         aria-hidden="true"
                       />
-                      <span>{{ link.label }}</span>
-                    </NuxtLink>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+                      {{ link.label }}
+                    </span>
+                    <ChevronDown
+                      :size="14"
+                      class="transition-transform duration-200 group-data-[state=open]:rotate-180"
+                    />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div class="mt-0.5 flex flex-col gap-0.5 pl-6">
+                      <NuxtLink
+                        v-for="(child, idx) in link.children"
+                        :key="idx"
+                        :to="child.href"
+                        class="rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+                        :class="
+                          child.active
+                            ? 'text-primary font-medium'
+                            : 'text-foreground'
+                        "
+                      >
+                        {{ child.label }}
+                      </NuxtLink>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </template>
+            </nav>
           </PopoverContent>
         </Popover>
         <!-- Logo -->
@@ -91,20 +124,16 @@
             </NavigationMenuItem>
             <NavigationMenuItem v-else>
               <NavigationMenuTrigger
-                class="hover:text-primary data-[state=open]:text-primary"
+                class="flex items-center gap-2 hover:text-primary data-[state=open]:text-primary"
                 :class="item.active ? 'text-primary' : ''"
               >
-                {{ item.label }}
+                <component :is="item.icon" :size="16" aria-hidden="true" />
+                <span class="text-nowrap">{{ item.label }}</span>
               </NavigationMenuTrigger>
-              <NavigationMenuContent align="end">
-                <ul class="grid w-50 gap-4">
-                  <li>
-                    <NavigationMenuLink
-                      v-for="(child, idx) in item.children"
-                      :key="idx"
-                      as-child
-                      :active="child.active"
-                    >
+              <NavigationMenuContent>
+                <ul class="grid w-50 gap-1 p-0">
+                  <li v-for="(child, idx) in item.children" :key="idx">
+                    <NavigationMenuLink as-child :active="child.active">
                       <NuxtLink
                         :to="child.href"
                         class="flex-row items-center gap-2"
@@ -120,7 +149,7 @@
         </NavigationMenuList>
       </NavigationMenu>
       <!-- Right side -->
-      <div class="flex flex-1 items-center justify-end gap-2">
+      <div class="flex items-center justify-end gap-2">
         <UserMenu />
       </div>
     </div>
@@ -132,12 +161,18 @@ import {
   LayoutDashboard,
   AppWindow,
   Play,
-  BookOpen,
+  BookOpenText,
   Users,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-vue-next";
 
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -190,7 +225,7 @@ const menuItems = computed<MenuItem[]>(() => [
   {
     href: "#",
     label: "Documentation",
-    icon: BookOpen,
+    icon: BookOpenText,
     active: route.path.startsWith("/docs/"),
     children: [
       {
