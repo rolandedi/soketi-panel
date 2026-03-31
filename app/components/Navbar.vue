@@ -131,7 +131,7 @@
                 <span class="text-nowrap">{{ item.label }}</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul class="grid w-50 gap-1 p-2">
+                <ul class="grid w-50 gap-1 p-0">
                   <li v-for="(child, idx) in item.children" :key="idx">
                     <NavigationMenuLink as-child :active="child.active">
                       <NuxtLink
