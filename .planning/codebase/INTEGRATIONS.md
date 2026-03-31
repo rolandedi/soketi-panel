@@ -3,6 +3,7 @@
 ## Database Integrations
 
 ### MySQL / MariaDB
+
 - **Driver:** mysql2 3.20.0
 - **Connection:** Pool-based for concurrency
 - **Default Port:** 3306
@@ -22,6 +23,7 @@
   - `sktp_messages` (Soketi Panel custom)
 
 ### PostgreSQL
+
 - **Driver:** pg 8.20.0
 - **Connection:** Pool-based for concurrency
 - **Default Port:** 5432
@@ -31,6 +33,7 @@
 ## Authentication & Authorization
 
 ### Better Auth Server
+
 - **Endpoint:** `server/lib/auth.ts`
 - **Provider:** Better Auth 1.5.6 self-hosted
 - **Auth Route:** `POST /api/auth/[...all]` (catch-all for all auth operations)
@@ -49,6 +52,7 @@
 - **Roles:** Admin and user roles stored in `sktp_users.role`
 
 ### Better Auth Client
+
 - **Endpoint:** `app/lib/auth-client.ts`
 - **Composable:** `app/composables/useAuth.ts`
 - **Session State:** Reactive via `authClient.useSession()`
@@ -60,6 +64,7 @@
 ## Real-time Communication
 
 ### Soketi WebSocket Server
+
 - **Service:** Self-hosted WebSocket server (external binary)
 - **Port:** 6001 (configurable via `SOKETI_PORT`)
 - **Metrics Port:** 9601 (for admin metrics)
@@ -68,7 +73,7 @@
   - `SOKETI_HOST` (server address)
   - `SOKETI_PORT` (WebSocket port)
   - `SOKETI_METRICS_HOST`
-  - `SOKETI_METRICS_SERVER_PORT` (also `SOKETI_METRICS_PORT`)
+  - `SOKETI_METRICS_PORT` (also `SOKETI_METRICS_PORT`)
   - Database settings for Soketi's own persistence:
     - `SOKETI_DB_HOST`, `SOKETI_DB_PORT`, `SOKETI_DB_DATABASE`
     - `SOKETI_DB_USERNAME`, `SOKETI_DB_PASSWORD`
@@ -76,6 +81,7 @@
     - `SOKETI_DB_APP_TABLE` (default: applications)
 
 ### Pusher Client & Server Libraries
+
 - **Client:** pusher-js 8.4.3 (frontend WebSocket client)
 - **Server:** pusher 5.3.3 (backend event publisher)
 - **Configuration:**
@@ -93,6 +99,7 @@
 ## Content Delivery
 
 ### Markdown Processing
+
 - **Service:** `server/api/markdown.ts`
 - **Parser:** marked 17.0.5
 - **Syntax Highlighting:** shiki 4.0.2
@@ -104,6 +111,7 @@
 ## Admin Dashboard Integration
 
 ### Role-Based Access
+
 - **Plugin:** Better Auth admin plugin
 - **User Roles:**
   - `admin` — Full access to all features
@@ -118,7 +126,9 @@
 ## API Response Format
 
 ### Pagination
+
 All collection endpoints return:
+
 ```typescript
 {
   data: T[],
@@ -132,6 +142,7 @@ All collection endpoints return:
 ```
 
 ### User Model (from Better Auth + custom fields)
+
 ```typescript
 {
   id: string,
@@ -149,6 +160,7 @@ All collection endpoints return:
 ```
 
 ### Application Model
+
 ```typescript
 {
   id: string,
@@ -178,6 +190,7 @@ All collection endpoints return:
 ```
 
 ### Message Model
+
 ```typescript
 {
   id: string,
@@ -192,19 +205,23 @@ All collection endpoints return:
 ## Service Dependencies
 
 ### Soketi Panel ↔ Soketi Server
+
 - Panel connects to Soketi metrics API (`http://SOKETI_METRICS_HOST:9601`)
 - Panel publishes events via Pusher library to Soketi WebSocket server
 - Soketi stores its own application config in shared database
 
 ### Soketi Panel ↔ Database
+
 - All user, application, message data persisted in shared database
 - Soketi also reads application config from same database
 
 ### Client ↔ Soketi Server
+
 - Browser clients connect via Pusher client library to Soketi at `SOKETI_HOST:SOKETI_PORT`
 - Real-time channel subscriptions and event broadcasts
 
 ## No Third-Party SaaS Dependencies
+
 - **No external APIs** (Stripe, Auth0, email services, etc.)
 - **Self-hosted auth** (Better Auth)
 - **Self-hosted WebSocket** (Soketi)

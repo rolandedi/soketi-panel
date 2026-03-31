@@ -90,36 +90,36 @@ Access the interface at `http://localhost:3000`.
 
 ## 🔑 Environment Variables
 
-| Variable                      | Description                                                  | Default                    |
-| :---------------------------- | :----------------------------------------------------------- | :------------------------- |
-| **App**                       |                                                              |                            |
-| `APP_NAME`                    | Name of the application (e.g., "Soketi Panel").              | `"Soketi Panel"`           |
-| `APP_ENV`                     | Application environment (`production`, `development`).       | `"production"`             |
-| `APP_URL`                     | Canonical URL of the application.                            | `http://localhost:3000`    |
-| **Better Auth**               |                                                              |                            |
-| `BETTER_AUTH_SECRET`          | Secret key for sessions (Generate with `openssl rand -hex 32`). | **Required**               |
-| `BETTER_AUTH_URL`             | Public URL of the authentication server.                     | `http://localhost:3000`    |
-| **Database**                  |                                                              |                            |
-| `DB_DRIVER`                   | Database driver (`mysql`, `pg`, `sqlite`).                   | `"mysql"`                  |
-| `DB_HOST`                     | Host of the database for the panel.                          | `"localhost"`              |
-| `DB_PORT`                     | Port of the database for the panel.                          | `3306` (MySQL) / `5432` (PG) |
-| `DB_DATABASE`                 | Database name for the panel.                                 | `"soketi_db"`              |
-| `DB_USERNAME`                 | Username for the database.                                   | `"soketi"`                 |
-| `DB_PASSWORD`                 | Password for the database.                                   | `""`                       |
-| **Soketi (Management)**       |                                                              |                            |
-| `SOKETI_HOST`                 | Hostname of the Soketi server.                               | `"127.0.0.1"`              |
-| `SOKETI_PORT`                 | Port of the Soketi server.                                   | `6001`                     |
-| `SOKETI_METRICS_HOST`         | Hostname for Soketi Prometheus metrics.                      | `"127.0.0.1"`              |
-| `SOKETI_METRICS_SERVER_PORT`  | Port for Soketi Prometheus metrics.                          | `9601`                     |
-| **Soketi (Database Backend)** |                                                              |                            |
-| `SOKETI_DB_HOST`              | Host of the database Soketi uses.                            | Same as `DB_HOST`          |
-| `SOKETI_DB_DATABASE`          | Database Soketi uses for app management.                     | Same as `DB_DATABASE`      |
-| **Playground (Pusher)**       |                                                              |                            |
-| `PUSHER_APP_CLUSTER`          | Cluster name for playground connection.                      | `"mt1"`                    |
-| `PUSHER_HOST`                 | WebSocket host for playground.                               | `SOKETI_HOST`              |
-| `PUSHER_PORT`                 | WebSocket port for playground.                               | `SOKETI_PORT`              |
-| `PUSHER_SCHEME`               | Connection scheme (`http` or `https`).                       | `"http"`                   |
-| `PUSHER_TLS`                  | Enable TLS for playground (`0` or `1`).                      | `0`                        |
+| Variable                      | Description                                                     | Default                      |
+| :---------------------------- | :-------------------------------------------------------------- | :--------------------------- |
+| **App**                       |                                                                 |                              |
+| `APP_NAME`                    | Name of the application (e.g., "Soketi Panel").                 | `"Soketi Panel"`             |
+| `APP_ENV`                     | Application environment (`production`, `development`).          | `"production"`               |
+| `APP_URL`                     | Canonical URL of the application.                               | `http://localhost:3000`      |
+| **Better Auth**               |                                                                 |                              |
+| `BETTER_AUTH_SECRET`          | Secret key for sessions (Generate with `openssl rand -hex 32`). | **Required**                 |
+| `BETTER_AUTH_URL`             | Public URL of the authentication server.                        | `http://localhost:3000`      |
+| **Database**                  |                                                                 |                              |
+| `DB_DRIVER`                   | Database driver (`mysql`, `pg`, `sqlite`).                      | `"mysql"`                    |
+| `DB_HOST`                     | Host of the database for the panel.                             | `"localhost"`                |
+| `DB_PORT`                     | Port of the database for the panel.                             | `3306` (MySQL) / `5432` (PG) |
+| `DB_DATABASE`                 | Database name for the panel.                                    | `"soketi_db"`                |
+| `DB_USERNAME`                 | Username for the database.                                      | `"soketi"`                   |
+| `DB_PASSWORD`                 | Password for the database.                                      | `""`                         |
+| **Soketi (Management)**       |                                                                 |                              |
+| `SOKETI_HOST`                 | Hostname of the Soketi server.                                  | `"127.0.0.1"`                |
+| `SOKETI_PORT`                 | Port of the Soketi server.                                      | `6001`                       |
+| `SOKETI_METRICS_HOST`         | Hostname for Soketi Prometheus metrics.                         | `"127.0.0.1"`                |
+| `SOKETI_METRICS_PORT`         | Port for Soketi Prometheus metrics.                             | `9601`                       |
+| **Soketi (Database Backend)** |                                                                 |                              |
+| `SOKETI_DB_HOST`              | Host of the database Soketi uses.                               | Same as `DB_HOST`            |
+| `SOKETI_DB_DATABASE`          | Database Soketi uses for app management.                        | Same as `DB_DATABASE`        |
+| **Playground (Pusher)**       |                                                                 |                              |
+| `PUSHER_APP_CLUSTER`          | Cluster name for playground connection.                         | `"mt1"`                      |
+| `PUSHER_HOST`                 | WebSocket host for playground.                                  | `SOKETI_HOST`                |
+| `PUSHER_PORT`                 | WebSocket port for playground.                                  | `SOKETI_PORT`                |
+| `PUSHER_SCHEME`               | Connection scheme (`http` or `https`).                          | `"http"`                     |
+| `PUSHER_TLS`                  | Enable TLS for playground (`0` or `1`).                         | `0`                          |
 
 ---
 
