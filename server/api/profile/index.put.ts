@@ -1,10 +1,10 @@
 import { auth } from "~~/server/lib/auth";
+import { updateProfileScheme } from "~~/server/validations/profile/updateProfileScheme";
 import {
   handleError,
   validateWith,
   createValidationError,
 } from "~~/server/lib/utils";
-import { updateProfileScheme } from "~~/server/validations/profile/updateProfileScheme";
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -27,8 +27,15 @@ export default defineEventHandler(async (event) => {
   try {
     await auth.api.updateUser({
       headers: event.headers,
-      body: data,
+      body: { name: data.name },
     });
+
+    if (data.email && data.email !== event.context.user.email) {
+      await auth.api.changeEmail({
+        headers: event.headers,
+        body: { newEmail: data.email },
+      });
+    }
 
     return {
       success: true,
