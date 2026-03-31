@@ -48,7 +48,7 @@
 import { LucideChevronDown, LucideLogOut, UserIcon } from "lucide-vue-next";
 
 import { getInitials } from "#shared/utils";
-import { useAuth } from "~/composables/useAuth";
+import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,10 +61,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const { user, signOut } = useAuth();
+const session = authClient.useSession();
+const user = computed(() => session.value?.data?.user ?? null);
 
 async function handleLogout() {
-  await signOut();
+  await authClient.signOut();
   navigateTo("/login");
 }
 </script>
