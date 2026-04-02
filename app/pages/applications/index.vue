@@ -5,7 +5,7 @@
       description="Manage your Soketi applications."
     >
       <CreateApplicationModal @success="handleUpdated">
-        <Button><PlusIcon /> New application</Button>
+        <Button :disabled="loading"><PlusIcon /> New application</Button>
       </CreateApplicationModal>
     </PageHero>
 

@@ -2,7 +2,9 @@
   <div class="space-y-6">
     <PageHero title="Users" description="Manage your Soketi Panel users.">
       <CreateUserModal @success="handleCreated">
-        <Button variant="default"> <PlusIcon /> New user </Button>
+        <Button variant="default" :disabled="loading">
+          <PlusIcon /> New user
+        </Button>
       </CreateUserModal>
     </PageHero>
 

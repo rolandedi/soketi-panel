@@ -1,7 +1,7 @@
 <template>
   <Popover>
     <PopoverTrigger asChild>
-      <Button variant="outline">
+      <Button variant="outline" :disabled="tableIsEmpty">
         <FilterIcon class="size-4" />
         Filter
         <template v-if="activeFiltersCount > 0">
@@ -140,6 +140,11 @@ const form = reactive({
 const activeFiltersCount = computed(() => {
   return [form.role, form.status, form.banned, form.createdAt].filter(Boolean)
     .length;
+});
+
+const tableIsEmpty = computed(() => {
+  const rowModel = props.table?.getRowModel();
+  return !rowModel || rowModel.rows.length === 0;
 });
 
 function applyFilter(column: string, value: AcceptableValue) {
