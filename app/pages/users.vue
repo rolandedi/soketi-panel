@@ -47,6 +47,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { Table } from "@tanstack/vue-table";
 import { ref, onMounted, computed } from "vue";
 import { toast } from "vue-sonner";
 import { PlusIcon } from "lucide-vue-next";
@@ -63,16 +64,11 @@ import EditUserModal from "@/components/modals/users/EditUserModal.vue";
 import BanUserModal from "@/components/modals/users/BanUserModal.vue";
 import DeleteUserAlert from "@/components/modals/users/DeleteUserAlert.vue";
 import UsersDataTableFilters from "@/components/filters/UsersDataTableFilters.vue";
-import type { Table } from "@tanstack/vue-table";
 
+definePageMeta({ middleware: ["admin"] });
 useHead({ title: "Users" });
 
 const { csrfFetch } = useCsrfFetch();
-
-const filterOptions = [
-  { label: "User", value: "user" },
-  { label: "Admin", value: "admin" },
-];
 
 const loading = ref(false);
 const data = ref<User[]>([]);
