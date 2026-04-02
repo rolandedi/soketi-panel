@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event);
-  const page = Number(query.page) || 1;
-  const limit = Number(query.limit) || 10;
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.max(1, Number(query.limit) || 10);
 
   const applicationRepository = new ApplicationRepository();
   const messageRepository = new MessageRepository();

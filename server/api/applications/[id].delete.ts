@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   const applicationRepository = new ApplicationRepository();
 
   try {
-    await applicationRepository.delete(id as string, user.id);
+    const userId = user.role === "admin" ? null : user.id;
+    await applicationRepository.delete(id as string, userId);
     return { success: true };
   } catch (error: any) {
     throw handleError(
