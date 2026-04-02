@@ -24,18 +24,19 @@
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem
-          v-for="(item, idx) in menuItems"
-          :key="idx"
-          :data-active="item.active"
-          class="hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10"
-          as-child
-        >
-          <NuxtLink :to="item.href" class="flex items-center w-full">
-            <component :is="item.icon" class="size-4" aria-hidden="true" />
-            <span>{{ item.label }}</span>
-          </NuxtLink>
-        </DropdownMenuItem>
+        <template v-for="(item, idx) in menuItems" :key="idx">
+          <DropdownMenuItem
+            v-if="item.visible"
+            :data-active="item.active"
+            class="hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10"
+            as-child
+          >
+            <NuxtLink :to="item.href" class="flex items-center w-full">
+              <component :is="item.icon" class="size-4" aria-hidden="true" />
+              <span>{{ item.label }}</span>
+            </NuxtLink>
+          </DropdownMenuItem>
+        </template>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
@@ -60,7 +61,7 @@ import {
 } from "lucide-vue-next";
 
 import { getInitials } from "#shared/utils";
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/composables/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,6 +75,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const route = useRoute();
+const auth = useAuth();
+
+const user = computed(() => auth.user.value);
 
 const menuItems = computed(() => [
   {
@@ -81,26 +85,26 @@ const menuItems = computed(() => [
     label: "Profile",
     icon: UserIcon,
     active: route.path === "/profile",
+    visible: true,
   },
   {
     href: "/settings",
     label: "Settings",
     icon: SettingsIcon,
     active: route.path === "/settings",
+    visible: auth.isAdmin.value,
   },
   {
     href: "/about",
     label: "About",
     icon: InfoIcon,
     active: route.path === "/about",
+    visible: true,
   },
 ]);
 
-const session = authClient.useSession();
-const user = computed(() => session.value?.data?.user ?? null);
-
 async function handleLogout() {
-  await authClient.signOut();
+  await auth.signOut();
   navigateTo("/login");
 }
 </script>
