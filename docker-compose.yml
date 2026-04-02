@@ -15,25 +15,31 @@ services:
     env_file:
       - .env
     environment:
-      APP_ENV: ${APP_ENV:-production}
+      APP_ENV: production
       APP_URL: http://localhost:4931
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-(openssl rand -base64 32)}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-supersecretkey}
       BETTER_AUTH_URL: http://localhost:4931
-      DB_DRIVER: ${DB_DRIVER:-mysql}
-      DB_HOST: ${DB_HOST:-mariadb}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_NAME: ${DB_NAME:-soketi}
-      DB_USER: ${DB_USER:-soketi}
-      DB_PASSWORD: ${DB_PASSWORD:-soketi_password}
+      DB_DRIVER: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: soketi
+      DB_USER: soketi
+      DB_PASSWORD: soketi_password
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      REDIS_PASSWORD: redis_password
       PUSHER_HOST: soketi
       PUSHER_PORT: 6001
       SOKETI_HOST: soketi
       SOKETI_PORT: 6001
       SOKETI_METRICS_HOST: soketi
       SOKETI_METRICS_PORT: 9601
-      SOKETI_PANEL_EMAIL: ${SOKETI_PANEL_EMAIL:-admin@soketi-panel.app}
-      SOKETI_PANEL_PASSWORD: ${SOKETI_PANEL_PASSWORD:-adminpassword}
-      REDIS_URL: ${REDIS_URL:-redis://:${REDIS_PASSWORD:-redis_password}@redis:6379}
+      SOKETI_PANEL_EMAIL: "admin@soketi-panel.app"
+      SOKETI_PANEL_PASSWORD: "Password123"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
       mariadb:
         condition: service_healthy

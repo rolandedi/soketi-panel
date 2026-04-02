@@ -8,11 +8,12 @@ export async function seed(knex: Knex): Promise<void> {
   const { SOKETI_PANEL_EMAIL, SOKETI_PANEL_PASSWORD } = process.env;
 
   try {
-    const res = await auth.api.signUpEmail({
+    const res = await auth.api.createUser({
       body: {
         email: SOKETI_PANEL_EMAIL || "admin@soketi-panel.app",
         password: SOKETI_PANEL_PASSWORD || "P@ssw0rd123",
         name: "Soketi Admin",
+        role: "admin",
       },
     });
 
