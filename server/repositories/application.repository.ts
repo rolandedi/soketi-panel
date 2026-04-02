@@ -10,6 +10,7 @@ import {
   generateAppKey,
   generateAppSecret,
 } from "../services/crypto";
+import { SettingsRepository, DEFAULT_SETTINGS } from "./settings.repository";
 
 type ApplicationInput = {
   name?: string;
@@ -132,6 +133,72 @@ export class ApplicationRepository {
 
   async create(data: ApplicationInput, userId: string) {
     const applicationId = generateAppId();
+
+    const settingsRepository = new SettingsRepository();
+    let settingsDefaults: Omit<
+      ApplicationType,
+      "id" | "name" | "key" | "secret" | "created_at" | "updated_at" | "user_id"
+    >;
+    try {
+      const settings = await settingsRepository.getAll();
+      settingsDefaults = {
+        max_connections: Number(
+          settings.default_app_max_connections ??
+            DEFAULT_SETTINGS.default_app_max_connections,
+        ),
+        enable_client_messages:
+          (settings.default_app_enable_client_messages ??
+            DEFAULT_SETTINGS.default_app_enable_client_messages) === "true",
+        enabled: true,
+        max_backend_events_per_sec: Number(
+          settings.default_app_max_backend_events_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_backend_events_per_sec,
+        ),
+        max_client_events_per_sec: Number(
+          settings.default_app_max_client_events_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_client_events_per_sec,
+        ),
+        max_read_req_per_sec: Number(
+          settings.default_app_max_read_req_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_read_req_per_sec,
+        ),
+        webhooks: null,
+        max_presence_members_per_channel: Number(
+          settings.default_app_max_presence_members_per_channel ??
+            DEFAULT_SETTINGS.default_app_max_presence_members_per_channel,
+        ),
+        max_presence_member_size_in_kb: Number(
+          settings.default_app_max_presence_member_size_in_kb ??
+            DEFAULT_SETTINGS.default_app_max_presence_member_size_in_kb,
+        ),
+        max_channel_name_length: Number(
+          settings.default_app_max_channel_name_length ??
+            DEFAULT_SETTINGS.default_app_max_channel_name_length,
+        ),
+        max_event_channels_at_once: Number(
+          settings.default_app_max_event_channels_at_once ??
+            DEFAULT_SETTINGS.default_app_max_event_channels_at_once,
+        ),
+        max_event_name_length: Number(
+          settings.default_app_max_event_name_length ??
+            DEFAULT_SETTINGS.default_app_max_event_name_length,
+        ),
+        max_event_payload_in_kb: Number(
+          settings.default_app_max_event_payload_in_kb ??
+            DEFAULT_SETTINGS.default_app_max_event_payload_in_kb,
+        ),
+        max_event_batch_size: Number(
+          settings.default_app_max_event_batch_size ??
+            DEFAULT_SETTINGS.default_app_max_event_batch_size,
+        ),
+        enable_user_authentication:
+          (settings.default_app_enable_user_authentication ??
+            DEFAULT_SETTINGS.default_app_enable_user_authentication) === "true",
+      };
+    } catch {
+      settingsDefaults = { ...defaultApplicationValues };
+    }
+
     const application = {
       id: applicationId,
       key: generateAppKey(),
@@ -140,7 +207,7 @@ export class ApplicationRepository {
       user_id: userId,
       created_at: toSQLDatetime(new Date()),
       updated_at: null,
-      ...defaultApplicationValues,
+      ...settingsDefaults,
       ...data,
       webhooks: serializeWebhooks(data.webhooks),
     };
@@ -174,9 +241,7 @@ export class ApplicationRepository {
 
   async delete(ids: string | string[], userId: string | null) {
     const applicationIds = Array.isArray(ids) ? ids : [ids];
-    const query = useDB()
-      .from(Application.table)
-      .whereIn("id", applicationIds);
+    const query = useDB().from(Application.table).whereIn("id", applicationIds);
 
     if (userId !== null) {
       query.where({ user_id: userId });
