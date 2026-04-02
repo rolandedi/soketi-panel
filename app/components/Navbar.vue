@@ -106,6 +106,7 @@
           </NuxtLink>
         </div>
       </div>
+
       <!-- Middle area -->
       <NavigationMenu class="max-md:hidden">
         <NavigationMenuList class="gap-2">
@@ -114,7 +115,7 @@
               <NavigationMenuLink
                 :active="item.active"
                 as-child
-                class="flex-row items-center gap-2 py-1.5 font-medium text-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:text-primary"
+                class="flex-row items-center gap-2 rounded-md font-medium text-foreground hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10 data-active:bg-primary/10 dark:hover:bg-primary/10 dark:hover:text-primary dark:data-active:hover:bg-primary/20 dark:data-active:bg-primary/20"
               >
                 <NuxtLink :to="item.href">
                   <component :is="item.icon" :size="16" aria-hidden="true" />
@@ -124,19 +125,19 @@
             </NavigationMenuItem>
             <NavigationMenuItem v-else>
               <NavigationMenuTrigger
-                class="flex items-center gap-2 hover:text-primary data-[state=open]:text-primary"
-                :class="item.active ? 'text-primary' : ''"
+                class="flex items-center gap-2 p-2 rounded-md hover:text-primary hover:bg-primary/10 data-active:focus:bg-primary/10 data-active:hover:bg-primary/10 data-active:bg-primary/10 data-[state=open]:text-primary data-[state=open]:bg-primary/10 data-[state=open]:hover:bg-primary/10 dark:data-active:hover:bg-primary/20 dark:data-active:bg-primary/20"
+                :class="item.active ? 'text-primary bg-primary/10' : ''"
               >
                 <component :is="item.icon" :size="16" aria-hidden="true" />
                 <span class="text-nowrap">{{ item.label }}</span>
               </NavigationMenuTrigger>
-              <NavigationMenuContent>
+              <NavigationMenuContent align="start" class="w-auto p-2">
                 <ul class="grid w-50 gap-1 p-0">
                   <li v-for="(child, idx) in item.children" :key="idx">
                     <NavigationMenuLink as-child :active="child.active">
                       <NuxtLink
                         :to="child.href"
-                        class="flex-row items-center gap-2"
+                        class="flex-row items-center gap-2 hover:bg-primary/10 hover:text-primary rounded-md text-foreground"
                       >
                         {{ child.label }}
                       </NuxtLink>
@@ -148,6 +149,7 @@
           </template>
         </NavigationMenuList>
       </NavigationMenu>
+
       <!-- Right side -->
       <div class="flex items-center justify-end gap-2">
         <UserMenu />
