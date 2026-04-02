@@ -32,3 +32,6 @@ test-results/
 .claude
 .cursor
 .kilocode
+CLAUDE.md
+QWEN.md
+GEMINI.md
