@@ -10,6 +10,7 @@ export function useAuth() {
   const user = computed(() => session.value?.data?.user ?? null);
   const isAuthenticated = computed(() => !!session.value?.data?.session);
   const isPending = computed(() => session.value?.isPending);
+  const isAdmin = computed(() => user.value?.role === "admin");
 
   async function signIn(email: string, password: string) {
     return authClient.signIn.email({ email, password });
@@ -24,6 +25,7 @@ export function useAuth() {
     user,
     isAuthenticated,
     isPending,
+    isAdmin,
     signIn,
     signOut,
   };
