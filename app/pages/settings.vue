@@ -494,11 +494,17 @@ onMounted(() => {
 
 async function onSaveSettings() {
   isSaving.value = true;
+
+  const payload: Record<string, string> = {};
+  for (const [key, value] of Object.entries(form)) {
+    payload[key] = String(value);
+  }
+
   try {
     const { csrfFetch } = useCsrfFetch();
     await csrfFetch("/api/settings", {
       method: "PUT",
-      body: { ...form },
+      body: { ...payload },
     });
     toast.success("Settings saved successfully");
   } catch (error: any) {
