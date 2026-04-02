@@ -3,7 +3,7 @@ import type { Knex } from "knex";
 import { auth } from "../../server/lib/auth";
 
 export async function seed(knex: Knex): Promise<void> {
-  consola.info("Seeding admin user...");
+  consola.info("Creating admin user...");
 
   const { SOKETI_PANEL_EMAIL, SOKETI_PANEL_PASSWORD } = process.env;
 
@@ -25,7 +25,7 @@ export async function seed(knex: Knex): Promise<void> {
     ) {
       consola.info("Admin user already exists. Skipping.");
     } else {
-      consola.error("Failed to seed user:", error);
+      consola.error("Failed to create admin user:", error);
     }
   }
 }
