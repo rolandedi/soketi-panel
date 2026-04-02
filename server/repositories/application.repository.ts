@@ -4,6 +4,7 @@ import type {
 } from "#shared/types";
 import { Application } from "../models/application";
 import { useDB } from "../lib/orm/db";
+import { toSQLDatetime, castRow } from "../lib/orm/utils";
 import {
   generateAppId,
   generateAppKey,
@@ -50,10 +51,6 @@ const defaultApplicationValues = {
   "id" | "name" | "key" | "secret" | "created_at" | "updated_at" | "user_id"
 >;
 
-function toSQLDatetime(date: Date): string {
-  return date.toISOString().slice(0, 19).replace("T", " ");
-}
-
 function serializeWebhooks(webhooks: ApplicationInput["webhooks"]) {
   if (webhooks === undefined) {
     return undefined;
@@ -67,32 +64,7 @@ function serializeWebhooks(webhooks: ApplicationInput["webhooks"]) {
 }
 
 function castApplication(row: Record<string, any>): ApplicationType {
-  const casted: Record<string, any> = { ...row };
-
-  for (const [key, type] of Object.entries(Application.casts)) {
-    if (casted[key] === undefined || casted[key] === null) {
-      continue;
-    }
-
-    if (type === "boolean") {
-      casted[key] = Boolean(casted[key]);
-    } else if (type === "number") {
-      casted[key] = Number(casted[key]);
-    } else if (type === "string") {
-      casted[key] = String(casted[key]);
-    } else if (type === "json") {
-      try {
-        casted[key] =
-          typeof casted[key] === "string"
-            ? JSON.parse(casted[key])
-            : casted[key];
-      } catch {
-        casted[key] = null;
-      }
-    }
-  }
-
-  return casted as ApplicationType;
+  return castRow<ApplicationType>(row, Application.casts);
 }
 
 export class ApplicationRepository {
@@ -200,14 +172,17 @@ export class ApplicationRepository {
     return await this.getById(id, userId);
   }
 
-  async delete(ids: string | string[], userId: string) {
+  async delete(ids: string | string[], userId: string | null) {
     const applicationIds = Array.isArray(ids) ? ids : [ids];
-
-    return await useDB()
+    const query = useDB()
       .from(Application.table)
-      .where({ user_id: userId })
-      .whereIn("id", applicationIds)
-      .delete();
+      .whereIn("id", applicationIds);
+
+    if (userId !== null) {
+      query.where({ user_id: userId });
+    }
+
+    return await query.delete();
   }
 
   async regenerate(id: string, userId: string) {

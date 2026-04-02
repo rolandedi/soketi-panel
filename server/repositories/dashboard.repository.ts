@@ -44,7 +44,7 @@ export class DashboardRepository {
     const rows = await query.select(
       db.raw("COUNT(*) as total"),
       db.raw(
-        "SUM(CASE WHEN enabled = 1 OR enabled = true THEN 1 ELSE 0 END) as enabled",
+        "SUM(CASE WHEN enabled = 1 THEN 1 ELSE 0 END) as enabled",
       ),
     );
 
