@@ -22,6 +22,19 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@nuxtjs/color-mode",
     "vue-sonner/nuxt",
+    [
+      "@nuxtjs/google-fonts",
+      {
+        families: {
+          Inter: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "PT Serif": {
+            wght: [400, 700],
+            ital: [400, 700],
+          },
+          "Geist Mono": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+        },
+      },
+    ],
   ],
   css: ["~/assets/css/tailwind.css"],
   vite: {
