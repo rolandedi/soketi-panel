@@ -11,6 +11,7 @@ export class Application extends Model implements ApplicationType {
     max_backend_events_per_sec: "number" as const,
     max_client_events_per_sec: "number" as const,
     max_read_req_per_sec: "number" as const,
+    webhooks: "json" as const,
     max_presence_members_per_channel: "number" as const,
     max_presence_member_size_in_kb: "number" as const,
     max_channel_name_length: "number" as const,
@@ -31,7 +32,7 @@ export class Application extends Model implements ApplicationType {
   public max_backend_events_per_sec!: number;
   public max_client_events_per_sec!: number;
   public max_read_req_per_sec!: number;
-  public webhooks!: string;
+  public webhooks!: string | string[] | null;
   public max_presence_members_per_channel!: number;
   public max_presence_member_size_in_kb!: number;
   public max_channel_name_length!: number;
