@@ -1,59 +1,54 @@
 import type { Knex } from "knex";
+import { faker } from "@faker-js/faker";
 import consola from "consola";
-import { useAuth } from "../../server/lib/auth";
-import { User } from "../../shared/types";
 
-export async function seed(knex: Knex): Promise<void> {
+import { useAuth } from "../../server/lib/auth";
+
+const FAKE_USERS_COUNT = 25;
+
+function createRandomUser() {
+  const isBanned = faker.datatype.boolean();
+
+  return {
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    image: faker.image.avatar(),
+    role: "user" as const,
+    banned: isBanned,
+    banReason: isBanned ? faker.lorem.sentence() : null,
+    banExpires: isBanned ? faker.date.future().toISOString() : null,
+  };
+}
+
+export async function seed(_knex: Knex): Promise<void> {
   const auth = useAuth();
 
-  const users: User[] = [
+  const fixedUsers = [
     {
-      id: "1",
       name: "Admin User",
       email: "admin@email.com",
-      emailVerified: true,
       image: null,
-      createdAt: "2022-01-01T00:00:00.000Z",
-      updatedAt: "2022-01-01T00:00:00.000Z",
-      role: "admin",
+      role: "admin" as const,
       banned: false,
       banReason: null,
       banExpires: null,
     },
     {
-      id: "2",
-      name: "Roland Edi",
-      email: "roland@email.com",
-      emailVerified: true,
-      image: null,
-      role: "user",
-      banned: false,
-      banReason: null,
-      banExpires: null,
-    },
-    {
-      id: "3",
       name: "John Doe",
-      email: "john@example.com",
-      emailVerified: true,
+      email: "john.doe@email.com",
       image: null,
-      role: "user",
-      banned: true,
-      banReason: "Spamming",
-      banExpires: "2022-01-01T00:00:00.000Z",
-    },
-    {
-      id: "4",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      emailVerified: false,
-      image: null,
-      role: "user",
+      role: "user" as const,
       banned: false,
       banReason: null,
       banExpires: null,
     },
   ];
+
+  const fakeUsers = faker.helpers.multiple(createRandomUser, {
+    count: FAKE_USERS_COUNT,
+  });
+
+  const users = [...fixedUsers, ...fakeUsers];
 
   try {
     for (const user of users) {
@@ -62,15 +57,15 @@ export async function seed(knex: Knex): Promise<void> {
           email: user.email,
           password: "Password123",
           name: user.name,
-          image: user.image,
+          image: user.image ?? null,
           role: user.role,
         },
       });
 
-      consola.info(`User ${user.email} created successfully`);
+      consola.info(`User ${user.email} created`);
     }
 
-    consola.success(`Users created successfully`);
+    consola.success(`${users.length} users created successfully`);
   } catch (error) {
     consola.error(error);
   }
