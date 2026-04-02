@@ -114,8 +114,8 @@
             <NavigationMenuItem v-if="!item.children">
               <NavigationMenuLink
                 :active="item.active"
-                as-child
                 class="flex-row items-center gap-2 rounded-md font-medium text-foreground hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10 data-active:bg-primary/10 dark:hover:bg-primary/10 dark:hover:text-primary dark:data-active:hover:bg-primary/20 dark:data-active:bg-primary/20"
+                as-child
               >
                 <NuxtLink :to="item.href">
                   <component :is="item.icon" :size="16" aria-hidden="true" />

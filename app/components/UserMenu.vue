@@ -24,8 +24,14 @@
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem v-for="(item, idx) in menuItems" :key="idx" as-child>
-          <NuxtLink :to="item.href" class="flex w-full items-center">
+        <DropdownMenuItem
+          v-for="(item, idx) in menuItems"
+          :key="idx"
+          :data-active="item.active"
+          class="hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10"
+          as-child
+        >
+          <NuxtLink :to="item.href" class="flex items-center w-full">
             <component :is="item.icon" class="size-4" aria-hidden="true" />
             <span>{{ item.label }}</span>
           </NuxtLink>
