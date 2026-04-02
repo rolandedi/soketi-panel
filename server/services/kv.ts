@@ -45,3 +45,11 @@ export async function kvKeys(pattern: string): Promise<string[]> {
     return [];
   }
 }
+
+export async function kvMget(keys: string[]): Promise<(string | null)[]> {
+  try {
+    return await getRedis().mget(keys);
+  } catch {
+    return new Array(keys.length).fill(null);
+  }
+}
