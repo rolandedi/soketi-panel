@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-8">
     <PageHero title="Users" description="Manage your Soketi Panel users.">
       <CreateUserModal @success="handleCreated">
         <Button variant="default" :disabled="loading">
