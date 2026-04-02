@@ -13,8 +13,7 @@ export default defineEventHandler(async (event) => {
 
   if (session) {
     event.context.session = session.session;
-    // Better Auth User type peut avoir des champs additionnels selon les plugins
-    event.context.user = session.user as any;
+    event.context.user = session.user;
 
     if (session.user.banned) {
       throw createError({
