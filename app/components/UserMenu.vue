@@ -24,22 +24,10 @@
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem as-child>
-          <NuxtLink to="/profile" class="flex w-full items-center">
-            <UserIcon class="size-4" aria-hidden="true" />
-            <span>Profile</span>
-          </NuxtLink>
-        </DropdownMenuItem>
-        <DropdownMenuItem as-child>
-          <NuxtLink to="/settings" class="flex w-full items-center">
-            <SettingsIcon class="size-4" aria-hidden="true" />
-            <span>Settings</span>
-          </NuxtLink>
-        </DropdownMenuItem>
-        <DropdownMenuItem as-child>
-          <NuxtLink to="/about" class="flex w-full items-center">
-            <InfoIcon class="size-4" aria-hidden="true" />
-            <span>About</span>
+        <DropdownMenuItem v-for="(item, idx) in menuItems" :key="idx" as-child>
+          <NuxtLink :to="item.href" class="flex w-full items-center">
+            <component :is="item.icon" class="size-4" aria-hidden="true" />
+            <span>{{ item.label }}</span>
           </NuxtLink>
         </DropdownMenuItem>
       </DropdownMenuGroup>
@@ -78,6 +66,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+const route = useRoute();
+
+const menuItems = computed(() => [
+  {
+    href: "/profile",
+    label: "Profile",
+    icon: UserIcon,
+    active: route.path === "/profile",
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: SettingsIcon,
+    active: route.path === "/settings",
+  },
+  {
+    href: "/about",
+    label: "About",
+    icon: InfoIcon,
+    active: route.path === "/about",
+  },
+]);
 
 const session = authClient.useSession();
 const user = computed(() => session.value?.data?.user ?? null);
