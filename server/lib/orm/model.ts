@@ -46,7 +46,8 @@ export class Model {
   public static async paginate<T extends Model>(
     this: (new () => T) & typeof Model,
     page: number = 1,
-    limit: number = 15
+    limit: number = 15,
+    orderBy: { column: string; direction: 'asc' | 'desc' } = { column: 'created_at', direction: 'desc' }
   ) {
     const offset = (page - 1) * limit;
 
@@ -54,7 +55,10 @@ export class Model {
     const total = Number(countResult.count || 0);
     const lastPage = Math.ceil(total / limit);
 
-    const data = await this.query().limit(limit).offset(offset);
+    const data = await this.query()
+      .orderBy(orderBy.column, orderBy.direction)
+      .limit(limit)
+      .offset(offset);
 
     return {
       data: data.map((row: any) => this.cast(row)) as T[],
