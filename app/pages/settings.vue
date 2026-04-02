@@ -9,4 +9,6 @@
 
 <script lang="ts" setup>
 import PageHero from "@/components/PageHero.vue";
+
+useHead({ title: "Settings" });
 </script>
