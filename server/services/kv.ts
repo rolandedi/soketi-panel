@@ -6,6 +6,7 @@ function getRedis(): Redis {
   if (!cachedRedis) {
     const url = process.env.REDIS_URL || "redis://127.0.0.1:6379";
     cachedRedis = new Redis(url, {
+      password: process.env.REDIS_PASSWORD,
       lazyConnect: true,
       maxRetriesPerRequest: 1,
       connectTimeout: 2000,
