@@ -74,6 +74,7 @@ export default defineNuxtConfig({
     soketiPort: process.env.SOKETI_PORT || "6001",
     soketiMetricsHost: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
     soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
+    soketiMetricsScheme: process.env.SOKETI_METRICS_SCHEME || "http",
 
     redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
 
