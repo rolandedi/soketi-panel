@@ -43,9 +43,7 @@ export class DashboardRepository {
 
     const rows = await query.select(
       db.raw("COUNT(*) as total"),
-      db.raw(
-        "SUM(CASE WHEN enabled = 1 THEN 1 ELSE 0 END) as enabled",
-      ),
+      db.raw("SUM(CASE WHEN enabled = 1 THEN 1 ELSE 0 END) as enabled"),
     );
 
     const total = Number(rows[0]?.total ?? 0);
@@ -54,24 +52,39 @@ export class DashboardRepository {
     return { total, enabled, disabled: total - enabled };
   }
 
-  async getMessageStats(): Promise<MessageStats> {
+  async getMessageStats(
+    userId?: string,
+    isAdmin = false,
+  ): Promise<MessageStats> {
     const db = useDB();
     const now = new Date();
 
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
 
+    function baseQuery() {
+      const q = db(Message.table).join(
+        Application.table,
+        `${Application.table}.id`,
+        `${Message.table}.app_id`,
+      );
+      if (!isAdmin && userId) {
+        q.where(`${Application.table}.user_id`, userId);
+      }
+      return q;
+    }
+
     const [totalRow, todayRow, yesterdayRow] = await Promise.all([
-      db(Message.table).count("* as count").first(),
-      db(Message.table)
+      baseQuery().count("* as count").first(),
+      baseQuery()
         .count("* as count")
-        .where("created_at", ">=", toSQLDateStart(now))
-        .where("created_at", "<=", toSQLDateEnd(now))
+        .where(`${Message.table}.created_at`, ">=", toSQLDateStart(now))
+        .where(`${Message.table}.created_at`, "<=", toSQLDateEnd(now))
         .first(),
-      db(Message.table)
+      baseQuery()
         .count("* as count")
-        .where("created_at", ">=", toSQLDateStart(yesterday))
-        .where("created_at", "<=", toSQLDateEnd(yesterday))
+        .where(`${Message.table}.created_at`, ">=", toSQLDateStart(yesterday))
+        .where(`${Message.table}.created_at`, "<=", toSQLDateEnd(yesterday))
         .first(),
     ]);
 

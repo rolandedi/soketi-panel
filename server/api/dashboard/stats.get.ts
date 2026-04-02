@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const [appStats, messageStats, recentApps, soketiMetrics] =
       await Promise.all([
         repo.getAppStats(userId, isAdmin),
-        repo.getMessageStats(),
+        repo.getMessageStats(userId, isAdmin),
         repo.getRecentApps(userId, isAdmin, 5),
         getSoketiMetrics(),
       ]);
