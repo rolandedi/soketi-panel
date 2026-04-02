@@ -24,7 +24,7 @@ export interface Application {
   max_backend_events_per_sec: number;
   max_client_events_per_sec: number;
   max_read_req_per_sec: number;
-  webhooks: string;
+  webhooks: string | string[] | null;
   max_presence_members_per_channel: number;
   max_presence_member_size_in_kb: number;
   max_channel_name_length: number;
