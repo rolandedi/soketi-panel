@@ -46,11 +46,11 @@ export default defineEventHandler(async (event) => {
     }
 
     const values = await kvMget(keys);
-
     const entries: { date: string; connections: number }[] = [];
+
     for (let i = 0; i < keys.length; i++) {
       entries.push({
-        date: dateLabels[i],
+        date: dateLabels[i]!,
         connections: values[i] === null ? 0 : Number(values[i]),
       });
     }
