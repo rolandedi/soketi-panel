@@ -30,6 +30,18 @@
             <span>Profile</span>
           </NuxtLink>
         </DropdownMenuItem>
+        <DropdownMenuItem as-child>
+          <NuxtLink to="/settings" class="flex w-full items-center">
+            <SettingsIcon class="size-4" aria-hidden="true" />
+            <span>Settings</span>
+          </NuxtLink>
+        </DropdownMenuItem>
+        <DropdownMenuItem as-child>
+          <NuxtLink to="/about" class="flex w-full items-center">
+            <InfoIcon class="size-4" aria-hidden="true" />
+            <span>About</span>
+          </NuxtLink>
+        </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
@@ -45,7 +57,13 @@
 </template>
 
 <script setup lang="ts">
-import { LucideChevronDown, LucideLogOut, UserIcon } from "lucide-vue-next";
+import {
+  InfoIcon,
+  LucideChevronDown,
+  LucideLogOut,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-vue-next";
 
 import { getInitials } from "#shared/utils";
 import { authClient } from "@/lib/auth-client";
