@@ -1,17 +1,25 @@
 import { useDB } from "./db";
 
 export class Model {
-  public static table: string;
-  public static casts: Record<string, "boolean" | "number" | "string" | "json"> = {};
+  public static readonly table: string;
+  public static casts: Record<
+    string,
+    "boolean" | "number" | "string" | "json"
+  > = {};
 
-  public static async all<T extends Model>(this: (new () => T) & typeof Model): Promise<T[]> {
+  public static CREATED_AT = "created_at";
+  public static UPDATED_AT = "updated_at";
+
+  public static async all<T extends Model>(
+    this: (new () => T) & typeof Model,
+  ): Promise<T[]> {
     const data = await this.query();
     return data.map((row: any) => this.cast(row)) as unknown as T[];
   }
 
   public static async find<T extends Model>(
     this: (new () => T) & typeof Model,
-    id: number | string
+    id: number | string,
   ): Promise<T | undefined> {
     const row = await this.query().where({ id }).first();
     return row ? (this.cast(row) as unknown as T) : undefined;
@@ -19,7 +27,7 @@ export class Model {
 
   public static async create<T extends Model>(
     this: (new () => T) & typeof Model,
-    data: Partial<T>
+    data: Partial<T>,
   ) {
     return this.buildQuery().insert(data);
   }
@@ -27,14 +35,14 @@ export class Model {
   public static async update<T extends Model>(
     this: (new () => T) & typeof Model,
     id: number | string,
-    data: Partial<T>
+    data: Partial<T>,
   ) {
     return this.buildQuery().update(data).where({ id });
   }
 
   public static async delete<T extends Model>(
     this: (new () => T) & typeof Model,
-    id: number | string
+    id: number | string,
   ) {
     return this.buildQuery().delete().where({ id });
   }
@@ -47,9 +55,11 @@ export class Model {
     this: (new () => T) & typeof Model,
     page: number = 1,
     limit: number = 15,
-    orderBy: { column: string; direction: 'asc' | 'desc' } = { column: 'created_at', direction: 'desc' }
+    orderBy?: { column: string; direction: "asc" | "desc" },
   ) {
     const offset = (page - 1) * limit;
+
+    orderBy = orderBy || { column: this.CREATED_AT, direction: "desc" };
 
     const [countResult] = await this.buildQuery().count("* as count");
     const total = Number(countResult.count || 0);
@@ -85,8 +95,12 @@ export class Model {
         casted[key] = String(casted[key]);
       } else if (type === "json") {
         try {
-          casted[key] = typeof casted[key] === "string" ? JSON.parse(casted[key]) : casted[key];
+          casted[key] =
+            typeof casted[key] === "string"
+              ? JSON.parse(casted[key])
+              : casted[key];
         } catch (e) {
+          console.error(`Failed to parse JSON for key "${key}":`, e);
           casted[key] = null;
         }
       }
