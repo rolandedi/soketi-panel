@@ -1,5 +1,5 @@
 import { getSoketiMetrics } from "~~/server/services/soketi";
-import { kvGet, kvSet } from "~~/server/services/kv";
+import { kvGet, kvSet, kvMget } from "~~/server/services/kv";
 import { handleError } from "~~/server/lib/utils";
 
 const KEY_PREFIX = "dashboard:connections:";
@@ -35,16 +35,23 @@ export default defineEventHandler(async (event) => {
     }
 
     // Build the last 30 days
-    const entries: { date: string; connections: number }[] = [];
+    const keys: string[] = [];
+    const dateLabels: string[] = [];
     for (let i = HISTORY_DAYS - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const key = dateKey(d);
-      const dateLabel = key.replace(KEY_PREFIX, "");
-      const raw = await kvGet(key);
+      keys.push(key);
+      dateLabels.push(key.replace(KEY_PREFIX, ""));
+    }
+
+    const values = await kvMget(keys);
+
+    const entries: { date: string; connections: number }[] = [];
+    for (let i = 0; i < keys.length; i++) {
       entries.push({
-        date: dateLabel,
-        connections: raw === null ? 0 : Number(raw),
+        date: dateLabels[i],
+        connections: values[i] === null ? 0 : Number(values[i]),
       });
     }
 

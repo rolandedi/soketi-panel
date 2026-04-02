@@ -65,12 +65,21 @@ export default defineEventHandler(async (event) => {
 
     await pusher.trigger(data.channel, data.event, payload);
 
-    return await messageRepository.create({
+    const message = await messageRepository.create({
       app_id: application.id,
       channel: data.channel,
       event: data.event,
       payload,
     });
+
+    // Don't expose potentially sensitive payload in response
+    return {
+      id: message.id,
+      app_id: message.app_id,
+      channel: message.channel,
+      event: message.event,
+      created_at: message.created_at,
+    };
   } catch (error: any) {
     throw handleError(
       "playground.broadcast",
