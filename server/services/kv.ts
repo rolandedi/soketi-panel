@@ -2,9 +2,10 @@ import Redis from "ioredis";
 
 let cachedRedis: Redis | null = null;
 
-function getRedis(): Redis {
+export function useRedis(): Redis {
   if (!cachedRedis) {
     const url = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+
     cachedRedis = new Redis(url, {
       password: process.env.REDIS_PASSWORD,
       lazyConnect: true,
@@ -12,12 +13,13 @@ function getRedis(): Redis {
       connectTimeout: 2000,
     });
   }
+
   return cachedRedis;
 }
 
 export async function kvGet(key: string): Promise<string | null> {
   try {
-    return await getRedis().get(key);
+    return await useRedis().get(key);
   } catch {
     return null;
   }
@@ -30,9 +32,9 @@ export async function kvSet(
 ): Promise<void> {
   try {
     if (ttlSeconds) {
-      await getRedis().setex(key, ttlSeconds, value);
+      await useRedis().setex(key, ttlSeconds, value);
     } else {
-      await getRedis().set(key, value);
+      await useRedis().set(key, value);
     }
   } catch {
     // Redis unavailable — fail silently
@@ -41,7 +43,7 @@ export async function kvSet(
 
 export async function kvKeys(pattern: string): Promise<string[]> {
   try {
-    return await getRedis().keys(pattern);
+    return await useRedis().keys(pattern);
   } catch {
     return [];
   }
@@ -49,7 +51,7 @@ export async function kvKeys(pattern: string): Promise<string[]> {
 
 export async function kvMget(keys: string[]): Promise<(string | null)[]> {
   try {
-    return await getRedis().mget(keys);
+    return await useRedis().mget(keys);
   } catch {
     return new Array(keys.length).fill(null);
   }
