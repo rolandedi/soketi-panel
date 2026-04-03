@@ -11,29 +11,27 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const runtimeConfig = useRuntimeConfig();
-
   try {
     const metrics = await getSoketiMetrics();
 
     return {
       soketi: {
-        host: runtimeConfig.soketiHost,
-        port: runtimeConfig.soketiPort,
+        host: process.env.SOKETI_HOST || "127.0.0.1",
+        port: process.env.SOKETI_PORT || 6001,
       },
       metrics: {
-        host: runtimeConfig.soketiMetricsHost,
-        port: runtimeConfig.soketiMetricsPort,
+        host: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
+        port: process.env.SOKETI_METRICS_PORT || 9601,
       },
       pusher: {
-        host: runtimeConfig.pusherHost,
-        port: runtimeConfig.pusherPort,
-        scheme: runtimeConfig.pusherScheme,
-        tls: runtimeConfig.pusherTls === "1",
-        cluster: runtimeConfig.pusherAppCluster || null,
+        host: process.env.PUSHER_HOST || "127.0.0.1",
+        port: process.env.PUSHER_PORT || 6001,
+        scheme: process.env.PUSHER_SCHEME || "http",
+        tls: process.env.PUSHER_TLS === "1",
+        cluster: process.env.PUSHER_APP_CLUSTER || "mt1",
       },
       redis: {
-        url: runtimeConfig.redisUrl,
+        url: process.env.REDIS_URL || "redis://localhost:6379",
       },
       status: {
         connectedSockets: metrics.connectedSockets,
