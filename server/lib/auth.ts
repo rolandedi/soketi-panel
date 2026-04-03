@@ -1,16 +1,18 @@
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
-import mysql from "mysql2/promise";
 import { Pool } from "pg";
+import mysql from "mysql2/promise";
+import consola from "consola";
 
 const {
   APP_NAME = "Soketi Panel",
   DB_DRIVER = "mysql",
   DB_HOST = "localhost",
   DB_PORT = "3306",
+  DB_NAME = "soketi",
   DB_USER = "soketi",
   DB_PASSWORD = "",
-  DB_NAME = "soketi_db",
+  BETTER_AUTH_URL,
 } = process.env;
 
 function createDbPool() {
@@ -37,6 +39,8 @@ function createDbPool() {
 
 export const auth = betterAuth({
   appName: APP_NAME,
+  baseURL: BETTER_AUTH_URL,
+  trustedOrigins: ["*"],
   database: createDbPool(),
   emailAndPassword: {
     enabled: true,
@@ -70,6 +74,19 @@ export const auth = betterAuth({
         "Your account has been banned. Please contact Admin for more information.",
     }),
   ],
+  logger: {
+    disabled: false,
+    level: "error",
+    log: (level, message, ...args) => {
+      consola[level](message, ...args);
+    },
+  },
+  onAPIError: {
+    throw: true,
+    onError: (error, _ctx) => {
+      consola.error(error);
+    },
+  },
 });
 
 export const useAuth = () => {
