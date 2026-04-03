@@ -18,6 +18,7 @@ services:
       APP_ENV: production
       APP_URL: http://localhost:4931
       BETTER_AUTH_URL: http://localhost:4931
+      BETTER_AUTH_INTERNAL_URL: http://localhost:3000
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-supersecretkey}
       DB_DRIVER: mysql
       DB_HOST: mariadb
