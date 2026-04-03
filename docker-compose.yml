@@ -156,4 +156,4 @@ volumes:
 # ──────────────────────────────────────────────
 networks:
   soketi-network:
-    driver: bridge
+    external: true
