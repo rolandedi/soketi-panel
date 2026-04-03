@@ -77,7 +77,7 @@ Run the development server:
 pnpm dev
 ```
 
-Access the interface at `http://localhost:3000`.
+Access the interface at `http://localhost:4601`.
 
 ### Useful Commands
 
@@ -95,10 +95,10 @@ Access the interface at `http://localhost:3000`.
 | **App**                       |                                                                 |                              |
 | `APP_NAME`                    | Name of the application (e.g., "Soketi Panel").                 | `"Soketi Panel"`             |
 | `APP_ENV`                     | Application environment (`production`, `development`).          | `"production"`               |
-| `APP_URL`                     | Canonical URL of the application.                               | `http://localhost:3000`      |
+| `APP_URL`                     | Canonical URL of the application.                               | `http://localhost:4601`      |
 | **Better Auth**               |                                                                 |                              |
 | `BETTER_AUTH_SECRET`          | Secret key for sessions (Generate with `openssl rand -hex 32`). | **Required**                 |
-| `BETTER_AUTH_URL`             | Public URL of the authentication server.                        | `http://localhost:3000`      |
+| `BETTER_AUTH_URL`             | Public URL of the authentication server.                        | `http://localhost:4601`      |
 | **Database**                  |                                                                 |                              |
 | `DB_DRIVER`                   | Database driver (`mysql`, `pg`, `sqlite`).                      | `"mysql"`                    |
 | `DB_HOST`                     | Host of the database for the panel.                             | `"localhost"`                |

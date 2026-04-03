@@ -11,14 +11,14 @@ services:
     container_name: soketi-panel
     restart: unless-stopped
     ports:
-      - "4931:3000"
+      - "4601:4601"
     env_file:
       - .env
     environment:
       APP_ENV: production
-      APP_URL: http://localhost:4931
-      BETTER_AUTH_URL: http://localhost:4931
-      BETTER_AUTH_INTERNAL_URL: http://localhost:3000
+      APP_URL: http://localhost:4601
+      BETTER_AUTH_URL: http://localhost:4601
+      BETTER_AUTH_INTERNAL_URL: http://localhost:4601
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-supersecretkey}
       DB_DRIVER: mysql
       DB_HOST: mariadb
@@ -38,7 +38,7 @@ services:
       SOKETI_PANEL_EMAIL: ${SOKETI_PANEL_EMAIL:-"admin@soketi-panel.app"}
       SOKETI_PANEL_PASSWORD: ${SOKETI_PANEL_PASSWORD:-"Password123"}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:4601/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

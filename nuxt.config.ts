@@ -55,12 +55,17 @@ export default defineNuxtConfig({
     componentDir: "@/components/ui",
   },
 
+  devServer: {
+    port: process.env.APP_PORT ? Number.parseInt(process.env.APP_PORT) : 4601,
+  },
+
   runtimeConfig: {
     appName: process.env.APP_NAME || "Soketi Panel",
-    appUrl: process.env.APP_URL || "http://localhost:3000",
+    appUrl: process.env.APP_URL || "http://localhost:4601",
 
     betterAuthSecret: process.env.BETTER_AUTH_SECRET,
     betterAuthUrl: process.env.BETTER_AUTH_URL,
+    betterAuthInternalUrl: process.env.BETTER_AUTH_INTERNAL_URL,
 
     dbDriver: process.env.DB_DRIVER || "mysql",
     dbHost: process.env.DB_HOST || "127.0.0.1",
@@ -86,6 +91,7 @@ export default defineNuxtConfig({
 
     public: {
       betterAuthUrl: process.env.BETTER_AUTH_URL,
+      betterAuthInternalUrl: process.env.BETTER_AUTH_INTERNAL_URL,
     },
   },
 });

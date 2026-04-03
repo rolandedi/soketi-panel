@@ -42,10 +42,10 @@ COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Change the port and host
-ENV PORT=3000
+ENV PORT=4601
 ENV HOST=0.0.0.0
 ENV NITRO_PORT=${PORT}
 
-EXPOSE 3000
+EXPOSE 4601
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
