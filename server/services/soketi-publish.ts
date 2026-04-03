@@ -22,16 +22,14 @@ export interface PublishInput {
 }
 
 function createPusherClient(application: ApplicationType): Pusher {
-  const runtimeConfig = useRuntimeConfig();
-
   return new Pusher({
     appId: application.id,
     key: application.key,
     secret: application.secret,
-    cluster: runtimeConfig.pusherAppCluster,
-    host: runtimeConfig.pusherHost,
-    port: runtimeConfig.pusherPort,
-    useTLS: runtimeConfig.pusherTls === "1",
+    cluster: process.env.PUSHER_APP_CLUSTER || "mt1",
+    host: process.env.PUSHER_HOST || "127.0.0.1",
+    port: process.env.PUSHER_PORT || "6001",
+    useTLS: process.env.PUSHER_TLS === "1",
   });
 }
 
