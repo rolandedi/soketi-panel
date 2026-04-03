@@ -15,6 +15,14 @@ export class MessageRepository {
     channel: string;
     event: string;
     payload: unknown;
+    source?: string;
+    event_type?: string | null;
+    socket_id?: string | null;
+    user_id?: string | null;
+    metadata?: Record<string, unknown> | null;
+    raw_payload?: string | null;
+    idempotency_key?: string | null;
+    received_at?: Date | null;
   }): Promise<MessageType> {
     const id = randomUUID();
 
@@ -26,6 +34,16 @@ export class MessageRepository {
         channel: data.channel,
         event: data.event,
         payload: JSON.stringify(data.payload),
+        source: data.source ?? "backend_api",
+        event_type: data.event_type ?? null,
+        socket_id: data.socket_id ?? null,
+        user_id: data.user_id ?? null,
+        metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+        raw_payload: data.raw_payload ?? null,
+        idempotency_key: data.idempotency_key ?? null,
+        received_at: data.received_at
+          ? toSQLDatetime(data.received_at)
+          : toSQLDatetime(new Date()),
         created_at: toSQLDatetime(new Date()),
       });
 
@@ -36,6 +54,17 @@ export class MessageRepository {
     }
 
     return castMessage(message);
+  }
+
+  async findByIdempotencyKey(
+    idempotencyKey: string,
+  ): Promise<MessageType | undefined> {
+    const message = await useDB()
+      .from(Message.table)
+      .where({ idempotency_key: idempotencyKey })
+      .first();
+
+    return message ? castMessage(message) : undefined;
   }
 
   async getAll(

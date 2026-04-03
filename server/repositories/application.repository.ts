@@ -1,6 +1,7 @@
 import type {
   Application as ApplicationType,
   PaginatedResponse,
+  SoketiWebhookConfig,
 } from "#shared/types";
 import { Application } from "../models/application";
 import { useDB } from "../lib/orm/db";
@@ -20,7 +21,7 @@ type ApplicationInput = {
   max_backend_events_per_sec?: number;
   max_client_events_per_sec?: number;
   max_read_req_per_sec?: number;
-  webhooks?: string | string[] | null;
+  webhooks?: string | string[] | SoketiWebhookConfig[] | null;
   max_presence_members_per_channel?: number;
   max_presence_member_size_in_kb?: number;
   max_channel_name_length?: number;
