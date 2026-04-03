@@ -23,16 +23,14 @@ export default defineEventHandler(async (event) => {
   const messageRepository = new MessageRepository();
 
   try {
-    const message = await messageRepository.getById(id, user.id);
+    const deleted = await messageRepository.deleteByIds([id], user.id);
 
-    if (!message) {
+    if (deleted === 0) {
       throw createError({
         statusCode: 404,
         statusMessage: "Message not found",
       });
     }
-
-    const deleted = await messageRepository.deleteByIds([id], user.id);
 
     return {
       success: true,

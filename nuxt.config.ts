@@ -22,6 +22,19 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@nuxtjs/color-mode",
     "vue-sonner/nuxt",
+    [
+      "@nuxtjs/google-fonts",
+      {
+        families: {
+          Inter: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "PT Serif": {
+            wght: [400, 700],
+            ital: [400, 700],
+          },
+          "Geist Mono": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+        },
+      },
+    ],
   ],
   css: ["~/assets/css/tailwind.css"],
   vite: {
@@ -42,12 +55,17 @@ export default defineNuxtConfig({
     componentDir: "@/components/ui",
   },
 
+  devServer: {
+    port: process.env.APP_PORT ? Number.parseInt(process.env.APP_PORT) : 4601,
+  },
+
   runtimeConfig: {
     appName: process.env.APP_NAME || "Soketi Panel",
-    appUrl: process.env.APP_URL || "http://localhost:3000",
+    appUrl: process.env.APP_URL || "http://localhost:4601",
 
     betterAuthSecret: process.env.BETTER_AUTH_SECRET,
     betterAuthUrl: process.env.BETTER_AUTH_URL,
+    betterAuthInternalUrl: process.env.BETTER_AUTH_INTERNAL_URL,
 
     dbDriver: process.env.DB_DRIVER || "mysql",
     dbHost: process.env.DB_HOST || "127.0.0.1",
@@ -61,9 +79,9 @@ export default defineNuxtConfig({
     soketiPort: process.env.SOKETI_PORT || "6001",
     soketiMetricsHost: process.env.SOKETI_METRICS_HOST || "127.0.0.1",
     soketiMetricsPort: process.env.SOKETI_METRICS_PORT || "9601",
+    soketiMetricsScheme: process.env.SOKETI_METRICS_SCHEME || "http",
 
     redisUrl: process.env.REDIS_URL || "redis://127.0.0.1:6379",
-    redisPassword: process.env.REDIS_PASSWORD || "",
 
     pusherAppCluster: process.env.PUSHER_APP_CLUSTER,
     pusherHost: process.env.PUSHER_HOST || "127.0.0.1",
@@ -73,6 +91,7 @@ export default defineNuxtConfig({
 
     public: {
       betterAuthUrl: process.env.BETTER_AUTH_URL,
+      betterAuthInternalUrl: process.env.BETTER_AUTH_INTERNAL_URL,
     },
   },
 });

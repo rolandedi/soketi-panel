@@ -106,48 +106,52 @@
           </NuxtLink>
         </div>
       </div>
+
       <!-- Middle area -->
       <NavigationMenu class="max-md:hidden">
         <NavigationMenuList class="gap-2">
           <template v-for="(item, index) in menuItems" :key="index">
-            <NavigationMenuItem v-if="!item.children">
-              <NavigationMenuLink
-                :active="item.active"
-                as-child
-                class="flex-row items-center gap-2 py-1.5 font-medium text-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:text-primary"
-              >
-                <NuxtLink :to="item.href">
+            <template v-if="item.visible !== false">
+              <NavigationMenuItem v-if="!item.children">
+                <NavigationMenuLink
+                  :active="item.active"
+                  class="flex-row items-center gap-2 rounded-md font-medium text-foreground hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10 data-active:bg-primary/10 dark:hover:bg-primary/10 dark:hover:text-primary dark:data-active:hover:bg-primary/20 dark:data-active:bg-primary/20"
+                  as-child
+                >
+                  <NuxtLink :to="item.href">
+                    <component :is="item.icon" :size="16" aria-hidden="true" />
+                    <span class="text-nowrap">{{ item.label }}</span>
+                  </NuxtLink>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem v-else>
+                <NavigationMenuTrigger
+                  class="flex items-center gap-2 p-2 rounded-md hover:text-primary hover:bg-primary/10 data-active:focus:bg-primary/10 data-active:hover:bg-primary/10 data-active:bg-primary/10 data-[state=open]:text-primary data-[state=open]:bg-primary/10 data-[state=open]:hover:bg-primary/10 dark:data-active:hover:bg-primary/20 dark:data-active:bg-primary/20"
+                  :class="item.active ? 'text-primary bg-primary/10' : ''"
+                >
                   <component :is="item.icon" :size="16" aria-hidden="true" />
                   <span class="text-nowrap">{{ item.label }}</span>
-                </NuxtLink>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem v-else>
-              <NavigationMenuTrigger
-                class="flex items-center gap-2 hover:text-primary data-[state=open]:text-primary"
-                :class="item.active ? 'text-primary' : ''"
-              >
-                <component :is="item.icon" :size="16" aria-hidden="true" />
-                <span class="text-nowrap">{{ item.label }}</span>
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul class="grid w-50 gap-1 p-0">
-                  <li v-for="(child, idx) in item.children" :key="idx">
-                    <NavigationMenuLink as-child :active="child.active">
-                      <NuxtLink
-                        :to="child.href"
-                        class="flex-row items-center gap-2"
-                      >
-                        {{ child.label }}
-                      </NuxtLink>
-                    </NavigationMenuLink>
-                  </li>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent align="start" class="w-auto p-2">
+                  <ul class="grid w-50 gap-1 p-0">
+                    <li v-for="(child, idx) in item.children" :key="idx">
+                      <NavigationMenuLink as-child :active="child.active">
+                        <NuxtLink
+                          :to="child.href"
+                          class="flex-row items-center gap-2 hover:bg-primary/10 hover:text-primary rounded-md text-foreground"
+                        >
+                          {{ child.label }}
+                        </NuxtLink>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </template>
           </template>
         </NavigationMenuList>
       </NavigationMenu>
+
       <!-- Right side -->
       <div class="flex items-center justify-end gap-2">
         <UserMenu />
@@ -167,6 +171,7 @@ import {
   type LucideIcon,
 } from "lucide-vue-next";
 
+import { useAuth } from "@/composables/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -192,10 +197,14 @@ interface MenuItem {
   label: string;
   icon?: LucideIcon;
   active?: boolean;
+  visible?: boolean;
   children?: MenuItem[];
 }
 
 const route = useRoute();
+const auth = useAuth();
+
+const user = computed(() => auth.user.value);
 
 const menuItems = computed<MenuItem[]>(() => [
   {
@@ -215,6 +224,7 @@ const menuItems = computed<MenuItem[]>(() => [
     label: "Users",
     icon: Users,
     active: route.path === "/users",
+    visible: auth.isAdmin.value,
   },
   {
     href: "/playground",

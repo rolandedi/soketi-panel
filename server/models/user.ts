@@ -2,7 +2,10 @@ import type { User as UserType } from "#shared/types";
 import { Model } from "../lib/orm/model";
 
 export class User extends Model implements UserType {
-  public static override table = "sktp_users";
+  public static override readonly table = "sktp_users";
+
+  public static readonly CREATED_AT = "createdAt";
+  public static readonly UPDATED_AT = "updatedAt";
 
   public static override casts = {
     emailVerified: "boolean" as const,

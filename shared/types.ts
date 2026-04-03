@@ -13,6 +13,26 @@ export interface User {
   banExpires: string | null;
 }
 
+export interface SoketiWebhookConfig {
+  url: string;
+  event_types?: string[];
+  filter?: {
+    channel_name_starts_with?: string;
+    channel_name_ends_with?: string;
+  };
+  headers?: Record<string, string>;
+}
+
+export interface SoketiWebhookConfig {
+  url: string;
+  event_types?: string[];
+  filter?: {
+    channel_name_starts_with?: string;
+    channel_name_ends_with?: string;
+  };
+  headers?: Record<string, string>;
+}
+
 export interface Application {
   id: string;
   name: string;
@@ -24,7 +44,7 @@ export interface Application {
   max_backend_events_per_sec: number;
   max_client_events_per_sec: number;
   max_read_req_per_sec: number;
-  webhooks: string;
+  webhooks: string | string[] | SoketiWebhookConfig[] | null;
   max_presence_members_per_channel: number;
   max_presence_member_size_in_kb: number;
   max_channel_name_length: number;
@@ -46,6 +66,21 @@ export interface Message {
   event: string;
   payload: unknown;
   created_at: string;
+  source: string;
+  event_type: string | null;
+  socket_id: string | null;
+  user_id: string | null;
+  metadata: Record<string, unknown> | null;
+  raw_payload: string | null;
+  idempotency_key: string | null;
+  received_at: string | null;
+}
+
+export interface Setting {
+  key: string;
+  value: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PaginatedResponse<T> {

@@ -1,6 +1,6 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { Copy, EyeIcon, LucideEllipsis, TrashIcon } from "lucide-vue-next";
+import { Copy, EyeIcon, LucideEllipsis, TrashIcon, ArrowUpRight, Users, Webhook } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 
 import type { Message } from "#shared/types";
@@ -59,6 +59,73 @@ const rowActions = (row: Message, options: MessagesTableOptions) => {
   ]);
 };
 
+function getSourceBadge(source: string) {
+  const sourceConfig: Record<string, { label: string; class: string; icon: any }> = {
+    backend_api: {
+      label: "Backend API",
+      class: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+      icon: ArrowUpRight,
+    },
+    client_webhook: {
+      label: "Client Event",
+      class: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+      icon: Webhook,
+    },
+    presence_webhook: {
+      label: "Presence",
+      class: "border-violet-500/20 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+      icon: Users,
+    },
+    soketi_webhook: {
+      label: "Soketi",
+      class: "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-300",
+      icon: Webhook,
+    },
+  };
+
+  const config = sourceConfig[source] ?? {
+    label: source,
+    class: "border-gray-500/20 bg-gray-500/10 text-gray-700 dark:text-gray-300",
+    icon: Webhook,
+  };
+
+  return h(
+    Badge,
+    {
+      variant: "outline",
+      class: `max-w-[120px] truncate ${config.class}`,
+    },
+    () => [
+      h(config.icon, { size: 12, class: "mr-1" }),
+      config.label,
+    ],
+  );
+}
+
+function getEventTypeBadge(eventType: string | null) {
+  if (!eventType) return null;
+
+  const typeConfig: Record<string, string> = {
+    client_event: "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    channel_occupied: "border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-300",
+    channel_vacated: "border-orange-500/20 bg-orange-500/10 text-orange-700 dark:text-orange-300",
+    member_added: "border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-300",
+    member_removed: "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-300",
+    publish_failed: "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-300",
+  };
+
+  const cls = typeConfig[eventType] ?? "border-gray-500/20 bg-gray-500/10 text-gray-700 dark:text-gray-300";
+
+  return h(
+    Badge,
+    {
+      variant: "outline",
+      class: `max-w-[160px] truncate ${cls}`,
+    },
+    () => eventType,
+  );
+}
+
 export const getMessagesColumns = (
   options?: MessagesTableOptions,
 ): ColumnDef<Message>[] => {
@@ -84,6 +151,17 @@ export const getMessagesColumns = (
       size: 28,
       enableSorting: false,
       enableHiding: false,
+    },
+    {
+      accessorKey: "source",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<Message, any>, { column, title: "Source" }),
+      cell: ({ row }) => {
+        const source = row.getValue("source") as string;
+        return getSourceBadge(source);
+      },
+      size: 120,
+      enableHiding: true,
     },
     {
       accessorKey: "id",
@@ -133,18 +211,54 @@ export const getMessagesColumns = (
         h(DataTableColumnHeader<Message, any>, { column, title: "Event" }),
       cell: ({ row }) => {
         const event = row.getValue("event") as string;
+        const eventType = row.original.event_type;
 
-        return h(
-          Badge,
-          {
-            variant: "outline",
-            class:
-              "max-w-[240px] truncate border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300",
-          },
-          () => event,
-        );
+        return h("div", { class: "flex flex-col gap-1" }, [
+          h(
+            "span",
+            { class: "max-w-[240px] truncate font-medium text-sm" },
+            event,
+          ),
+          eventType ? getEventTypeBadge(eventType) : null,
+        ].filter(Boolean));
       },
       enableHiding: false,
+    },
+    {
+      accessorKey: "socket_id",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<Message, any>, { column, title: "Socket ID" }),
+      cell: ({ row }) => {
+        const socketId = row.getValue("socket_id") as string | null;
+        if (!socketId) {
+          return h("span", { class: "text-muted-foreground text-xs" }, "—");
+        }
+        return h(
+          "span",
+          { class: "max-w-[180px] truncate font-mono text-xs text-muted-foreground" },
+          socketId,
+        );
+      },
+      size: 140,
+      enableHiding: true,
+    },
+    {
+      accessorKey: "user_id",
+      header: ({ column }) =>
+        h(DataTableColumnHeader<Message, any>, { column, title: "User ID" }),
+      cell: ({ row }) => {
+        const userId = row.getValue("user_id") as string | null;
+        if (!userId) {
+          return h("span", { class: "text-muted-foreground text-xs" }, "—");
+        }
+        return h(
+          "span",
+          { class: "max-w-[180px] truncate font-mono text-xs text-muted-foreground" },
+          userId,
+        );
+      },
+      size: 140,
+      enableHiding: true,
     },
     {
       accessorKey: "created_at",

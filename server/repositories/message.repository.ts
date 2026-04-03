@@ -3,38 +3,10 @@ import { randomUUID } from "node:crypto";
 import { Application } from "../models/application";
 import { Message } from "../models/message";
 import { useDB } from "../lib/orm/db";
+import { toSQLDatetime, castRow } from "../lib/orm/utils";
 
 function castMessage(row: Record<string, any>): MessageType {
-  const casted: Record<string, any> = { ...row };
-
-  for (const [key, type] of Object.entries(Message.casts)) {
-    if (casted[key] === undefined || casted[key] === null) {
-      continue;
-    }
-
-    if (type === "boolean") {
-      casted[key] = Boolean(casted[key]);
-    } else if (type === "number") {
-      casted[key] = Number(casted[key]);
-    } else if (type === "string") {
-      casted[key] = String(casted[key]);
-    } else if (type === "json") {
-      try {
-        casted[key] =
-          typeof casted[key] === "string"
-            ? JSON.parse(casted[key])
-            : casted[key];
-      } catch {
-        casted[key] = null;
-      }
-    }
-  }
-
-  return casted as MessageType;
-}
-
-function toSQLDatetime(date: Date): string {
-  return date.toISOString().slice(0, 19).replace("T", " ");
+  return castRow<MessageType>(row, Message.casts);
 }
 
 export class MessageRepository {
@@ -43,6 +15,14 @@ export class MessageRepository {
     channel: string;
     event: string;
     payload: unknown;
+    source?: string;
+    event_type?: string | null;
+    socket_id?: string | null;
+    user_id?: string | null;
+    metadata?: Record<string, unknown> | null;
+    raw_payload?: string | null;
+    idempotency_key?: string | null;
+    received_at?: Date | null;
   }): Promise<MessageType> {
     const id = randomUUID();
 
@@ -54,6 +34,16 @@ export class MessageRepository {
         channel: data.channel,
         event: data.event,
         payload: JSON.stringify(data.payload),
+        source: data.source ?? "backend_api",
+        event_type: data.event_type ?? null,
+        socket_id: data.socket_id ?? null,
+        user_id: data.user_id ?? null,
+        metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+        raw_payload: data.raw_payload ?? null,
+        idempotency_key: data.idempotency_key ?? null,
+        received_at: data.received_at
+          ? toSQLDatetime(data.received_at)
+          : toSQLDatetime(new Date()),
         created_at: toSQLDatetime(new Date()),
       });
 
@@ -66,12 +56,31 @@ export class MessageRepository {
     return castMessage(message);
   }
 
+  async findByIdempotencyKey(
+    idempotencyKey: string,
+  ): Promise<MessageType | undefined> {
+    const message = await useDB()
+      .from(Message.table)
+      .where({ idempotency_key: idempotencyKey })
+      .first();
+
+    return message ? castMessage(message) : undefined;
+  }
+
   async getAll(
     page: number = 1,
     limit: number = 10,
+    userId?: string,
   ): Promise<PaginatedResponse<MessageType>> {
     const offset = (page - 1) * limit;
     const query = useDB().from(Message.table);
+
+    if (userId) {
+      query.whereIn(
+        "app_id",
+        useDB().from(Application.table).select("id").where({ user_id: userId }),
+      );
+    }
 
     const [countResult] = await query
       .clone()

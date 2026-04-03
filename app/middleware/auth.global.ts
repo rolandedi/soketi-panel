@@ -15,11 +15,21 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // If no session, redirect to login
   if (!session) {
-    return navigateTo("/login");
+    return navigateTo({
+      path: "/login",
+      query: {
+        reason: "session-expired",
+      },
+    });
   }
 
   // If user is banned, redirect to login with error
   if (session.user.banned) {
-    return navigateTo("/login?error=Your+account+has+been+banned");
+    return navigateTo({
+      path: "/login",
+      query: {
+        reason: "banned",
+      },
+    });
   }
 });

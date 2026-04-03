@@ -63,9 +63,9 @@
           <template v-else>
             <div class="text-2xl font-bold">{{ stats?.apps.total ?? 0 }}</div>
             <p class="text-xs text-muted-foreground whitespace-nowrap">
-              <span class="text-emerald-500 font-medium"
-                >{{ stats?.apps.enabled ?? 0 }} enabled</span
-              >
+              <span class="text-emerald-500 font-medium">
+                {{ stats?.apps.enabled ?? 0 }} enabled
+              </span>
               &middot; {{ stats?.apps.disabled ?? 0 }} disabled
             </p>
           </template>

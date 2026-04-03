@@ -1,14 +1,17 @@
 import type {
   Application as ApplicationType,
   PaginatedResponse,
+  SoketiWebhookConfig,
 } from "#shared/types";
 import { Application } from "../models/application";
 import { useDB } from "../lib/orm/db";
+import { toSQLDatetime, castRow } from "../lib/orm/utils";
 import {
   generateAppId,
   generateAppKey,
   generateAppSecret,
 } from "../services/crypto";
+import { SettingsRepository, DEFAULT_SETTINGS } from "./settings.repository";
 
 type ApplicationInput = {
   name?: string;
@@ -18,7 +21,7 @@ type ApplicationInput = {
   max_backend_events_per_sec?: number;
   max_client_events_per_sec?: number;
   max_read_req_per_sec?: number;
-  webhooks?: string | string[] | null;
+  webhooks?: string | string[] | SoketiWebhookConfig[] | null;
   max_presence_members_per_channel?: number;
   max_presence_member_size_in_kb?: number;
   max_channel_name_length?: number;
@@ -50,10 +53,6 @@ const defaultApplicationValues = {
   "id" | "name" | "key" | "secret" | "created_at" | "updated_at" | "user_id"
 >;
 
-function toSQLDatetime(date: Date): string {
-  return date.toISOString().slice(0, 19).replace("T", " ");
-}
-
 function serializeWebhooks(webhooks: ApplicationInput["webhooks"]) {
   if (webhooks === undefined) {
     return undefined;
@@ -67,32 +66,7 @@ function serializeWebhooks(webhooks: ApplicationInput["webhooks"]) {
 }
 
 function castApplication(row: Record<string, any>): ApplicationType {
-  const casted: Record<string, any> = { ...row };
-
-  for (const [key, type] of Object.entries(Application.casts)) {
-    if (casted[key] === undefined || casted[key] === null) {
-      continue;
-    }
-
-    if (type === "boolean") {
-      casted[key] = Boolean(casted[key]);
-    } else if (type === "number") {
-      casted[key] = Number(casted[key]);
-    } else if (type === "string") {
-      casted[key] = String(casted[key]);
-    } else if (type === "json") {
-      try {
-        casted[key] =
-          typeof casted[key] === "string"
-            ? JSON.parse(casted[key])
-            : casted[key];
-      } catch {
-        casted[key] = null;
-      }
-    }
-  }
-
-  return casted as ApplicationType;
+  return castRow<ApplicationType>(row, Application.casts);
 }
 
 export class ApplicationRepository {
@@ -160,6 +134,72 @@ export class ApplicationRepository {
 
   async create(data: ApplicationInput, userId: string) {
     const applicationId = generateAppId();
+
+    const settingsRepository = new SettingsRepository();
+    let settingsDefaults: Omit<
+      ApplicationType,
+      "id" | "name" | "key" | "secret" | "created_at" | "updated_at" | "user_id"
+    >;
+    try {
+      const settings = await settingsRepository.getAll();
+      settingsDefaults = {
+        max_connections: Number(
+          settings.default_app_max_connections ??
+            DEFAULT_SETTINGS.default_app_max_connections,
+        ),
+        enable_client_messages:
+          (settings.default_app_enable_client_messages ??
+            DEFAULT_SETTINGS.default_app_enable_client_messages) === "true",
+        enabled: true,
+        max_backend_events_per_sec: Number(
+          settings.default_app_max_backend_events_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_backend_events_per_sec,
+        ),
+        max_client_events_per_sec: Number(
+          settings.default_app_max_client_events_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_client_events_per_sec,
+        ),
+        max_read_req_per_sec: Number(
+          settings.default_app_max_read_req_per_sec ??
+            DEFAULT_SETTINGS.default_app_max_read_req_per_sec,
+        ),
+        webhooks: null,
+        max_presence_members_per_channel: Number(
+          settings.default_app_max_presence_members_per_channel ??
+            DEFAULT_SETTINGS.default_app_max_presence_members_per_channel,
+        ),
+        max_presence_member_size_in_kb: Number(
+          settings.default_app_max_presence_member_size_in_kb ??
+            DEFAULT_SETTINGS.default_app_max_presence_member_size_in_kb,
+        ),
+        max_channel_name_length: Number(
+          settings.default_app_max_channel_name_length ??
+            DEFAULT_SETTINGS.default_app_max_channel_name_length,
+        ),
+        max_event_channels_at_once: Number(
+          settings.default_app_max_event_channels_at_once ??
+            DEFAULT_SETTINGS.default_app_max_event_channels_at_once,
+        ),
+        max_event_name_length: Number(
+          settings.default_app_max_event_name_length ??
+            DEFAULT_SETTINGS.default_app_max_event_name_length,
+        ),
+        max_event_payload_in_kb: Number(
+          settings.default_app_max_event_payload_in_kb ??
+            DEFAULT_SETTINGS.default_app_max_event_payload_in_kb,
+        ),
+        max_event_batch_size: Number(
+          settings.default_app_max_event_batch_size ??
+            DEFAULT_SETTINGS.default_app_max_event_batch_size,
+        ),
+        enable_user_authentication:
+          (settings.default_app_enable_user_authentication ??
+            DEFAULT_SETTINGS.default_app_enable_user_authentication) === "true",
+      };
+    } catch {
+      settingsDefaults = { ...defaultApplicationValues };
+    }
+
     const application = {
       id: applicationId,
       key: generateAppKey(),
@@ -168,7 +208,7 @@ export class ApplicationRepository {
       user_id: userId,
       created_at: toSQLDatetime(new Date()),
       updated_at: null,
-      ...defaultApplicationValues,
+      ...settingsDefaults,
       ...data,
       webhooks: serializeWebhooks(data.webhooks),
     };
@@ -200,14 +240,15 @@ export class ApplicationRepository {
     return await this.getById(id, userId);
   }
 
-  async delete(ids: string | string[], userId: string) {
+  async delete(ids: string | string[], userId: string | null) {
     const applicationIds = Array.isArray(ids) ? ids : [ids];
+    const query = useDB().from(Application.table).whereIn("id", applicationIds);
 
-    return await useDB()
-      .from(Application.table)
-      .where({ user_id: userId })
-      .whereIn("id", applicationIds)
-      .delete();
+    if (userId !== null) {
+      query.where({ user_id: userId });
+    }
+
+    return await query.delete();
   }
 
   async regenerate(id: string, userId: string) {

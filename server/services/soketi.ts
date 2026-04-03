@@ -21,11 +21,13 @@ function parsePrometheusGauge(text: string, metricName: string): number | null {
 }
 
 export async function getSoketiMetrics(): Promise<SoketiMetrics> {
-  const host = process.env.SOKETI_METRICS_HOST || "127.0.0.1";
-  const port = process.env.SOKETI_METRICS_PORT || "9601";
+  const runtimeConfig = useRuntimeConfig();
+  const host = runtimeConfig.soketiMetricsHost || "127.0.0.1";
+  const port = runtimeConfig.soketiMetricsPort || "9601";
+  const scheme = runtimeConfig.soketiMetricsScheme || "http";
 
   try {
-    const response = await fetch(`http://${host}:${port}/metrics`, {
+    const response = await fetch(`${scheme}://${host}:${port}/metrics`, {
       signal: AbortSignal.timeout(3000),
     });
 

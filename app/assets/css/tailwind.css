@@ -38,8 +38,8 @@
   --sidebar-border: oklch(0.8717 0.0093 258.3382);
   --sidebar-ring: oklch(0.5413 0.2466 293.009);
   --font-sans: Inter, sans-serif;
-  --font-serif: PT Serif, ui-serif, serif;
-  --font-mono: Geist Mono, ui-monospace, monospace;
+  --font-serif: "PT Serif", ui-serif, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
   --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 4px;
@@ -98,8 +98,8 @@
   --sidebar-border: oklch(0.4461 0.0263 256.8018);
   --sidebar-ring: oklch(0.5413 0.2466 293.009);
   --font-sans: Inter, sans-serif;
-  --font-serif: PT Serif, ui-serif, serif;
-  --font-mono: Geist Mono, ui-monospace, monospace;
+  --font-serif: "PT Serif", ui-serif, serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
   --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 4px;

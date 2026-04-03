@@ -3,14 +3,17 @@ import type { Knex } from "knex";
 import { auth } from "../../server/lib/auth";
 
 export async function seed(knex: Knex): Promise<void> {
-  consola.info("Seeding admin user...");
+  consola.info("Creating admin user...");
+
+  const { SOKETI_PANEL_EMAIL, SOKETI_PANEL_PASSWORD } = process.env;
 
   try {
-    const res = await auth.api.signUpEmail({
+    const res = await auth.api.createUser({
       body: {
-        email: "admin@soketi-panel.app",
-        password: "P@ssw0rd123",
-        name: "John Doe",
+        email: SOKETI_PANEL_EMAIL || "admin@soketi-panel.app",
+        password: SOKETI_PANEL_PASSWORD || "P@ssw0rd123",
+        name: "Soketi Admin",
+        role: "admin",
       },
     });
 
@@ -22,7 +25,7 @@ export async function seed(knex: Knex): Promise<void> {
     ) {
       consola.info("Admin user already exists. Skipping.");
     } else {
-      consola.error("Failed to seed user:", error);
+      consola.error("Failed to create admin user:", error);
     }
   }
 }

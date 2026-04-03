@@ -28,6 +28,7 @@
     "@codemirror/view": "^6.40.0",
     "@internationalized/date": "^3.12.0",
     "@nuxt/eslint": "1.15.2",
+    "@nuxtjs/google-fonts": "3.2.0",
     "@tanstack/vue-table": "^8.21.3",
     "@unovis/vue": "^1.6.4",
     "@vee-validate/zod": "^4.15.1",
@@ -61,6 +62,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@nuxt/test-utils": "^4.0.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@tailwindcss/typography": "^0.5.19",

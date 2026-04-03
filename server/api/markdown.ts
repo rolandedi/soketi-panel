@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Path is required" });
   }
 
-  const filePath = path.join(
-    process.cwd(),
-    "server",
-    "markdowns",
-    `${docPath}.md`,
-  );
+  const markdownsDir = path.resolve(process.cwd(), "server", "markdowns");
+  const filePath = path.resolve(markdownsDir, `${docPath}.md`);
+
+  if (!filePath.startsWith(markdownsDir + path.sep)) {
+    throw createError({ statusCode: 400, statusMessage: "Invalid path" });
+  }
 
   try {
     const md = await fs.readFile(filePath, "utf-8");

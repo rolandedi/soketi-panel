@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+const soketiWebhookConfig = z.object({
+  url: z.string().url("Webhook URL must be a valid URL"),
+  event_types: z.array(z.string()).optional(),
+  filter: z
+    .object({
+      channel_name_starts_with: z.string().optional(),
+      channel_name_ends_with: z.string().optional(),
+    })
+    .optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+});
+
 const applicationConfigScheme = {
   name: z
     .string()
@@ -13,7 +25,11 @@ const applicationConfigScheme = {
   max_client_events_per_sec: z.coerce.number().int().optional(),
   max_read_req_per_sec: z.coerce.number().int().optional(),
   webhooks: z
-    .union([z.string().min(1), z.array(z.string().min(1))])
+    .union([
+      soketiWebhookConfig.array(),
+      z.string().min(1),
+      z.array(z.string().min(1)),
+    ])
     .nullable()
     .optional(),
   max_presence_members_per_channel: z.coerce.number().int().optional(),

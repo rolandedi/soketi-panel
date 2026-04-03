@@ -1,7 +1,7 @@
 <template>
   <DropdownMenu v-if="items.length > 0">
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" class="hidden lg:flex">
+      <Button variant="outline" class="hidden lg:flex" :disabled="tableIsEmpty">
         <LucideColumns3 class="size-4" />
         {{ triggerLabel }}
       </Button>
@@ -53,4 +53,9 @@ const table = inject<Table<TData>>("table");
 const items = computed(
   () => table?.getAllColumns().filter((i) => i.getCanHide()) ?? [],
 );
+
+const tableIsEmpty = computed(() => {
+  const rowModel = table?.getRowModel();
+  return !rowModel || rowModel.rows.length === 0;
+});
 </script>

@@ -25,10 +25,15 @@ test-results/
 # Local env files
 .env
 .env.*
+!.env.docker
 !.env.example
 
 # AI
 .agent
 .claude
 .cursor
+.kilo
 .kilocode
+CLAUDE.md
+QWEN.md
+GEMINI.md

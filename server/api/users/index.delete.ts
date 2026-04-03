@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const { data, error } = await validateWith(event, "body", bodySchema);
 
   if (error) {
-    throw createValidationError(error as any);
+    throw createValidationError(error);
   }
 
   const userRepository = new UserRepository();

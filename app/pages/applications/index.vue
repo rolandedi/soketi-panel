@@ -1,33 +1,28 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-8">
     <PageHero
       title="Applications"
       description="Manage your Soketi applications."
     >
       <CreateApplicationModal @success="handleUpdated">
-        <Button><PlusIcon /> New application</Button>
+        <Button :disabled="loading"><PlusIcon /> New application</Button>
       </CreateApplicationModal>
     </PageHero>
 
     <div class="grid gap-4 md:grid-cols-3">
-      <Card
-        v-for="card in kpiCards"
-        :key="card.label"
-        class="border-border/70 shadow-none"
-      >
-        <CardHeader class="gap-1.5 pb-3">
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            {{ card.label }}
-          </CardTitle>
-          <div class="text-3xl font-semibold tracking-tight text-foreground">
-            {{ card.value }}
-          </div>
+      <Card v-for="card in kpiCards" :key="card.label">
+        <CardHeader
+          class="flex flex-row items-center justify-between space-y-0"
+        >
+          <CardTitle class="text-sm font-medium">{{ card.label }}</CardTitle>
+          <component :is="card.icon" class="size-4 text-muted-foreground" />
         </CardHeader>
-
-        <CardContent>
-          <p class="text-sm leading-5 text-muted-foreground">
-            {{ card.description }}
-          </p>
+        <CardContent class="flex flex-col items-start gap-4">
+          <div class="min-w-0">
+            <p class="truncate text-xl md:text-2xl font-semibold capitalize">
+              {{ card.value }}
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -65,17 +60,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
 import type { Table } from "@tanstack/vue-table";
-import { PlusIcon } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
 import { toast } from "vue-sonner";
+import {
+  MonitorCheckIcon,
+  MonitorIcon,
+  MonitorXIcon,
+  PlusIcon,
+} from "lucide-vue-next";
 
 import type { Application, PaginatedResponse } from "#shared/types";
+import { getApplicationsColumns } from "@/table-columns/applicationsColumns";
 import { DataTable } from "@/components/data-table";
 import { useCsrfFetch } from "@/composables/useCsrfFetch";
 import { Button } from "@/components/ui/button";
 import PageHero from "@/components/PageHero.vue";
-import { getApplicationsColumns } from "@/table-columns/applicationsColumns";
 import ApplicationsDataTableFilters from "@/components/filters/ApplicationsDataTableFilters.vue";
 import CreateApplicationModal from "@/components/modals/applications/CreateApplicationModal.vue";
 import EditApplicationModal from "@/components/modals/applications/EditApplicationModal.vue";
@@ -128,16 +128,19 @@ const disabledCount = computed(() => pagination.value.disabledTotal);
 
 const kpiCards = computed(() => [
   {
+    icon: MonitorIcon,
     label: "Total applications",
     value: pagination.value.total,
     description: "All applications available in the current workspace.",
   },
   {
+    icon: MonitorCheckIcon,
     label: "Enabled",
     value: enabledCount.value,
     description: "Applications currently allowed to receive traffic.",
   },
   {
+    icon: MonitorXIcon,
     label: "Disabled",
     value: disabledCount.value,
     description: "Applications currently paused or blocked from traffic.",

@@ -1,4 +1,4 @@
-import { mkdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -43,12 +43,12 @@ export default defineEventHandler(async (event) => {
   if (avatarPart.data.byteLength > MAX_AVATAR_SIZE) {
     throw createError({
       statusCode: 413,
-      statusMessage: "Avatar must be smaller than 2 MB",
+      statusMessage: "Avatar must be smaller than 10 MB",
     });
   }
 
   const avatarDirectory = join(process.cwd(), "public", "uploads", "avatars");
-  mkdirSync(avatarDirectory, { recursive: true });
+  await mkdir(avatarDirectory, { recursive: true });
 
   const extension = ALLOWED_MIME_TYPES[avatarPart.type];
   const fileName = `${user.id}-${Date.now()}-${randomUUID()}.${extension}`;
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     ? join(process.cwd(), "public", previousImage.replace(/^\//, ""))
     : null;
 
-  writeFileSync(filePath, Buffer.from(avatarPart.data));
+  await writeFile(filePath, Buffer.from(avatarPart.data));
 
   try {
     await auth.api.updateUser({
@@ -69,13 +69,13 @@ export default defineEventHandler(async (event) => {
       },
     });
   } catch (error: any) {
-    unlinkSync(filePath);
+    await unlink(filePath);
     throw error;
   }
 
   if (previousImagePath && previousImagePath !== filePath) {
     try {
-      unlinkSync(previousImagePath);
+      await unlink(previousImagePath);
     } catch {
       // Ignore stale files.
     }

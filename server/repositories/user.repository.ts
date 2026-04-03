@@ -3,8 +3,33 @@ import { User } from "../models/user";
 import type { User as UserType } from "#shared/types";
 
 export class UserRepository {
-  async getAll(page: number = 1, limit: number = 10) {
-    return await User.paginate(page, limit);
+  async getAll(page: number = 1, limit: number = 10, excludeId?: string) {
+    if (!excludeId) {
+      return await User.paginate(page, limit);
+    }
+
+    const offset = (page - 1) * limit;
+    const orderBy = { column: User.CREATED_AT, direction: "desc" as const };
+
+    const [countResult] = await (User as any)
+      .buildQuery()
+      .whereNot({ id: excludeId })
+      .count("* as count");
+    const total = Number(countResult.count || 0);
+    const lastPage = Math.ceil(total / limit);
+
+    const rows = await (User as any)
+      .buildQuery()
+      .select("*")
+      .whereNot({ id: excludeId })
+      .orderBy(orderBy.column, orderBy.direction)
+      .limit(limit)
+      .offset(offset);
+
+    return {
+      data: rows.map((row: any) => (User as any).cast(row)),
+      meta: { total, perPage: limit, currentPage: page, lastPage },
+    };
   }
 
   async getById(id: string): Promise<UserType | undefined> {
