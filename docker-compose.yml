@@ -13,7 +13,7 @@ services:
     ports:
       - "4601:4601"
     env_file:
-      - .env
+      - .env.docker
     environment:
       APP_ENV: production
       APP_URL: http://localhost:4601
@@ -58,7 +58,7 @@ services:
     container_name: soketi-mariadb
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.docker
     environment:
       MARIADB_DATABASE: soketi
       MARIADB_USER: soketi
@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD:-redis_password}
     env_file:
-      - .env
+      - .env.docker
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
     volumes:
@@ -115,7 +115,7 @@ services:
     ports:
       - "6001:6001"
     env_file:
-      - .env
+      - .env.docker
     environment:
       SOKETI_DEBUG: 0
       SOKETI_METRICS_ENABLED: 1
