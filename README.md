@@ -7,6 +7,8 @@
 
 **Soketi Panel** is a modern and intuitive administration interface for the [Soketi](https://soketi.app/) WebSocket server. Manage your applications, monitor connections, and test events in real-time with elegance.
 
+![Soketi Panel](https://github.com/user-attachments/assets/74e1fba6-8235-4d68-a964-8af17a6fdd02)
+
 ---
 
 ## ✨ Features
