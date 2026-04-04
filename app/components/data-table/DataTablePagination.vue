@@ -3,7 +3,7 @@
     <div class="flex items-center space-x-2">
       <p class="text-sm font-medium">Rows per page</p>
       <Select v-model="pageSize">
-        <SelectTrigger class="h-8 w-17.5">
+        <SelectTrigger class="h-8 w-17.5" :disabled="pagination?.total === 0">
           <SelectValue :placeholder="`${pagination.perPage}`" />
         </SelectTrigger>
         <SelectContent side="top">
