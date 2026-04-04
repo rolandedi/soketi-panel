@@ -150,9 +150,9 @@
                 class="rounded-2xl border border-dashed border-border/70 bg-background/80 p-4 text-sm text-muted-foreground"
               >
                 Selected file:
-                <span class="font-medium text-foreground">{{
-                  selectedAvatarFile.name
-                }}</span>
+                <span class="font-medium text-foreground">
+                  {{ selectedAvatarFile.name }}
+                </span>
               </div>
             </div>
           </section>
@@ -449,7 +449,7 @@
                   class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                   <div class="inline-block max-w-40 md:max-w-50 truncate">
-                    {{ entry.ipAddress ?? "Unknown" }}
+                    {{ normalizeIpAddress(entry.ipAddress) }}
                   </div>
                   <span
                     v-if="entry.token === currentSessionToken"
@@ -989,6 +989,19 @@ function isValidAvatarFile(file: File) {
   const maxSizeInBytes = 2 * 1024 * 1024;
 
   return allowedTypes.has(file.type) && file.size <= maxSizeInBytes;
+}
+
+function normalizeIpAddress(ip?: string | null): string {
+  if (!ip) return "Unknown";
+
+  // IPv6 loopback → IPv4 loopback
+  if (ip === "::1") return "127.0.0.1";
+
+  // IPv6-mapped IPv4: ::ffff:x.x.x.x
+  const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (mapped) return mapped[1]!;
+
+  return ip;
 }
 
 watch(

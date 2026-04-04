@@ -4,7 +4,7 @@ services:
   # ──────────────────────────────────────────────
   # Nuxt Application
   # ──────────────────────────────────────────────
-  app:
+  soketi-panel:
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,24 +15,24 @@ services:
     env_file:
       - .env.docker
     environment:
-      APP_ENV: production
-      APP_URL: http://localhost:4601
-      BETTER_AUTH_URL: http://localhost:4601
-      BETTER_AUTH_INTERNAL_URL: http://localhost:4601
+      APP_ENV: ${APP_ENV:-production}
+      APP_URL: ${APP_URL:-http://localhost:4601}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:4601}
+      BETTER_AUTH_INTERNAL_URL: ${BETTER_AUTH_INTERNAL_URL:-http://localhost:4601}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-supersecretkey}
       DB_DRIVER: mysql
-      DB_HOST: mariadb
+      DB_HOST: soketi-mariadb
       DB_PORT: 3306
       DB_NAME: soketi
       DB_USER: soketi
       DB_PASSWORD: ${DB_PASSWORD:-soketi_password}
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://soketi-redis:6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
-      PUSHER_HOST: soketi
+      PUSHER_HOST: soketi-server
       PUSHER_PORT: 6001
-      SOKETI_HOST: soketi
+      SOKETI_HOST: soketi-server
       SOKETI_PORT: 6001
-      SOKETI_METRICS_HOST: soketi
+      SOKETI_METRICS_HOST: soketi-server
       SOKETI_METRICS_PORT: 9601
       SOKETI_METRICS_SCHEME: ${SOKETI_METRICS_SCHEME:-http}
       SOKETI_PANEL_EMAIL: ${SOKETI_PANEL_EMAIL:-"admin@soketi-panel.app"}
@@ -43,9 +43,9 @@ services:
       timeout: 10s
       retries: 3
     depends_on:
-      mariadb:
+      soketi-mariadb:
         condition: service_healthy
-      redis:
+      soketi-redis:
         condition: service_healthy
     networks:
       - soketi-network
@@ -53,7 +53,7 @@ services:
   # ──────────────────────────────────────────────
   # MariaDB Database
   # ──────────────────────────────────────────────
-  mariadb:
+  soketi-mariadb:
     image: mariadb:11.8
     container_name: soketi-mariadb
     restart: unless-stopped
@@ -78,7 +78,7 @@ services:
   # ──────────────────────────────────────────────
   # Redis
   # ──────────────────────────────────────────────
-  redis:
+  soketi-redis:
     image: redis:8-alpine
     container_name: soketi-redis
     restart: unless-stopped
@@ -108,7 +108,7 @@ services:
   # ──────────────────────────────────────────────
   # Soketi (WebSocket Server)
   # ──────────────────────────────────────────────
-  soketi:
+  soketi-server:
     image: quay.io/soketi/soketi:latest
     container_name: soketi-server
     restart: unless-stopped
@@ -122,12 +122,12 @@ services:
       SOKETI_METRICS_SERVER_PORT: ${SOKETI_METRICS_PORT:-9601}
       SOKETI_APP_MANAGER_DRIVER: "mysql"
       SOKETI_APP_MANAGER_MYSQL_TABLE: sktp_applications # Don't change
-      SOKETI_DB_MYSQL_HOST: mariadb
+      SOKETI_DB_MYSQL_HOST: soketi-mariadb
       SOKETI_DB_MYSQL_PORT: 3306
       SOKETI_DB_MYSQL_DATABASE: soketi
       SOKETI_DB_MYSQL_USERNAME: soketi
       SOKETI_DB_MYSQL_PASSWORD: ${DB_PASSWORD:-soketi_password}
-      SOKETI_DB_REDIS_HOST: redis
+      SOKETI_DB_REDIS_HOST: soketi-redis
       SOKETI_DB_REDIS_PORT: 6379
       SOKETI_DB_REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
       SOKETI_DB_REDIS_DB: 4
@@ -137,9 +137,9 @@ services:
     networks:
       - soketi-network
     depends_on:
-      mariadb:
+      soketi-mariadb:
         condition: service_healthy
-      redis:
+      soketi-redis:
         condition: service_healthy
 
 # ──────────────────────────────────────────────
