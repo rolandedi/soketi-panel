@@ -28,7 +28,7 @@
           <DropdownMenuItem
             v-if="item.visible"
             :data-active="item.active"
-            class="hover:bg-primary/10 focus:bg-primary/10 hover:text-primary data-active:focus:bg-primary/10 data-active:hover:bg-primary/10"
+            class="focus:bg-primary/10 data-active:focus:bg-primary/10 data-active:hover:bg-primary/10"
             as-child
           >
             <NuxtLink :to="item.href" class="flex items-center w-full">
